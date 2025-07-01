@@ -1,0 +1,213 @@
+@import '../../../../styles.scss';
+
+.dashboard-content {
+    flex: 1;
+    width: 100%;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0.5rem;
+
+        .left h1 {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+        }
+
+        .right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            span {
+                font-size: 0.9rem;
+                color: var(--primary-blue);
+            }
+
+            .user-section {
+                position: relative;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-weight: bold;
+
+                .user-dropdown {
+                    position: absolute;
+                    top: 120%;
+                    right: 0;
+                    background-color: var(--white);
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    min-width: 180px;
+                    z-index: 200;
+
+                    ul {
+                        margin: 0;
+                        padding: 0;
+                        list-style: none;
+
+                        li {
+                            padding: 0.8rem 1rem;
+                            cursor: pointer;
+                            color: var(--primary-blue);
+
+                            &:hover {
+                                background-color: rgba(33, 51, 100, 0.1);
+                            }
+                        }
+
+                        li:not(:last-child) {
+                            border-bottom: 1px solid #eee;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .content-divider {
+        margin-bottom: 1.5rem;
+        border: none;
+        border-top: 1px solid #ddd;
+    }
+
+    /* ===== Filtros en forma de tarjeta ===== */
+    .filters-card {
+        display: flex;
+        align-items: flex-end;
+        gap: 1rem;
+        background-color: #f9f9f9;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+
+            label {
+                font-size: 0.85rem;
+                margin-bottom: 0.3rem;
+                color: #555;
+            }
+
+            select,
+            input[type='number'] {
+                padding: 0.5rem;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 0.9rem;
+            }
+        }
+
+        .btn.primary {
+            height: 2.4rem;
+            padding: 0 1rem;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+
+            &:hover {
+                filter: brightness(0.95);
+            }
+        }
+    }
+
+    /* ===== Título Lista + Buscar + Agregar ===== */
+    .docentes-section {
+        .docentes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+
+            h2 {
+                font-size: 1.4rem;
+                color: var(--primary-blue);
+            }
+
+            .actions {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+
+                input[type='text'] {
+                    padding: 0.5rem 0.8rem;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    font-size: 0.9rem;
+                }
+
+                .btn.primary {
+                    padding: 0.5rem 1rem;
+                    background-color:var(--primary-blue);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: bold;
+
+                    &:hover {
+                        filter: brightness(0.95);
+                    }
+                }
+            }
+        }
+
+        /* ===== Tabla ===== */
+        .docentes-table {
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow-x: auto;
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+
+                th,
+                td {
+                    text-align: left;
+                    padding: 0.8rem 1rem;
+                    font-size: 0.9rem;
+                }
+
+                thead {
+                    background-color: #f1f5f9;
+
+                    th {
+                        font-weight: bold;
+                        color: #374151;
+                        font-size: 0.85rem;
+                    }
+                }
+
+                tbody tr {
+                    border-top: 1px solid #eee;
+
+                    &:hover {
+                        background-color: #f9fafb;
+                    }
+
+                    td {
+                        color: #555;
+                    }
+                }
+            }
+        }
+    }
+}   

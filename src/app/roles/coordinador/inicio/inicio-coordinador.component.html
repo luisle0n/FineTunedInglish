@@ -1,0 +1,79 @@
+<main class="dashboard-content">
+    <!-- Header Superior -->
+    <header class="dashboard-header">
+        <div class="left">
+            <h1>Inicio</h1>
+        </div>
+        <div class="right">
+            <span>Rol: Coordinador</span>
+
+            <!-- USER DROPDOWN -->
+            <div class="user-section" (click)="toggleUserMenu()">
+                <span>🔔</span>
+                <span>👤 Usuario ▼</span>
+
+                <div class="user-dropdown" *ngIf="userMenuOpen">
+                    <ul>
+                        <li (click)="verPerfil()">👤 Mi Perfil</li>
+                        <li (click)="cerrarSesion()">🚪 Cerrar Sesión</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Línea separadora -->
+    <hr class="content-divider" />
+
+    <!-- Bloque de métricas -->
+    <section class="dashboard-metrics">
+        <div class="metric-card">
+            <h3>Total Docentes</h3>
+            <p class="metric-value">24</p>
+        </div>
+        <div class="metric-card">
+            <h3>Aulas Asignadas</h3>
+            <p class="metric-value">18</p>
+        </div>
+        <div class="metric-card">
+            <h3>Horas Programadas</h3>
+            <p class="metric-value">320</p>
+        </div>
+        <div class="metric-card">
+            <h3>Horas Disponibles</h3>
+            <p class="metric-value">80</p>
+        </div>
+    </section>
+
+    <!-- Bloques de Gráficas -->
+    <section class="dashboard-charts">
+        <div class="chart-card">
+            <h3>Distribución por Tipo de Contrato</h3>
+            <p>Gráfico Estadístico</p>
+        </div>
+        <div class="chart-card">
+            <h3>Distribución por Rango de Edad</h3>
+            <p>Gráfico Estadístico</p>
+        </div>
+    </section>
+
+    <!-- Última fila: Actividad y Acciones -->
+    <section class="dashboard-bottom">
+        <div class="recent-activity">
+            <h3>Actividad Reciente</h3>
+            <ul>
+                <li>✔️ Carga de datos de docentes - Hace 2 horas</li>
+                <li>✔️ Generación de horarios completada - Hace 1 día</li>
+                <li>✔️ Actualización de criterios - Hace 2 días</li>
+            </ul>
+        </div>
+
+        <div class="quick-actions">
+            <h3>Acciones Rápidas</h3>
+            <button class="btn primary">+ Nuevo Docente</button>
+            <button class="btn outline">⬆ Cargar Datos</button>
+            <button class="btn outline">📅 Generar Horario</button>
+        </div>
+    </section>
+</main>

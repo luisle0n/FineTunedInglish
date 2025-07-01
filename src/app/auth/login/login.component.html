@@ -1,0 +1,66 @@
+<div class="login-wrapper">
+
+    <!-- Lado Izquierdo -->
+    <div class="login-left">
+        <img src="/img/logo2.jpg" alt="Fine Tuned Logo" class="institution-logo" />
+
+        <h1>Fine-Tuned English</h1>
+        <h2>Language Institute</h2>
+        <p>
+            Master English with precision and confidence. Join thousands of students who have transformed their language
+            skills with our expert-guided approach.
+        </p>
+
+        <!-- Recursos (Redes Sociales + Web) -->
+        <div class="resources">
+            <p class="recursos-title">Resources:</p>
+            <div class="social-icons">
+                <a href="https://www.facebook.com/finetunedenglish" target="_blank">
+                    <img src="/img/facebook.png" alt="Facebook" />
+                </a>
+                <a href="https://www.instagram.com/finetunedenglish/" target="_blank">
+                    <img src="/img/instagram.png" alt="Instagram" />
+                </a>
+                <a href="https://www.tiktok.com/@finetunedenglish" target="_blank">
+                    <img src="/img/tik-tok.png" alt="TikTok" />
+                </a>
+                <span class="social-text">&#64;finetunedenglish</span>
+                <a href="https://www.fte.edu.ec" target="_blank" class="web-link">www.fte.edu.ec</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Lado Derecho (Formulario) -->
+    <div class="login-right">
+        <h2>Welcome Back</h2>
+        <p>Sign in to continue your English journey</p>
+
+        <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+            <div class="form-group">
+                <label for="cedula">Email Address</label>
+                <input type="text" id="cedula" name="cedula" [(ngModel)]="cedula" placeholder="Enter your email"
+                    required />
+            </div>
+
+            <div class="form-group">
+                <label for="contrasena">Password</label>
+                <input type="password" id="contrasena" name="contrasena" [(ngModel)]="contrasena"
+                    placeholder="Enter your password" required />
+            </div>
+
+            <div class="form-actions">
+                <label>
+                    <input type="checkbox" /> Remember me
+                </label>
+            </div>
+
+            <button type="submit" class="login-button">Sign In</button>
+            <p class="register-link">
+                <img src="/img/ven.png" alt="Ven Al Fine" />
+            </p>
+
+            <div class="footer-note">© 2025 Fine-Tuned English. All rights reserved.</div>
+        </form>
+    </div>
+</div>
