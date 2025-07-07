@@ -6,27 +6,29 @@
         </div>
         <div class="right">
             <span>Rol: Coordinador</span>
-            <div class="user-section" (click)="toggleUserMenu()" tabindex="0" (blur)="cerrarMenu()">
-                <span>🔔</span>
-                <span>👤 Usuario ▼</span>
+            <div class="user-section" (click)="toggleUserMenu()" (blur)="cerrarMenu()" tabindex="0">
+                <img src="img/campana.png" alt="Notificaciones" class="icon" />
+                <span>
+                    <img src="img/usuario.png" alt="Usuario" class="user-icon" />
+                    Usuario ▼
+                </span>
                 <div class="user-dropdown" *ngIf="userMenuOpen">
                     <ul>
-                        <li (click)="verPerfil()">👤 Mi Perfil</li>
-                        <li (click)="cerrarSesion()">🚪 Cerrar Sesión</li>
+                        <li (click)="verPerfil()">Mi Perfil</li>
+                        <li (click)="cerrarSesion()">Cerrar Sesión</li>
                     </ul>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Línea separadora -->
     <hr class="content-divider" />
 
     <!-- Filtros -->
     <section class="filters-card">
         <div class="filter-group">
-            <label>Tipo de Contrato</label>
-            <select>
+            <label for="tipoContrato">Tipo de Contrato</label>
+            <select id="tipoContrato" [(ngModel)]="filtroContrato">
                 <option>Todos</option>
                 <option>Tiempo Completo</option>
                 <option>Medio Tiempo</option>
@@ -35,8 +37,8 @@
         </div>
 
         <div class="filter-group">
-            <label>Nivel de Inglés</label>
-            <select>
+            <label for="nivelIngles">Nivel de Inglés</label>
+            <select id="nivelIngles" [(ngModel)]="filtroNivelIngles">
                 <option>Todos</option>
                 <option>B1</option>
                 <option>B2</option>
@@ -46,20 +48,29 @@
         </div>
 
         <div class="filter-group">
-            <label>Experiencia Mínima</label>
-            <input type="number" placeholder="0" />
+            <label for="experiencia">Experiencia Mínima</label>
+            <input id="experiencia" type="number" [(ngModel)]="filtroExperiencia" placeholder="0" />
         </div>
 
-        <button class="btn primary">Aplicar Filtros</button>
+        <div class="filter-group acciones-filtros">
+            <label style="visibility: hidden;">Acciones</label>
+            <div class="botones-filtro">
+                <button class="btn primary" (click)="resetearFiltros()">Limpiar</button>
+                <label class="btn secondary cargar-excel-label">
+                    Cargar Excel
+                    <input type="file" hidden (change)="cargarDesdeExcel($event)" accept=".xlsx, .xls" />
+                </label>
+            </div>
+        </div>
     </section>
 
-    <!-- Lista de Docentes con buscador y botón -->
+    <!-- Lista de Docentes -->
     <section class="docentes-section">
         <div class="docentes-header">
             <h2>Lista de Docentes</h2>
             <div class="actions">
-                <input type="text" placeholder="Buscar..." />
-                <button class="btn primary">+ Agregar</button>
+                <input type="text" [(ngModel)]="textoBusqueda" placeholder="Buscar por nombre..." />
+                <button class="btn primary" (click)="abrirModal()">+ Agregar</button>
             </div>
         </div>
 
@@ -77,27 +88,106 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>María López</td>
-                        <td>Tiempo Completo</td>
-                        <td>5</td>
-                        <td>C1</td>
-                        <td>40</td>
-                        <td>General</td>
-                        <td>✏️ 🗑️</td>
+                    <tr *ngFor="let docente of docentesFiltrados; let i = index">
+                        <ng-container *ngIf="editIndex !== i; else editRow">
+                            <td>{{ docente.nombre }}</td>
+                            <td>{{ docente.tipoContrato }}</td>
+                            <td>{{ docente.experiencia }}</td>
+                            <td>{{ docente.nivelIngles }}</td>
+                            <td>{{ docente.horasDisponibles }}</td>
+                            <td>{{ docente.especializacion }}</td>
+                            <td>
+                                <button (click)="editarFila(i)">
+                                    <img src="img/edicion.png" alt="Editar" width="20" />
+                                </button>
+                                <button (click)="eliminarFila(i)">
+                                    <img src="img/eliminar.png" alt="Eliminar" width="20" />
+                                </button>
+                            </td>
+                        </ng-container>
+
+                        <ng-template #editRow>
+                            <td><input [(ngModel)]="docente.nombre" /></td>
+                            <td>
+                                <select [(ngModel)]="docente.tipoContrato">
+                                    <option>Tiempo Completo</option>
+                                    <option>Medio Tiempo</option>
+                                    <option>Ocasional</option>
+                                </select>
+                            </td>
+                            <td><input type="number" [(ngModel)]="docente.experiencia" /></td>
+                            <td>
+                                <select [(ngModel)]="docente.nivelIngles">
+                                    <option>B1</option>
+                                    <option>B2</option>
+                                    <option>C1</option>
+                                    <option>C2</option>
+                                </select>
+                            </td>
+                            <td><input type="number" [(ngModel)]="docente.horasDisponibles" /></td>
+                            <td><input [(ngModel)]="docente.especializacion" /></td>
+                            <td>
+                                <button (click)="guardarFila(i)">
+                                    <img src="img/edicion.png" alt="Guardar" width="20" />
+                                </button>
+                                <button (click)="cancelarEdicion()">
+                                    <img src="img/eliminar.png" alt="Cancelar" width="20" />
+                                </button>
+                            </td>
+                        </ng-template>
                     </tr>
-                    <tr>
-                        <td>Juan Pérez</td>
-                        <td>Medio Tiempo</td>
-                        <td>3</td>
-                        <td>B2</td>
-                        <td>20</td>
-                        <td>Niños</td>
-                        <td>✏️ 🗑️</td>
-                    </tr>
-                    <!-- Más filas si deseas -->
                 </tbody>
             </table>
         </div>
     </section>
+
+    <!-- Modal de Agregar -->
+    <div class="modal-backdrop" *ngIf="mostrarModal">
+        <div class="modal">
+            <h3>Agregar Docente</h3>
+            <div class="docentes-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo de Contrato</th>
+                            <th>Experiencia (Años)</th>
+                            <th>Nivel de Inglés</th>
+                            <th>Horas Disponibles</th>
+                            <th>Especialización</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input [(ngModel)]="nuevoDocente.nombre" /></td>
+                            <td>
+                                <select [(ngModel)]="nuevoDocente.tipoContrato">
+                                    <option disabled selected>Seleccione</option>
+                                    <option>Tiempo Completo</option>
+                                    <option>Medio Tiempo</option>
+                                    <option>Ocasional</option>
+                                </select>
+                            </td>
+                            <td><input type="number" [(ngModel)]="nuevoDocente.experiencia" /></td>
+                            <td>
+                                <select [(ngModel)]="nuevoDocente.nivelIngles">
+                                    <option disabled selected>Seleccione</option>
+                                    <option>B1</option>
+                                    <option>B2</option>
+                                    <option>C1</option>
+                                    <option>C2</option>
+                                </select>
+                            </td>
+                            <td><input type="number" [(ngModel)]="nuevoDocente.horasDisponibles" /></td>
+                            <td><input [(ngModel)]="nuevoDocente.especializacion" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-actions">
+                <button class="btn secondary" (click)="cerrarModal()">Cancelar</button>
+                <button class="btn primary" (click)="agregarDocente()">Guardar</button>
+            </div>
+        </div>
+    </div>
 </main>

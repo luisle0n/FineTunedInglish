@@ -3,12 +3,13 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';  // ✅ Agrega esto para NgIf
 
 @Component({
+  standalone: true,
   selector: 'app-inicio-coordinador',
-  standalone: true,  // ✅ Si estás usando standalone
-  imports: [CommonModule],  // ✅ Aquí importas NgIf, etc
   templateUrl: './inicio-coordinador.component.html',
-  styleUrls: ['./inicio-coordinador.component.scss']
+  styleUrls: ['./inicio-coordinador.component.scss'],
+  imports: [CommonModule]
 })
+
 export class InicioCoordinadorComponent {
   userMenuOpen = false;
 
