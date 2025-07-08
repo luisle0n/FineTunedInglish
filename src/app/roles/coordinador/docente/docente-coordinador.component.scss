@@ -76,14 +76,12 @@
     }
   }
 
-  // === DIVISOR ===
   .content-divider {
     margin-bottom: 1.5rem;
     border: none;
     border-top: 1px solid #ddd;
   }
 
-  // === FILTROS ===
   .filters-card {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -154,14 +152,13 @@
           }
         }
 
-        input[type="file"] {
+        input[type='file'] {
           display: none;
         }
       }
     }
   }
 
-  // === TABLA DE DOCENTES ===
   .docentes-section {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -269,22 +266,6 @@
     }
   }
 
-  // === ÍCONOS ===
-  .user-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-
-  .icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-
-  // === MODAL ===
   .modal-backdrop {
     position: fixed;
     top: 0;
@@ -308,13 +289,14 @@
 
     h3 {
       margin-top: 0;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       color: var(--primary-blue);
       font-size: 1.5rem;
     }
 
     .docentes-table {
       overflow-x: auto;
+      margin-bottom: 1rem;
 
       table {
         width: 100%;
@@ -322,8 +304,8 @@
 
         th,
         td {
-          padding: 0.75rem;
-          border: 1px solid #ddd;
+          padding: 0.5rem;
+          border: 1px solid #ccc;
           text-align: left;
           vertical-align: middle;
         }
@@ -331,19 +313,21 @@
         th {
           background-color: #f3f4f6;
           color: var(--primary-blue);
-          font-weight: bold;
           text-align: center;
         }
 
-        td {
+        td input,
+        td select {
+          width: 100%;
+          padding: 0.4rem 0.5rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
 
-          input,
-          select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-          }
+        td.checkbox-group {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
         }
       }
     }
@@ -380,5 +364,38 @@
         }
       }
     }
+  }
+
+  .user-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+}
+.formulario-tabla {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    text-align: left;
+    padding: 0.5rem;
+    background-color: #f8f8f8;
+  }
+
+  td {
+    padding: 0.5rem;
+  }
+
+  input, select {
+    width: 100%;
+    box-sizing: border-box;
   }
 }

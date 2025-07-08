@@ -1,5 +1,5 @@
 <main class="dashboard-content">
-    <!-- Header Superior -->
+    <!-- HEADER -->
     <header class="dashboard-header">
         <div class="left">
             <h1>Docentes</h1>
@@ -24,15 +24,13 @@
 
     <hr class="content-divider" />
 
-    <!-- Filtros -->
+    <!-- FILTROS -->
     <section class="filters-card">
         <div class="filter-group">
             <label for="tipoContrato">Tipo de Contrato</label>
             <select id="tipoContrato" [(ngModel)]="filtroContrato">
                 <option>Todos</option>
-                <option>Tiempo Completo</option>
-                <option>Medio Tiempo</option>
-                <option>Ocasional</option>
+                <option *ngFor="let contrato of contratos">{{ contrato.nombre }}</option>
             </select>
         </div>
 
@@ -40,10 +38,7 @@
             <label for="nivelIngles">Nivel de Inglés</label>
             <select id="nivelIngles" [(ngModel)]="filtroNivelIngles">
                 <option>Todos</option>
-                <option>B1</option>
-                <option>B2</option>
-                <option>C1</option>
-                <option>C2</option>
+                <option *ngFor="let nivel of nivelesIngles">{{ nivel.nombre }}</option>
             </select>
         </div>
 
@@ -64,7 +59,7 @@
         </div>
     </section>
 
-    <!-- Lista de Docentes -->
+    <!-- LISTA DE DOCENTES -->
     <section class="docentes-section">
         <div class="docentes-header">
             <h2>Lista de Docentes</h2>
@@ -78,116 +73,147 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Nombre</th>
+                        <th>Nombre Completo</th>
+                        <th>Cédula</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
                         <th>Tipo de Contrato</th>
-                        <th>Experiencia (Años)</th>
+                        <th>Experiencia</th>
                         <th>Nivel de Inglés</th>
-                        <th>Horas Disponibles</th>
+                        <th>Horas</th>
                         <th>Especialización</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let docente of docentesFiltrados; let i = index">
-                        <ng-container *ngIf="editIndex !== i; else editRow">
-                            <td>{{ docente.nombre }}</td>
-                            <td>{{ docente.tipoContrato }}</td>
-                            <td>{{ docente.experiencia }}</td>
-                            <td>{{ docente.nivelIngles }}</td>
-                            <td>{{ docente.horasDisponibles }}</td>
-                            <td>{{ docente.especializacion }}</td>
-                            <td>
-                                <button (click)="editarFila(i)">
-                                    <img src="img/edicion.png" alt="Editar" width="20" />
-                                </button>
-                                <button (click)="eliminarFila(i)">
-                                    <img src="img/eliminar.png" alt="Eliminar" width="20" />
-                                </button>
-                            </td>
-                        </ng-container>
-
-                        <ng-template #editRow>
-                            <td><input [(ngModel)]="docente.nombre" /></td>
-                            <td>
-                                <select [(ngModel)]="docente.tipoContrato">
-                                    <option>Tiempo Completo</option>
-                                    <option>Medio Tiempo</option>
-                                    <option>Ocasional</option>
-                                </select>
-                            </td>
-                            <td><input type="number" [(ngModel)]="docente.experiencia" /></td>
-                            <td>
-                                <select [(ngModel)]="docente.nivelIngles">
-                                    <option>B1</option>
-                                    <option>B2</option>
-                                    <option>C1</option>
-                                    <option>C2</option>
-                                </select>
-                            </td>
-                            <td><input type="number" [(ngModel)]="docente.horasDisponibles" /></td>
-                            <td><input [(ngModel)]="docente.especializacion" /></td>
-                            <td>
-                                <button (click)="guardarFila(i)">
-                                    <img src="img/edicion.png" alt="Guardar" width="20" />
-                                </button>
-                                <button (click)="cancelarEdicion()">
-                                    <img src="img/eliminar.png" alt="Cancelar" width="20" />
-                                </button>
-                            </td>
-                        </ng-template>
+                        <td>{{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
+                            docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}</td>
+                        <td>{{ docente.persona?.cedula }}</td>
+                        <td>{{ docente.persona?.correo }}</td>
+                        <td>{{ docente.persona?.telefono }}</td>
+                        <td>{{ docente.tipo_contrato?.nombre }}</td>
+                        <td>{{ docente.experiencia_anios }}</td>
+                        <td>{{ docente.nivel_ingles?.nombre }}</td>
+                        <td>{{ docente.horas_disponibles }}</td>
+                        <td>
+                            <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre
+                                }}<br /></span>
+                        </td>
+                        <td>
+                            <button (click)="eliminarFila(i)">
+                                <img src="img/eliminar.png" alt="Eliminar" width="20" />
+                            </button>
+                             <button (click)="cancelarEdicion()">
+        <img src="img/eliminar.png" alt="Cancelar" width="20" />
+      </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </section>
 
-    <!-- Modal de Agregar -->
+    <!-- MODAL AGREGAR DOCENTE -->
     <div class="modal-backdrop" *ngIf="mostrarModal">
         <div class="modal">
             <h3>Agregar Docente</h3>
-            <div class="docentes-table">
-                <table>
+            <form (ngSubmit)="agregarDocente()" #formDocente="ngForm">
+                <table class="formulario-tabla" style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <th colspan="4" style="text-align: left; font-size: 1.2rem;">Datos del Docente</th>
+                    </tr>
+                    <tr>
+                        <th>Primer Nombre</th>
+                        <th>Segundo Nombre</th>
+                        <th>Primer Apellido</th>
+                        <th>Segundo Apellido</th>
+                    </tr>
+                    <tr>
+                        <td><input [(ngModel)]="nuevoDocente.primer_nombre" name="primer_nombre" required /></td>
+                        <td><input [(ngModel)]="nuevoDocente.segundo_nombre" name="segundo_nombre" /></td>
+                        <td><input [(ngModel)]="nuevoDocente.primer_apellido" name="primer_apellido" required /></td>
+                        <td><input [(ngModel)]="nuevoDocente.segundo_apellido" name="segundo_apellido" /></td>
+                    </tr>
+
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Correo Electrónico</th>
+                        <th>Teléfono</th>
+                        <th>Tipo de Contrato</th>
+                    </tr>
+                    <tr>
+                        <td><input [(ngModel)]="nuevoDocente.cedula" name="cedula" required /></td>
+                        <td><input [(ngModel)]="nuevoDocente.correo" name="correo" required /></td>
+                        <td><input [(ngModel)]="nuevoDocente.telefono" name="telefono" required /></td>
+                        <td>
+                            <select [(ngModel)]="nuevoDocente.tipo_contrato_id" name="tipo_contrato_id" required>
+                                <option disabled value="">Seleccione</option>
+                                <option *ngFor="let contrato of contratos" [value]="contrato.id">{{ contrato.nombre }}
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Experiencia (años)</th>
+                        <th>Nivel de Inglés</th>
+                        <th>Horas Disponibles</th>
+                        <th>Especializaciones</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" [(ngModel)]="nuevoDocente.experiencia_anios" name="experiencia_anios"
+                                required /></td>
+                        <td>
+                            <select [(ngModel)]="nuevoDocente.nivel_ingles_id" name="nivel_ingles_id" required>
+                                <option disabled value="">Seleccione</option>
+                                <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">{{ nivel.nombre }}
+                                </option>
+                            </select>
+                        </td>
+                        <td><input type="number" [(ngModel)]="nuevoDocente.horas_disponibles" name="horas_disponibles"
+                                required /></td>
+                        <td>
+                            <div style="display: flex; flex-direction: column;">
+                                <label *ngFor="let espec of especializaciones"
+                                    style="display: flex; align-items: center;">
+                                    <input type="checkbox" [value]="espec.id"
+                                        (change)="toggleEspecializacion(espec.id, $event)" />
+                                    {{ espec.nombre }}
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- HORARIOS -->
+                <h4 style="margin-top: 1rem;">Disponibilidad Horaria</h4>
+                <table class="horarios-tabla" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Tipo de Contrato</th>
-                            <th>Experiencia (Años)</th>
-                            <th>Nivel de Inglés</th>
-                            <th>Horas Disponibles</th>
-                            <th>Especialización</th>
+                            <th>Seleccionar</th>
+                            <th>Día</th>
+                            <th>Hora Inicio</th>
+                            <th>Hora Fin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><input [(ngModel)]="nuevoDocente.nombre" /></td>
-                            <td>
-                                <select [(ngModel)]="nuevoDocente.tipoContrato">
-                                    <option disabled selected>Seleccione</option>
-                                    <option>Tiempo Completo</option>
-                                    <option>Medio Tiempo</option>
-                                    <option>Ocasional</option>
-                                </select>
-                            </td>
-                            <td><input type="number" [(ngModel)]="nuevoDocente.experiencia" /></td>
-                            <td>
-                                <select [(ngModel)]="nuevoDocente.nivelIngles">
-                                    <option disabled selected>Seleccione</option>
-                                    <option>B1</option>
-                                    <option>B2</option>
-                                    <option>C1</option>
-                                    <option>C2</option>
-                                </select>
-                            </td>
-                            <td><input type="number" [(ngModel)]="nuevoDocente.horasDisponibles" /></td>
-                            <td><input [(ngModel)]="nuevoDocente.especializacion" /></td>
+                        <tr *ngFor="let horario of horariosDisponibles">
+                            <td><input type="checkbox" [value]="horario.id"
+                                    (change)="toggleHorario(horario.id, $event)" /></td>
+                            <td>{{ horario.dia }}</td>
+                            <td>{{ horario.hora_inicio }}</td>
+                            <td>{{ horario.hora_fin }}</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-            <div class="modal-actions">
-                <button class="btn secondary" (click)="cerrarModal()">Cancelar</button>
-                <button class="btn primary" (click)="agregarDocente()">Guardar</button>
-            </div>
+
+                <!-- BOTONES -->
+                <div class="modal-actions" style="margin-top: 1rem; text-align: right;">
+                    <button type="button" class="btn secondary" (click)="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn primary">Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 </main>
