@@ -323,4 +323,23 @@ export class DocenteCoordinadorComponent implements OnInit {
       }
     });
   }
+  filtrarDocentes(): void {
+  const texto = this.textoBusqueda.trim().toLowerCase();
+
+  this.docentesFiltrados = this.docentes.filter(docente => {
+    const coincideContrato = this.filtroContrato === 'Todos' || docente.tipo_contrato?.nombre === this.filtroContrato;
+    const coincideNivel = this.filtroNivelIngles === 'Todos' || docente.nivel_ingles?.nombre === this.filtroNivelIngles;
+    const coincideExperiencia = docente.experiencia_anios >= this.filtroExperiencia;
+
+    const nombres = [
+      docente.persona?.primer_nombre || '',
+      docente.persona?.segundo_nombre || '',
+      docente.persona?.primer_apellido || '',
+      docente.persona?.segundo_apellido || ''
+    ].join(' ').toLowerCase();
+
+    return coincideContrato && coincideNivel && coincideExperiencia && nombres.includes(texto);
+  });
+}
+
 }

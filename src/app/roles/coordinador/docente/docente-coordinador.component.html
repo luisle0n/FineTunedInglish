@@ -25,26 +25,32 @@
     <hr class="content-divider" />
 
     <!-- FILTROS -->
+    <!-- FILTROS -->
     <section class="filters-card">
         <div class="filter-group">
             <label for="tipoContrato">Tipo de Contrato</label>
-            <select id="tipoContrato" [(ngModel)]="filtroContrato">
-                <option>Todos</option>
-                <option *ngFor="let contrato of contratos">{{ contrato.nombre }}</option>
+            <select id="tipoContrato" [(ngModel)]="filtroContrato" (change)="filtrarDocentes()">
+                <option value="Todos">Todos</option>
+                <option *ngFor="let contrato of contratos" [value]="contrato.nombre">
+                    {{ contrato.nombre }}
+                </option>
             </select>
         </div>
 
         <div class="filter-group">
             <label for="nivelIngles">Nivel de Inglés</label>
-            <select id="nivelIngles" [(ngModel)]="filtroNivelIngles">
-                <option>Todos</option>
-                <option *ngFor="let nivel of nivelesIngles">{{ nivel.nombre }}</option>
+            <select id="nivelIngles" [(ngModel)]="filtroNivelIngles" (change)="filtrarDocentes()">
+                <option value="Todos">Todos</option>
+                <option *ngFor="let nivel of nivelesIngles" [value]="nivel.nombre">
+                    {{ nivel.nombre }}
+                </option>
             </select>
         </div>
 
         <div class="filter-group">
             <label for="experiencia">Experiencia Mínima</label>
-            <input id="experiencia" type="number" [(ngModel)]="filtroExperiencia" placeholder="0" />
+            <input id="experiencia" type="number" [(ngModel)]="filtroExperiencia" (input)="filtrarDocentes()"
+                placeholder="0" />
         </div>
 
         <div class="filter-group acciones-filtros">
@@ -64,7 +70,8 @@
         <div class="docentes-header">
             <h2>Lista de Docentes</h2>
             <div class="actions">
-                <input type="text" [(ngModel)]="textoBusqueda" placeholder="Buscar por nombre..." />
+                <input type="text" [(ngModel)]="textoBusqueda" (ngModelChange)="filtrarDocentes()"
+                    placeholder="Buscar por nombre..." />
                 <button class="btn primary" (click)="abrirModal()">+ Agregar</button>
             </div>
         </div>
@@ -74,7 +81,6 @@
                 <thead>
                     <tr>
                         <th>Nombre Completo</th>
-                        <th>Cédula</th>
                         <th>Correo</th>
                         <th>Teléfono</th>
                         <th>Tipo de Contrato</th>
@@ -88,9 +94,9 @@
                 <tbody>
                     <tr *ngFor="let docente of docentesFiltrados; let i = index">
                         <td>
-                            {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{ docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
+                            {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
+                            docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
                         </td>
-                        <td>{{ docente.persona?.cedula }}</td>
                         <td *ngIf="editIndex !== i">{{ docente.persona?.correo }}</td>
                         <td *ngIf="editIndex === i">
                             <input [(ngModel)]="docente.editValues.correo" />
@@ -102,7 +108,8 @@
                         <td *ngIf="editIndex !== i">{{ docente.tipo_contrato?.nombre }}</td>
                         <td *ngIf="editIndex === i">
                             <select [(ngModel)]="docente.editValues.tipo_contrato_id">
-                                <option *ngFor="let contrato of contratos" [value]="contrato.id">{{ contrato.nombre }}</option>
+                                <option *ngFor="let contrato of contratos" [value]="contrato.id">{{ contrato.nombre }}
+                                </option>
                             </select>
                         </td>
                         <td *ngIf="editIndex !== i">{{ docente.experiencia_anios }}</td>
@@ -112,7 +119,8 @@
                         <td *ngIf="editIndex !== i">{{ docente.nivel_ingles?.nombre }}</td>
                         <td *ngIf="editIndex === i">
                             <select [(ngModel)]="docente.editValues.nivel_ingles_id">
-                                <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">{{ nivel.nombre }}</option>
+                                <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">{{ nivel.nombre }}
+                                </option>
                             </select>
                         </td>
                         <td *ngIf="editIndex !== i">{{ docente.horas_disponibles }}</td>
@@ -120,13 +128,14 @@
                             <input type="number" [(ngModel)]="docente.editValues.horas_disponibles" />
                         </td>
                         <td *ngIf="editIndex !== i">
-                            <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre }}<br /></span>
+                            <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre
+                                }}<br /></span>
                         </td>
                         <td *ngIf="editIndex === i">
                             <div style="display: flex; flex-direction: column;">
-                                <label *ngFor="let espec of especializaciones" style="display: flex; align-items: center;">
-                                    <input type="checkbox"
-                                        [value]="espec.id"
+                                <label *ngFor="let espec of especializaciones"
+                                    style="display: flex; align-items: center;">
+                                    <input type="checkbox" [value]="espec.id"
                                         [checked]="docente.editValues.especializaciones?.includes(espec.id)"
                                         (change)="toggleEspecializacionEditar(docente, espec.id, $event)" />
                                     {{ espec.nombre }}
@@ -136,7 +145,7 @@
                         <td>
                             <ng-container *ngIf="editIndex !== i">
                                 <button (click)="editarFila(i)">
-                                    <img src="img/editar.png" alt="Editar" width="20" />
+                                    <img src="img/edicion.png" alt="Editar" width="20" />
                                 </button>
                                 <button (click)="eliminarFila(i)">
                                     <img src="img/eliminar.png" alt="Eliminar" width="20" />
