@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { limpiarLineasCSV, extraerEncabezados, procesarFilas, transformarAFilaDocente } from '../../../../utils/excel-utils';
+
 
 @Component({
   selector: 'app-docente-coordinador',
@@ -41,7 +43,7 @@ export class DocenteCoordinadorComponent implements OnInit {
     horarios: []
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.cargarCatalogos();
@@ -233,15 +235,61 @@ export class DocenteCoordinadorComponent implements OnInit {
     this.docentesFiltrados = [...this.docentes];
   }
 
-  cargarDesdeExcel(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      console.log('Archivo seleccionado:', file.name);
-    } else {
-      console.warn('No se seleccionó ningún archivo');
-    }
+cargarDesdeExcel(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
+    console.warn('%c⚠️ No se seleccionó ningún archivo', 'color: orange; font-weight: bold;');
+    return;
   }
+
+  const file = input.files[0];
+  const reader = new FileReader();
+
+  reader.onload = (e: any) => {
+    const contenido = e.target.result as string;
+    const lineas = limpiarLineasCSV(contenido);
+
+    if (lineas.length <= 1) {
+      console.warn('%c⚠️ El archivo no contiene datos válidos.', 'color: orange; font-weight: bold;');
+      return;
+    }
+
+    const encabezados = extraerEncabezados(lineas);
+    const filas = procesarFilas(lineas.slice(1), encabezados);
+
+    console.log('%c📄 Datos crudos leídos del CSV:', 'color: #1976d2; font-weight: bold;', filas);
+
+    const errores: string[] = [];
+
+    const nuevosDocentes = filas.map(fila =>
+      transformarAFilaDocente(
+        fila,
+        errores,
+        this.contratos,
+        this.nivelesIngles,
+        this.especializaciones,
+        this.horariosDisponibles
+      )
+    ).filter((d): d is any => !!d);
+    console.log('%c✅ Docentes cargados desde nuevo archivo:', 'color: green; font-weight: bold;', this.docentes);
+
+    if (errores.length > 0) {
+      console.error('%c❌ Errores encontrados:', 'color: red; font-weight: bold;');
+      errores.forEach(err => console.error(`→ ${err}`));
+    } else if (nuevosDocentes.length === 0) {
+      console.warn('%c⚠️ No se pudo cargar ningún docente (errores en todas las filas).', 'color: orange; font-weight: bold;');
+    }
+  };
+
+  reader.onerror = (e) => {
+    console.error('%c💥 Error al leer el archivo:', 'color: red; font-weight: bold;', e);
+  };
+
+  reader.readAsText(file, 'utf-8');
+  input.value = '';
+}
+
+
 
   editarFila(index: number) {
     this.editIndex = index;
@@ -324,22 +372,22 @@ export class DocenteCoordinadorComponent implements OnInit {
     });
   }
   filtrarDocentes(): void {
-  const texto = this.textoBusqueda.trim().toLowerCase();
+    const texto = this.textoBusqueda.trim().toLowerCase();
 
-  this.docentesFiltrados = this.docentes.filter(docente => {
-    const coincideContrato = this.filtroContrato === 'Todos' || docente.tipo_contrato?.nombre === this.filtroContrato;
-    const coincideNivel = this.filtroNivelIngles === 'Todos' || docente.nivel_ingles?.nombre === this.filtroNivelIngles;
-    const coincideExperiencia = docente.experiencia_anios >= this.filtroExperiencia;
+    this.docentesFiltrados = this.docentes.filter(docente => {
+      const coincideContrato = this.filtroContrato === 'Todos' || docente.tipo_contrato?.nombre === this.filtroContrato;
+      const coincideNivel = this.filtroNivelIngles === 'Todos' || docente.nivel_ingles?.nombre === this.filtroNivelIngles;
+      const coincideExperiencia = docente.experiencia_anios >= this.filtroExperiencia;
 
-    const nombres = [
-      docente.persona?.primer_nombre || '',
-      docente.persona?.segundo_nombre || '',
-      docente.persona?.primer_apellido || '',
-      docente.persona?.segundo_apellido || ''
-    ].join(' ').toLowerCase();
+      const nombres = [
+        docente.persona?.primer_nombre || '',
+        docente.persona?.segundo_nombre || '',
+        docente.persona?.primer_apellido || '',
+        docente.persona?.segundo_apellido || ''
+      ].join(' ').toLowerCase();
 
-    return coincideContrato && coincideNivel && coincideExperiencia && nombres.includes(texto);
-  });
-}
+      return coincideContrato && coincideNivel && coincideExperiencia && nombres.includes(texto);
+    });
+  }
 
 }
