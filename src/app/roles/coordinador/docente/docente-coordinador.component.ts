@@ -167,6 +167,23 @@ export class DocenteCoordinadorComponent implements OnInit {
     }
   }
 
+  toggleEspecializacionEditar(docente: any, id: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const checked = input.checked;
+
+    if (!docente.especializaciones) {
+      docente.especializaciones = [];
+    }
+
+    if (checked) {
+      if (!docente.especializaciones.some((e: any) => e.id === id)) {
+        docente.especializaciones.push({ id });
+      }
+    } else {
+      docente.especializaciones = docente.especializaciones.filter((e: any) => e.id !== id);
+    }
+  }
+
   eliminarFila(index: number) {
     const docente = this.docentesFiltrados[index];
     if (!docente || !docente.id) return;
@@ -196,20 +213,17 @@ export class DocenteCoordinadorComponent implements OnInit {
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
       console.log('Archivo seleccionado:', file.name);
-      // Lógica de carga con xlsx si deseas
     } else {
       console.warn('No se seleccionó ningún archivo');
     }
   }
-
-  // ========== EDICIÓN EN LÍNEA ==========
 
   editarFila(index: number) {
     this.editIndex = index;
     const original = this.docentesFiltrados[index];
     this.docentesFiltrados[index] = {
       ...original,
-      backup: JSON.parse(JSON.stringify(original)) // deep clone
+      backup: JSON.parse(JSON.stringify(original))
     };
   }
 
@@ -240,10 +254,10 @@ export class DocenteCoordinadorComponent implements OnInit {
       nivel_ingles_id: docente.nivel_ingles?.id,
       horas_disponibles: docente.horas_disponibles,
       especializaciones: docente.especializaciones?.map((e: any) => e.id) ?? [],
-      horarios: docente.horarios ?? []
+      horarios: docente.horarios?.map((h: any) => h.id) ?? []
     };
 
-    this.http.put('http://localhost:3000/docentes', payload).subscribe({
+    this.http.patch('http://localhost:3000/docentes', payload).subscribe({
       next: () => {
         alert('Docente actualizado correctamente.');
         this.editIndex = null;
