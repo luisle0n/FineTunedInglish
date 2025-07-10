@@ -1,23 +1,22 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';  // ✅ Agrega esto para NgIf
 
 @Component({
-  selector: 'app-dashboard-talento-humano',
-  standalone: false,
-  templateUrl: './dashboard-talento-humano.component.html',
-  styleUrls: ['./dashboard-talento-humano.component.scss']
+  standalone: true,
+  selector: 'app-inicio-coordinador',
+  templateUrl: './inicio-talento-humano.component.html',
+  styleUrls: ['./inicio-talento-humano.component.scss'],
+  imports: [CommonModule]
 })
-export class DashboardTalentoHumanoComponent {
+
+export class InicioTalentoHuemanoComponent {
   userMenuOpen = false;
 
   constructor(private router: Router) {}
 
   toggleUserMenu() {
     this.userMenuOpen = !this.userMenuOpen;
-  }
-
-  cerrarMenu() {
-    setTimeout(() => this.userMenuOpen = false, 150);  // Delay para permitir clics
   }
 
   verPerfil() {

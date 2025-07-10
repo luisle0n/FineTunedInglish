@@ -1,0 +1,39 @@
+<div class="admin-dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar"
+        style="background-image: url('/img/logo.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="sidebar-background"></div>
+
+        <div class="sidebar-header">
+            <img src="/img/logo2.jpg" alt="Logo" class="sidebar-logo" />
+            <h2>Carga Horaria</h2>
+            <hr class="sidebar-divider" />
+        </div>
+
+        <nav class="sidebar-menu">
+            <ul>
+                <li>
+                    <a routerLink="/talento-humano/inicio" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+                </li>
+                <li>
+                    <a routerLink="/talento-humano/docente" routerLinkActive="active">Docentes</a>
+                </li>
+                <li>
+                    <a routerLink="/talento-humano/criterios" routerLinkActive="active">Criterios</a>
+                </li>
+                <li>
+                    <a routerLink="/talento-humano/horarios" routerLinkActive="active">Horarios</a>
+                </li>
+            </ul>
+        </nav>
+
+    </aside>
+
+    <!-- Contenedor principal derecho -->
+    <div class="main-content">
+        <router-outlet></router-outlet>
+    </div>
+
+</div>
