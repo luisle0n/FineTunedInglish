@@ -196,6 +196,53 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         }
     }
 
+    // Métodos para la tabla de horarios mejorada
+    toggleAllHorarios(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const checked = input.checked;
+        
+        if (checked) {
+            this.nuevoDocente.horarios = this.horariosDisponibles.map(h => h.id);
+        } else {
+            this.nuevoDocente.horarios = [];
+        }
+    }
+
+    areAllHorariosSelected(): boolean {
+        return this.horariosDisponibles.length > 0 && 
+               this.nuevoDocente.horarios.length === this.horariosDisponibles.length;
+    }
+
+    areSomeHorariosSelected(): boolean {
+        return this.nuevoDocente.horarios.length > 0 && 
+               this.nuevoDocente.horarios.length < this.horariosDisponibles.length;
+    }
+
+    isHorarioSelected(horarioId: string): boolean {
+        return this.nuevoDocente.horarios.includes(horarioId);
+    }
+
+    getSelectedHorariosCount(): number {
+        return this.nuevoDocente.horarios.length;
+    }
+
+    formatTime(timeString: string): string {
+        if (!timeString) return '';
+        
+        // Si ya está en formato HH:MM, devolverlo tal como está
+        if (timeString.includes(':')) {
+            const parts = timeString.split(':');
+            return `${parts[0]}:${parts[1]}`;
+        }
+        
+        // Si está en formato HH:MM:SS, extraer solo HH:MM
+        if (timeString.includes(':')) {
+            return timeString.substring(0, 5);
+        }
+        
+        return timeString;
+    }
+
     toggleEspecializacionEditar(docente: any, id: string, event: Event) {
         const input = event.target as HTMLInputElement;
         const checked = input.checked;

@@ -1,8 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+// import { StoreModule } from '@ngrx/store';
+// import { EffectsModule } from '@ngrx/effects';
+// import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -17,7 +20,17 @@ import { CriterioCoordinadorComponent } from './roles/coordinador/criterios/crit
 import { HorarioCoordinadorComponent } from './roles/coordinador/horarios/horario-coordinador.component';
 
 import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/docente-talento-humano.component';
-import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios/criterios-telento-humano.component'; // ✅ Nuevo import
+import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios/criterios-telento-humano.component';
+
+// Interceptors
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
+
+// Shared Components
+import { LoadingSpinnerComponent } from './shared/components/loading-spinner/loading-spinner.component';
+
+// Store
+import { reducers } from './store/app.state';
 
 @NgModule({
   declarations: [
@@ -30,16 +43,27 @@ import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios
     CriterioCoordinadorComponent,
     HorarioCoordinadorComponent,
     DocenteTalentoHumanoComponent,
-    CriterioTalentoHumanoComponent // ✅ Agregado aquí
+    CriterioTalentoHumanoComponent,
+    LoadingSpinnerComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
-    RouterModule
+    RouterModule,
+    // StoreModule.forRoot(reducers),
+    // EffectsModule.forRoot([]),
+    // StoreDevtoolsModule.instrument({
+    //   maxAge: 25,
+    //   logOnly: false
+    // })
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

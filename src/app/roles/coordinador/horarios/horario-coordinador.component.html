@@ -1,0 +1,73 @@
+<main class="horario-container">
+  <h2>Generación de Horarios</h2>
+
+  <!-- OPCIONES -->
+  <section class="generar-opciones">
+    <div class="input-card">
+      <h3>Parámetros</h3>
+
+      <label for="fecha">Fecha</label>
+      <input type="date" id="fecha" [(ngModel)]="configuracion.fecha" />
+
+      <label for="periodo">Periodo</label>
+      <select id="periodo" [(ngModel)]="configuracion.periodo">
+        <option value="2024-1">2024-1</option>
+        <option value="2024-2">2024-2</option>
+      </select>
+
+      <label for="priorizar">Priorizar</label>
+      <select id="priorizar" [(ngModel)]="configuracion.priorizar">
+        <option value="balanceado">Balanceado</option>
+        <option value="horas">Horas</option>
+      </select>
+
+      <label for="distribuir">Distribuir</label>
+      <select id="distribuir" [(ngModel)]="configuracion.distribuir">
+        <option value="preferencias">Por Preferencias</option>
+        <option value="aleatorio">Aleatorio</option>
+      </select>
+
+      <div class="checkboxes">
+        <label><input type="checkbox" [(ngModel)]="configuracion.respetarPeriodo" /> Respetar periodo académico</label>
+        <label><input type="checkbox" [(ngModel)]="configuracion.balancearTipoContrato" /> Balancear tipo de contrato</label>
+      </div>
+
+      <label for="horario">Archivo Horario</label>
+      <input type="file" id="horario" (change)="subirArchivo('horario', $event)" />
+
+      <label for="empresarial">Archivo Empresarial</label>
+      <input type="file" id="empresarial" (change)="subirArchivo('empresarial', $event)" />
+
+      <label for="aulas">Archivo Aulas</label>
+      <input type="file" id="aulas" (change)="subirArchivo('aulas', $event)" />
+
+      <button class="btn-generar" (click)="generarHorario()">Generar Horario</button>
+    </div>
+  </section>
+
+  <!-- HORARIO GENERADO -->
+  <section class="horario-generado" *ngIf="horarioGenerado.length">
+    <h3>Horario Generado</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Docente</th>
+          <th *ngFor="let dia of dias">{{ dia | titlecase }}</th>
+          <th>Total Horas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let docente of horarioGenerado">
+          <td>{{ docente.nombre }}<br /><small>{{ docente.contrato }}</small></td>
+          <td *ngFor="let dia of dias">
+            <div *ngFor="let clase of docente.horario[dia]" [ngClass]="getColorPorCarga(docente.totalHoras)" class="clase">
+              {{ clase }}
+            </div>
+          </td>
+          <td><strong>{{ docente.totalHoras }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>

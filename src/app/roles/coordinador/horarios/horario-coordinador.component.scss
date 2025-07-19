@@ -1,0 +1,257 @@
+@use 'sass:color';
+
+// === VARIABLES ===
+$azul: #1a73e8;
+$azul-claro: #e8f0fe;
+$verde: #d4edda;
+$amarillo: #fff3cd;
+$naranja: #ffe5b4;
+$rojo: #f8d7da;
+$gris-claro: #f5f5f5;
+$gris-borde: #e0e0e0;
+$fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+// === ESTILOS GENERALES ===
+* {
+  box-sizing: border-box;
+  font-family: $fuente;
+  margin: 0;
+  padding: 0;
+}
+
+//// === HEADER CON USUARIO ===
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem 2rem;
+
+  .left h1 {
+    font-size: 1.8rem;
+    color: #000; // ← CAMBIO: antes $azul
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    span {
+      font-size: 0.9rem;
+      color: #000; // ← CAMBIO: antes $azul
+    }
+
+    .user-section {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: bold;
+
+      .user-dropdown {
+        position: absolute;
+        top: 120%;
+        right: 0;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+        z-index: 200;
+
+        ul {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+
+          li {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            color: #000; // ← CAMBIO: antes $azul
+
+            &:hover {
+              background-color: rgba(0, 0, 0, 0.05); // más neutral
+            }
+
+            &:not(:last-child) {
+              border-bottom: 1px solid #eee;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// === ICONOS ===
+.user-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+// === CONTENIDO DE GENERAR HORARIOS ===
+.horario-container {
+  padding: 2rem;
+  background-color: white;
+  min-height: 100vh;
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+
+  .generar-opciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    .input-card {
+      flex: 1 1 350px;
+      background-color: $gris-claro;
+      border: 1px solid $gris-borde;
+      border-radius: 8px;
+      padding: 1.5rem;
+
+      h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: #222;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 0.8rem 0 0.4rem;
+        color: #444;
+      }
+
+      select,
+      input[type='date'],
+      input[type='file'] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid $gris-borde;
+        border-radius: 4px;
+        background-color: white;
+        margin-bottom: 0.8rem;
+      }
+
+      .checkboxes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin: 1rem 0;
+
+        label {
+          font-weight: normal;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        input[type='checkbox'] {
+          transform: scale(1.2);
+        }
+      }
+
+      .btn-generar,
+      .btn-exportar {
+        margin-top: 1rem;
+        margin-right: 0.5rem;
+        background-color: $azul;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: color.adjust($azul, $lightness: -10%);
+        }
+      }
+
+      .btn-exportar {
+        background-color: gray;
+
+        &:hover {
+          background-color: color.adjust(gray, $lightness: -10%);
+        }
+      }
+    }
+  }
+
+
+  .horario-generado {
+    margin-top: 3rem;
+
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+      th,
+      td {
+        padding: 0.8rem;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: top;
+      }
+
+      th {
+        background-color: #f1f5f9;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .clase {
+        display: inline-block;
+        padding: 0.4rem 0.7rem;
+        margin: 0.2rem 0;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .bg-green {
+        background-color: #38a169; // verde
+      }
+
+      .bg-yellow {
+        background-color: #d69e2e; // amarillo
+      }
+
+      .bg-red {
+        background-color: #e53e3e; // rojo
+      }
+
+      .bg-gray {
+        background-color: #cbd5e0; // fallback
+        color: #2d3748;
+      }
+    }
+  }
+}

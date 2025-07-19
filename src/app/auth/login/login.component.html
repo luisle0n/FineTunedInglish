@@ -36,17 +36,31 @@
         <h2>Welcome Back</h2>
         <p>Sign in to continue your English journey</p>
 
-        <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <div class="form-group">
-                <label for="cedula">Email Address</label>
-                <input type="text" id="cedula" name="cedula" [(ngModel)]="cedula" placeholder="Enter your email"
-                    required />
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    formControlName="username" 
+                    placeholder="Enter your username"
+                    [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" />
+                <div class="error-message" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+                    {{ getErrorMessage('username') }}
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="contrasena">Password</label>
-                <input type="password" id="contrasena" name="contrasena" [(ngModel)]="contrasena"
-                    placeholder="Enter your password" required />
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    formControlName="password" 
+                    placeholder="Enter your password"
+                    [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
+                <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                    {{ getErrorMessage('password') }}
+                </div>
             </div>
 
             <div class="form-actions">

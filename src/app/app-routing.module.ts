@@ -14,6 +14,10 @@ import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios
 
 import { DashboardGerenciaComponent } from './roles/gerencia/dashboard-gerencia.component';
 
+// Guards
+import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
+
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -21,6 +25,8 @@ const routes: Routes = [
   {
     path: 'coordinador',
     component: DashboardCoordinadorComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'coordinador academico' },
     children: [
       {
         path: 'inicio',
@@ -37,6 +43,8 @@ const routes: Routes = [
   {
     path: 'talento-humano',
     component: DashboardTalentoHumanoComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'talento humano' },
     children: [
       {
         path: 'inicio',
@@ -45,14 +53,15 @@ const routes: Routes = [
             .then(m => m.InicioTalentoHuemanoComponent)
       },
       { path: 'docente', component: DocenteTalentoHumanoComponent },
-      { path: 'criterios', component: CriterioTalentoHumanoComponent } // ✅ Agregado
+      { path: 'criterios', component: CriterioTalentoHumanoComponent }
     ]
   },
 
   {
     path: 'gerencia',
-    component: DashboardGerenciaComponent
-    // Puedes agregar children aquí si Gerencia tiene vistas internas
+    component: DashboardGerenciaComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'gerencia' }
   },
 
   { path: '**', redirectTo: 'login' }

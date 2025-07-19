@@ -171,94 +171,223 @@
         <div class="modal">
             <h3>Agregar Docente</h3>
             <form (ngSubmit)="agregarDocente()" #formDocente="ngForm">
-                <table class="formulario-tabla" style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <th colspan="4" style="text-align: left; font-size: 1.2rem;">Datos del Docente</th>
-                    </tr>
-                    <tr>
-                        <th>Primer Nombre</th>
-                        <th>Segundo Nombre</th>
-                        <th>Primer Apellido</th>
-                        <th>Segundo Apellido</th>
-                    </tr>
-                    <tr>
-                        <td><input [(ngModel)]="nuevoDocente.primer_nombre" name="primer_nombre" required /></td>
-                        <td><input [(ngModel)]="nuevoDocente.segundo_nombre" name="segundo_nombre" /></td>
-                        <td><input [(ngModel)]="nuevoDocente.primer_apellido" name="primer_apellido" required /></td>
-                        <td><input [(ngModel)]="nuevoDocente.segundo_apellido" name="segundo_apellido" /></td>
-                    </tr>
-
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Correo Electrónico</th>
-                        <th>Teléfono</th>
-                        <th>Tipo de Contrato</th>
-                    </tr>
-                    <tr>
-                        <td><input [(ngModel)]="nuevoDocente.cedula" name="cedula" required /></td>
-                        <td><input [(ngModel)]="nuevoDocente.correo" name="correo" required /></td>
-                        <td><input [(ngModel)]="nuevoDocente.telefono" name="telefono" required /></td>
-                        <td>
-                            <select [(ngModel)]="nuevoDocente.tipo_contrato_id" name="tipo_contrato_id" required>
-                                <option disabled value="">Seleccione</option>
-                                <option *ngFor="let contrato of contratos" [value]="contrato.id">{{ contrato.nombre }}
-                                </option>
-                            </select>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th>Experiencia (años)</th>
-                        <th>Nivel de Inglés</th>
-                        <th>Horas Disponibles</th>
-                        <th>Especializaciones</th>
-                    </tr>
-                    <tr>
-                        <td><input type="number" [(ngModel)]="nuevoDocente.experiencia_anios" name="experiencia_anios"
-                                required /></td>
-                        <td>
-                            <select [(ngModel)]="nuevoDocente.nivel_ingles_id" name="nivel_ingles_id" required>
-                                <option disabled value="">Seleccione</option>
-                                <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">{{ nivel.nombre }}
-                                </option>
-                            </select>
-                        </td>
-                        <td><input type="number" [(ngModel)]="nuevoDocente.horas_disponibles" name="horas_disponibles"
-                                required /></td>
-                        <td>
-                            <div style="display: flex; flex-direction: column;">
-                                <label *ngFor="let espec of especializaciones"
-                                    style="display: flex; align-items: center;">
-                                    <input type="checkbox" [value]="espec.id"
-                                        (change)="toggleEspecializacion(espec.id, $event)" />
-                                    {{ espec.nombre }}
-                                </label>
+                <!-- DATOS DEL DOCENTE -->
+                <div class="datos-docente-section">
+                    <h4 class="section-title">Datos del Docente</h4>
+                    
+                    <!-- Información Personal -->
+                    <div class="form-section">
+                        <h5 class="subsection-title">Información Personal</h5>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="primer_nombre">Primer Nombre *</label>
+                                <input 
+                                    id="primer_nombre"
+                                    type="text" 
+                                    [(ngModel)]="nuevoDocente.primer_nombre" 
+                                    name="primer_nombre" 
+                                    required 
+                                    placeholder="Ingrese el primer nombre" />
                             </div>
-                        </td>
-                    </tr>
-                </table>
+                            
+                            <div class="form-group">
+                                <label for="segundo_nombre">Segundo Nombre</label>
+                                <input 
+                                    id="segundo_nombre"
+                                    type="text" 
+                                    [(ngModel)]="nuevoDocente.segundo_nombre" 
+                                    name="segundo_nombre" 
+                                    placeholder="Ingrese el segundo nombre" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="primer_apellido">Primer Apellido *</label>
+                                <input 
+                                    id="primer_apellido"
+                                    type="text" 
+                                    [(ngModel)]="nuevoDocente.primer_apellido" 
+                                    name="primer_apellido" 
+                                    required 
+                                    placeholder="Ingrese el primer apellido" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="segundo_apellido">Segundo Apellido</label>
+                                <input 
+                                    id="segundo_apellido"
+                                    type="text" 
+                                    [(ngModel)]="nuevoDocente.segundo_apellido" 
+                                    name="segundo_apellido" 
+                                    placeholder="Ingrese el segundo apellido" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cedula">Cédula *</label>
+                                <input 
+                                    id="cedula"
+                                    type="text" 
+                                    [(ngModel)]="nuevoDocente.cedula" 
+                                    name="cedula" 
+                                    required 
+                                    placeholder="Ingrese la cédula" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="correo">Correo Electrónico *</label>
+                                <input 
+                                    id="correo"
+                                    type="email" 
+                                    [(ngModel)]="nuevoDocente.correo" 
+                                    name="correo" 
+                                    required 
+                                    placeholder="ejemplo@email.com" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="telefono">Teléfono *</label>
+                                <input 
+                                    id="telefono"
+                                    type="tel" 
+                                    [(ngModel)]="nuevoDocente.telefono" 
+                                    name="telefono" 
+                                    required 
+                                    placeholder="0991234567" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información Profesional -->
+                    <div class="form-section">
+                        <h5 class="subsection-title">Información Profesional</h5>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="tipo_contrato">Tipo de Contrato *</label>
+                                <select 
+                                    id="tipo_contrato"
+                                    [(ngModel)]="nuevoDocente.tipo_contrato_id" 
+                                    name="tipo_contrato_id" 
+                                    required>
+                                    <option value="" disabled selected>Seleccione un tipo de contrato</option>
+                                    <option *ngFor="let contrato of contratos" [value]="contrato.id">
+                                        {{ contrato.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="experiencia_anios">Experiencia (años) *</label>
+                                <input 
+                                    id="experiencia_anios"
+                                    type="number" 
+                                    [(ngModel)]="nuevoDocente.experiencia_anios" 
+                                    name="experiencia_anios" 
+                                    required 
+                                    min="0"
+                                    placeholder="0" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="nivel_ingles">Nivel de Inglés *</label>
+                                <select 
+                                    id="nivel_ingles"
+                                    [(ngModel)]="nuevoDocente.nivel_ingles_id" 
+                                    name="nivel_ingles_id" 
+                                    required>
+                                    <option value="" disabled selected>Seleccione el nivel de inglés</option>
+                                    <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">
+                                        {{ nivel.nombre }}
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="horas_disponibles">Horas Disponibles *</label>
+                                <input 
+                                    id="horas_disponibles"
+                                    type="number" 
+                                    [(ngModel)]="nuevoDocente.horas_disponibles" 
+                                    name="horas_disponibles" 
+                                    required 
+                                    min="0"
+                                    placeholder="0" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Especializaciones -->
+                    <div class="form-section">
+                        <h5 class="subsection-title">Especializaciones</h5>
+                        <div class="especializaciones-container">
+                            <div class="especializaciones-grid">
+                                <div class="especializacion-item" *ngFor="let espec of especializaciones">
+                                    <label class="checkbox-container">
+                                        <input 
+                                            type="checkbox" 
+                                            [value]="espec.id"
+                                            (change)="toggleEspecializacion(espec.id, $event)" />
+                                        <span class="checkmark"></span>
+                                        <span class="especializacion-label">{{ espec.nombre }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="especializaciones-summary" *ngIf="nuevoDocente.especializaciones.length > 0">
+                                <p class="summary-text">
+                                    <strong>{{ nuevoDocente.especializaciones.length }}</strong> especialización(es) seleccionada(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- HORARIOS -->
-                <h4 style="margin-top: 1rem;">Disponibilidad Horaria</h4>
-                <table class="horarios-tabla" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th>Seleccionar</th>
-                            <th>Día</th>
-                            <th>Hora Inicio</th>
-                            <th>Hora Fin</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let horario of horariosDisponibles">
-                            <td><input type="checkbox" [value]="horario.id"
-                                    (change)="toggleHorario(horario.id, $event)" /></td>
-                            <td>{{ horario.dia }}</td>
-                            <td>{{ horario.hora_inicio }}</td>
-                            <td>{{ horario.hora_fin }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="horarios-section">
+                    <h4 class="horarios-title">Disponibilidad Horaria</h4>
+                    <div class="horarios-container">
+                        <table class="horarios-tabla">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-header">
+                                        <input type="checkbox" 
+                                               (change)="toggleAllHorarios($event)"
+                                               [checked]="areAllHorariosSelected()"
+                                               [indeterminate]="areSomeHorariosSelected()" />
+                                    </th>
+                                    <th>Día</th>
+                                    <th>Hora Inicio</th>
+                                    <th>Hora Fin</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let horario of horariosDisponibles; let i = index" 
+                                    [class.selected]="isHorarioSelected(horario.id)"
+                                    [class.even]="i % 2 === 0">
+                                    <td class="checkbox-cell">
+                                        <input type="checkbox" 
+                                               [value]="horario.id"
+                                               [checked]="isHorarioSelected(horario.id)"
+                                               (change)="toggleHorario(horario.id, $event)" />
+                                    </td>
+                                    <td class="dia-cell">{{ horario.dia }}</td>
+                                    <td class="hora-cell">{{ formatTime(horario.hora_inicio) }}</td>
+                                    <td class="hora-cell">{{ formatTime(horario.hora_fin) }}</td>
+                                    <td class="estado-cell">
+                                        <span class="estado-badge" 
+                                              [class.selected]="isHorarioSelected(horario.id)">
+                                            {{ isHorarioSelected(horario.id) ? 'Seleccionado' : 'Disponible' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="horarios-summary" *ngIf="getSelectedHorariosCount() > 0">
+                            <p class="summary-text">
+                                <strong>{{ getSelectedHorariosCount() }}</strong> horario(s) seleccionado(s)
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- BOTONES -->
                 <div class="modal-actions" style="margin-top: 1rem; text-align: right;">
