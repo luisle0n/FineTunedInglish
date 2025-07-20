@@ -1,0 +1,608 @@
+<div class="aulas-container">
+  <!-- Header General - Using HeaderComponent -->
+  <app-header #headerComponent></app-header>
+
+  <!-- Estado de Carga -->
+  <div *ngIf="cargando" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando información de aulas...</p>
+  </div>
+
+  <!-- Estado de Error -->
+  <div *ngIf="error && !cargando" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Error al cargar las aulas</h3>
+    <p>No se pudo cargar la información de las aulas. Por favor intente nuevamente.</p>
+    <button class="btn-primary" (click)="cargarAulas()">Reintentar</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!cargando && !error">
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏫</div>
+        <div class="stat-content">
+          <h3>{{ totalAulas }}</h3>
+          <p>Total Aulas</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ aulasDisponibles }}</h3>
+          <p>Disponibles</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🚫</div>
+        <div class="stat-content">
+          <h3>{{ aulasOcupadas }}</h3>
+          <p>Ocupadas</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-content">
+          <h3>{{ aulasInactivas }}</h3>
+          <p>Inactivas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters-card">
+      <div class="filter-group">
+        <label for="filtroPiso">Piso</label>
+        <select id="filtroPiso" 
+                [(ngModel)]="filtroPiso" 
+                (ngModelChange)="filtrarAulas()">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let piso of pisos" [value]="piso">
+            {{ piso }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtroTipo">Tipo de Aula</label>
+        <select id="filtroTipo" 
+                [(ngModel)]="filtroTipo" 
+                (ngModelChange)="filtrarAulas()">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let tipo of tipos" [value]="tipo">
+            {{ tipo }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtroEstado">Disponibilidad</label>
+        <select id="filtroEstado" 
+                [(ngModel)]="filtroEstado" 
+                (ngModelChange)="filtrarAulas()">
+          <option value="Todos">Todos</option>
+          <option value="Disponible">🟢 Libre</option>
+          <option value="Ocupada">🔴 Ocupada</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtroCapacidad">Capacidad Mínima</label>
+        <input type="number" 
+               id="filtroCapacidad" 
+               [(ngModel)]="filtroCapacidad" 
+               min="0"
+               (input)="validarCapacidadMinima($event)"
+               (blur)="validarCapacidadMinima($event)"
+               placeholder="0" />
+      </div>
+
+      <div class="acciones-filtros">
+        <div class="botones-filtro">
+          <button class="btn-primary" (click)="resetearFiltros()">
+            Limpiar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Aulas -->
+    <div class="aulas-table-container">
+      <div class="table-header">
+        <h2>{{ mostrarAulasEliminadas ? 'Aulas Eliminadas' : 'Lista de Aulas' }}</h2>
+        <div class="actions">
+          <input type="text" 
+                 [(ngModel)]="textoBusqueda" 
+                 (ngModelChange)="filtrarAulas()"
+                 placeholder="Buscar por número, piso u observaciones..." />
+          
+          <!-- Botón para cambiar vista -->
+          <button class="btn-toggle-view" (click)="cambiarVistaAulas()">
+            {{ mostrarAulasEliminadas ? '🔄 Ver Aulas Activas' : '🗑️ Ver Aulas Eliminadas' }}
+          </button>
+          
+          <!-- Botón agregar solo para aulas activas -->
+          <button *ngIf="!mostrarAulasEliminadas" class="btn-primary">
+            <img src="img/mas.png" alt="Agregar" class="btn-icon" />
+            Agregar Aula
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <!-- Estado de carga para aulas eliminadas -->
+        <div *ngIf="mostrarAulasEliminadas && cargandoEliminadas" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Cargando aulas eliminadas...</p>
+        </div>
+
+        <!-- Estado de error para aulas eliminadas -->
+        <div *ngIf="mostrarAulasEliminadas && errorEliminadas && !cargandoEliminadas" class="error-state">
+          <div class="error-icon">⚠️</div>
+          <h3>Error al cargar aulas eliminadas</h3>
+          <p>No se pudieron cargar las aulas eliminadas. Por favor intente nuevamente.</p>
+          <button class="btn primary" (click)="cargarAulasEliminadas()">🔄 Reintentar</button>
+        </div>
+
+        <!-- Tabla de aulas activas -->
+        <table *ngIf="!mostrarAulasEliminadas" class="aulas-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Piso</th>
+              <th>Capacidad</th>
+              <th>Tipo</th>
+              <th>Disponibilidad</th>
+              <th>Equipamiento</th>
+              <th>Observaciones</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="aulasPaginadas.length === 0">
+              <td colspan="8" class="no-data">
+                <div class="no-data-content">
+                  <p>No se encontraron aulas que coincidan con los filtros aplicados.</p>
+                </div>
+              </td>
+            </tr>
+            <tr *ngFor="let aula of aulasPaginadas; let i = index">
+              <td>
+                <strong>Aula {{ aula.numero }}</strong>
+              </td>
+              <td>{{ aula.piso }}</td>
+              <td>{{ aula.capacidad }} estudiantes</td>
+              <td>
+                <span class="tipo-badge" [ngClass]="getTipoClass(aula.para_ninos)">
+                  {{ getTipoAula(aula.para_ninos) }}
+                </span>
+              </td>
+              <td>
+                <span class="disponibilidad-badge" [ngClass]="aula.disponible ? 'disponible' : 'no-disponible'">
+                  {{ aula.disponible ? '🟢 Libre' : '🔴 Ocupada' }}
+                </span>
+              </td>
+              <td>
+                <div class="equipamiento-list">
+                  <span *ngFor="let equipo of getEquipamientoList(aula.equipamiento)" class="equipo-tag">
+                    {{ equipo }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span class="observaciones" *ngIf="aula.observaciones">
+                  {{ aula.observaciones }}
+                </span>
+                <span class="sin-observaciones" *ngIf="!aula.observaciones">
+                  Sin observaciones
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-view" (click)="verAula(i)" title="Ver Aula">
+                    <img src="img/ojo-abierto.png" alt="Ver" width="20" />
+                  </button>
+                  <button class="btn-edit" (click)="editarAula(aula)" title="Editar Aula">
+                    <img src="img/edicion.png" alt="Editar" class="btn-icon" />
+                  </button>
+                  <button class="btn-delete" (click)="eliminarAula(aula)" title="Eliminar Aula">
+                    <img src="img/eliminar.png" alt="Eliminar" class="btn-icon" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Tabla de aulas eliminadas -->
+        <table *ngIf="mostrarAulasEliminadas && !cargandoEliminadas && !errorEliminadas" class="aulas-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Piso</th>
+              <th>Capacidad</th>
+              <th>Tipo</th>
+              <th>Equipamiento</th>
+              <th>Observaciones</th>
+              <th>Fecha Eliminación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="aulasEliminadas.length === 0">
+              <td colspan="8" class="no-data">
+                <div class="no-data-content">
+                  <p>No hay aulas eliminadas.</p>
+                </div>
+              </td>
+            </tr>
+            <tr *ngFor="let aula of aulasEliminadas; let i = index">
+              <td>
+                <strong>Aula {{ aula.numero }}</strong>
+              </td>
+              <td>{{ aula.piso }}</td>
+              <td>{{ aula.capacidad }} estudiantes</td>
+              <td>
+                <span class="tipo-badge" [ngClass]="getTipoClass(aula.para_ninos)">
+                  {{ getTipoAula(aula.para_ninos) }}
+                </span>
+              </td>
+              <td>
+                <div class="equipamiento-list">
+                  <span *ngFor="let equipo of getEquipamientoList(aula.equipamiento)" class="equipo-tag">
+                    {{ equipo }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span class="observaciones" *ngIf="aula.observaciones">
+                  {{ aula.observaciones }}
+                </span>
+                <span class="sin-observaciones" *ngIf="!aula.observaciones">
+                  Sin observaciones
+                </span>
+              </td>
+              <td>
+                {{ aula.updated_at | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-view" (click)="verAulaEliminada(i)" title="Ver Aula">
+                    <img src="img/ojo-abierto.png" alt="Ver" width="20" />
+                  </button>
+                  <button class="btn-edit" (click)="editarAulaEliminada(aula)" title="Editar Aula">
+                    <img src="img/edicion.png" alt="Editar" class="btn-icon" />
+                  </button>
+                  <button class="btn-restore" (click)="restaurarAula(aula)" title="Restaurar Aula">
+                    <img src="img/actualizar.png" alt="Restaurar" class="btn-icon" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div class="pagination" *ngIf="totalPaginas > 1">
+        <div class="pagination-info">
+          <span>Mostrando {{ obtenerRangoPagina().inicio }} - {{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} aulas</span>
+        </div>
+        
+        <div class="pagination-controls">
+          <button class="btn-pagination" 
+                  [disabled]="paginaActual === 1" 
+                  (click)="cambiarPagina(paginaActual - 1)">
+            ← Anterior
+          </button>
+          
+          <div class="page-numbers">
+            <button *ngFor="let pagina of obtenerPaginasVisibles()" 
+                    class="btn-page" 
+                    [class.active]="pagina === paginaActual"
+                    (click)="cambiarPagina(pagina)">
+              {{ pagina }}
+            </button>
+          </div>
+          
+          <button class="btn-pagination" 
+                  [disabled]="paginaActual === totalPaginas" 
+                  (click)="cambiarPagina(paginaActual + 1)">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VER DETALLES -->
+  <div class="modal-backdrop" *ngIf="mostrarModalVista">
+    <div class="modal-vista">
+      <div class="modal-header">
+        <h3>Detalle del Aula</h3>
+        <button class="btn-close" (click)="cerrarModalVista()">×</button>
+      </div>
+      
+      <div class="modal-content" *ngIf="aulaSeleccionada">
+        
+        <div class="info-section">
+          <h4>Información General</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Número de Aula:</label>
+              <span class="aula-numero">Aula {{ aulaSeleccionada.numero }}</span>
+            </div>
+            <div class="info-item">
+              <label>Piso:</label>
+              <span>{{ aulaSeleccionada.piso }}</span>
+            </div>
+            <div class="info-item">
+              <label>Capacidad:</label>
+              <span>{{ aulaSeleccionada.capacidad }} estudiantes</span>
+            </div>
+            <div class="info-item">
+              <label>Tipo de Aula:</label>
+              <span class="tipo-badge" [ngClass]="getTipoClass(aulaSeleccionada.para_ninos)">
+                {{ getTipoAula(aulaSeleccionada.para_ninos) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h4>Estado y Disponibilidad</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Disponibilidad:</label>
+              <span class="estado-badge" [ngClass]="aulaSeleccionada.disponible ? 'estado-disponible' : 'estado-ocupada'">
+                {{ aulaSeleccionada.disponible ? 'Disponible' : 'Ocupada' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Estado del Aula:</label>
+              <span class="estado-badge" [ngClass]="aulaSeleccionada.estado ? 'estado-activa' : 'estado-inactiva'">
+                {{ aulaSeleccionada.estado ? 'Activa' : 'Inactiva' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Para Niños:</label>
+              <span class="badge" [ngClass]="aulaSeleccionada.para_ninos ? 'badge-si' : 'badge-no'">
+                {{ aulaSeleccionada.para_ninos ? 'Sí' : 'No' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h4>Equipamiento Disponible</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Sistema de Audio:</label>
+              <span class="badge" [ngClass]="aulaSeleccionada.equipamiento?.audio ? 'badge-disponible' : 'badge-no-disponible'">
+                {{ aulaSeleccionada.equipamiento?.audio ? 'Disponible' : 'No disponible' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Juegos Educativos:</label>
+              <span class="badge" [ngClass]="aulaSeleccionada.equipamiento?.juegos ? 'badge-disponible' : 'badge-no-disponible'">
+                {{ aulaSeleccionada.equipamiento?.juegos ? 'Disponible' : 'No disponible' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Proyector:</label>
+              <span class="badge" [ngClass]="aulaSeleccionada.equipamiento?.proyector ? 'badge-disponible' : 'badge-no-disponible'">
+                {{ aulaSeleccionada.equipamiento?.proyector ? 'Disponible' : 'No disponible' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Pizarra Digital:</label>
+              <span class="badge" [ngClass]="aulaSeleccionada.equipamiento?.pizarra_digital ? 'badge-disponible' : 'badge-no-disponible'">
+                {{ aulaSeleccionada.equipamiento?.pizarra_digital ? 'Disponible' : 'No disponible' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Computadoras:</label>
+              <span class="badge" [ngClass]="aulaSeleccionada.equipamiento?.computadoras && aulaSeleccionada.equipamiento?.computadoras > 0 ? 'badge-disponible' : 'badge-no-disponible'">
+                {{ aulaSeleccionada.equipamiento?.computadoras && aulaSeleccionada.equipamiento?.computadoras > 0 ? aulaSeleccionada.equipamiento.computadoras + ' Computadora' + (aulaSeleccionada.equipamiento.computadoras > 1 ? 's' : '') : 'No disponible' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section" *ngIf="aulaSeleccionada.observaciones">
+          <h4>Observaciones</h4>
+          <div class="info-item">
+            <label>Notas Adicionales:</label>
+            <span class="observaciones-texto">{{ aulaSeleccionada.observaciones }}</span>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h4>Información del Sistema</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Fecha de Creación:</label>
+              <span>{{ aulaSeleccionada.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Última Actualización:</label>
+              <span>{{ aulaSeleccionada.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR AULA -->
+  <div class="modal-backdrop" *ngIf="mostrarModalEdicion">
+    <div class="modal-edicion">
+      <div class="modal-header">
+        <h3>Editar Aula</h3>
+        <button class="btn-close" (click)="cerrarModalEdicion()">×</button>
+      </div>
+      
+      <div class="modal-content" *ngIf="aulaEditando">
+        <form (ngSubmit)="guardarAula()" #editForm="ngForm">
+          
+          <!-- Información Básica -->
+          <div class="form-section">
+            <h4>Información Básica</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="numero">Número de Aula *</label>
+                <input type="text" 
+                       id="numero" 
+                       name="numero"
+                       [(ngModel)]="aulaEditando.numero" 
+                       required
+                       class="form-control" />
+              </div>
+              
+              <div class="form-group">
+                <label for="piso">Piso *</label>
+                <input type="text" 
+                       id="piso" 
+                       name="piso"
+                       [(ngModel)]="aulaEditando.piso" 
+                       required
+                       class="form-control" />
+              </div>
+              
+              <div class="form-group">
+                <label for="capacidad">Capacidad *</label>
+                <input type="number" 
+                       id="capacidad" 
+                       name="capacidad"
+                       [(ngModel)]="aulaEditando.capacidad" 
+                       min="1"
+                       required
+                       class="form-control" />
+              </div>
+              
+              <div class="form-group">
+                <label for="para_ninos">Tipo de Aula</label>
+                <select id="para_ninos" 
+                        name="para_ninos"
+                        [(ngModel)]="aulaEditando.para_ninos" 
+                        class="form-control">
+                  <option [value]="true">Tiny Kids</option>
+                  <option [value]="false">Regular</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado y Disponibilidad -->
+          <div class="form-section">
+            <h4>Estado y Disponibilidad</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="disponible">Disponibilidad</label>
+                <select id="disponible" 
+                        name="disponible"
+                        [(ngModel)]="aulaEditando.disponible" 
+                        class="form-control">
+                  <option [value]="true">🟢 Libre</option>
+                  <option [value]="false">🔴 Ocupada</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="estado">Estado del Aula</label>
+                <select id="estado" 
+                        name="estado"
+                        [(ngModel)]="aulaEditando.estado" 
+                        class="form-control">
+                  <option [value]="true">Activa</option>
+                  <option [value]="false">Inactiva</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Equipamiento -->
+          <div class="form-section">
+            <h4>Equipamiento</h4>
+            <div class="form-grid">
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" 
+                         [(ngModel)]="aulaEditando.equipamiento.audio" 
+                         name="audio" />
+                  Sistema de Audio
+                </label>
+              </div>
+              
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" 
+                         [(ngModel)]="aulaEditando.equipamiento.juegos" 
+                         name="juegos" />
+                  Juegos Educativos
+                </label>
+              </div>
+              
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" 
+                         [(ngModel)]="aulaEditando.equipamiento.proyector" 
+                         name="proyector" />
+                  Proyector
+                </label>
+              </div>
+              
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" 
+                         [(ngModel)]="aulaEditando.equipamiento.pizarra_digital" 
+                         name="pizarra_digital" />
+                  Pizarra Digital
+                </label>
+              </div>
+              
+              <div class="form-group">
+                <label for="computadoras">Número de Computadoras</label>
+                <input type="number" 
+                       id="computadoras" 
+                       name="computadoras"
+                       [(ngModel)]="aulaEditando.equipamiento.computadoras" 
+                       min="0"
+                       class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="form-section">
+            <h4>Observaciones</h4>
+            <div class="form-group">
+              <label for="observaciones">Notas Adicionales</label>
+              <textarea id="observaciones" 
+                        name="observaciones"
+                        [(ngModel)]="aulaEditando.observaciones" 
+                        rows="3"
+                        class="form-control"
+                        placeholder="Descripción adicional del aula..."></textarea>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="form-actions">
+            <button type="button" 
+                    class="btn-secondary" 
+                    (click)="cerrarModalEdicion()">
+              Cancelar
+            </button>
+            <button type="submit" 
+                    class="btn-primary" 
+                    [disabled]="!editForm.valid || guardando">
+              {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> 

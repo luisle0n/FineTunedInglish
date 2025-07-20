@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-criterios',
+  selector: 'app-criterios-coordinador',
   standalone: true,
   templateUrl: './criterio-coordinador.component.html',
   styleUrls: ['./criterio-coordinador.component.scss'],

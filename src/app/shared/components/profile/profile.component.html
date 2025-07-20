@@ -1,190 +1,212 @@
 <!-- Contenido del Perfil -->
 <div class="profile-container">
-    
+
     <!-- Estado de Carga -->
     <div *ngIf="cargando" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Cargando información del perfil...</p>
+        <div class="loading-spinner"></div>
+        <p>Cargando información del perfil...</p>
     </div>
 
     <!-- Estado de Error -->
     <div *ngIf="error && !cargando" class="error-state">
-      <div class="error-icon">⚠️</div>
-      <h3>Error al cargar el perfil</h3>
-      <p>No se pudo cargar la información del usuario. Por favor intente nuevamente.</p>
-      <button class="btn primary" (click)="cargarPerfilUsuario()">Reintentar</button>
+        <div class="error-icon">⚠️</div>
+        <h3>Error al cargar el perfil</h3>
+        <p>No se pudo cargar la información del usuario. Por favor intente nuevamente.</p>
+        <button class="btn primary" (click)="cargarPerfilUsuario()">🔄 Reintentar</button>
     </div>
 
     <!-- Perfil del Usuario -->
     <div *ngIf="!cargando && !error && usuario" class="profile-content">
-      
-      <!-- Encabezado del Perfil -->
-      <div class="profile-header">
-        <div class="profile-avatar">
-          <img src="img/usuario.png" alt="Avatar" />
-        </div>
-        <div class="profile-info">
-          <h1>{{ obtenerNombreCompleto() }}</h1>
-          <p class="role-badge">{{ obtenerRolFormateado() }}</p>
-          <p class="username">&#64;{{ usuario.username }}</p>
-        </div>
-        <div class="profile-actions">
-          <button *ngIf="!modoEdicion" class="btn primary" (click)="activarEdicion()">
-            Editar Perfil
-          </button>
-        </div>
-      </div>
 
-      <!-- Información del Perfil -->
-      <div class="profile-details">
-        
-        <!-- Información Personal -->
-        <div class="info-section">
-          <h3>Información Personal</h3>
-          
-          <div class="info-grid">
-            <!-- Primer Nombre -->
-            <div class="info-item">
-              <label>Primer Nombre *</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.primer_nombre || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="text" 
-                     [(ngModel)]="datosEditables.primer_nombre" 
-                     placeholder="Primer nombre"
-                     required />
+        <!-- Encabezado del Perfil -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="img/usuario.png" alt="Avatar del usuario" />
             </div>
-
-            <!-- Segundo Nombre -->
-            <div class="info-item">
-              <label>Segundo Nombre</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.segundo_nombre || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="text" 
-                     [(ngModel)]="datosEditables.segundo_nombre" 
-                     placeholder="Segundo nombre" />
+            <div class="profile-info">
+                <h1>{{ obtenerNombreCompleto() }}</h1>
+                <p class="role-badge">{{ obtenerRolFormateado() }}</p>
+                <p class="username">&#64;{{ usuario.username }}</p>
             </div>
-
-            <!-- Primer Apellido -->
-            <div class="info-item">
-              <label>Primer Apellido *</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.primer_apellido || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="text" 
-                     [(ngModel)]="datosEditables.primer_apellido" 
-                     placeholder="Primer apellido"
-                     required />
+            <div class="profile-actions">
+                <button *ngIf="!modoEdicion" class="btn primary" (click)="activarEdicion()">
+                    ✏️ Editar Perfil
+                </button>
             </div>
-
-            <!-- Segundo Apellido -->
-            <div class="info-item">
-              <label>Segundo Apellido</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.segundo_apellido || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="text" 
-                     [(ngModel)]="datosEditables.segundo_apellido" 
-                     placeholder="Segundo apellido" />
-            </div>
-          </div>
         </div>
 
-        <!-- Información de Contacto -->
-        <div class="info-section">
-          <h3>Información de Contacto</h3>
-          
-          <div class="info-grid">
-            <!-- Cédula -->
-            <div class="info-item">
-              <label>Cédula *</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.cedula || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="text" 
-                     [(ngModel)]="datosEditables.cedula" 
-                     placeholder="Número de cédula"
-                     required />
+        <!-- Información del Perfil -->
+        <div class="profile-details">
+
+            <!-- Información Personal -->
+            <div class="info-section">
+                <h3>👤 Información Personal</h3>
+
+                <div class="info-grid">
+                    <!-- Primer Nombre -->
+                    <div class="info-item">
+                        <label>Primer Nombre *</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.primer_nombre || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="text" 
+                               [(ngModel)]="datosEditables.primer_nombre"
+                               placeholder="Ingrese su primer nombre" 
+                               required 
+                               maxlength="50" />
+                    </div>
+
+                    <!-- Segundo Nombre -->
+                    <div class="info-item">
+                        <label>Segundo Nombre</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.segundo_nombre || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="text" 
+                               [(ngModel)]="datosEditables.segundo_nombre"
+                               placeholder="Ingrese su segundo nombre (opcional)" 
+                               maxlength="50" />
+                    </div>
+
+                    <!-- Primer Apellido -->
+                    <div class="info-item">
+                        <label>Primer Apellido *</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.primer_apellido || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="text" 
+                               [(ngModel)]="datosEditables.primer_apellido"
+                               placeholder="Ingrese su primer apellido" 
+                               required 
+                               maxlength="50" />
+                    </div>
+
+                    <!-- Segundo Apellido -->
+                    <div class="info-item">
+                        <label>Segundo Apellido</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.segundo_apellido || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="text" 
+                               [(ngModel)]="datosEditables.segundo_apellido"
+                               placeholder="Ingrese su segundo apellido (opcional)" 
+                               maxlength="50" />
+                    </div>
+                </div>
             </div>
 
-            <!-- Correo -->
-            <div class="info-item">
-              <label>Correo Electrónico *</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.correo || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="email" 
-                     [(ngModel)]="datosEditables.correo" 
-                     placeholder="correo@ejemplo.com"
-                     required />
+            <!-- Información de Contacto -->
+            <div class="info-section">
+                <h3>📞 Información de Contacto</h3>
+
+                <div class="info-grid">
+                    <!-- Cédula -->
+                    <div class="info-item">
+                        <label>Cédula *</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.cedula || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="text" 
+                               [(ngModel)]="datosEditables.cedula"
+                               placeholder="Ingrese su número de cédula" 
+                               required 
+                               maxlength="10" 
+                               pattern="[0-9]+" />
+                    </div>
+
+                    <!-- Correo -->
+                    <div class="info-item">
+                        <label>Correo Electrónico *</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.correo || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="email" 
+                               [(ngModel)]="datosEditables.correo"
+                               placeholder="correo@ejemplo.com" 
+                               required 
+                               maxlength="100" />
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="info-item">
+                        <label>Teléfono</label>
+                        <div *ngIf="!modoEdicion" class="info-value">
+                            {{ usuario.persona?.telefono || 'No especificado' }}
+                        </div>
+                        <input *ngIf="modoEdicion" 
+                               type="tel" 
+                               [(ngModel)]="datosEditables.telefono"
+                               placeholder="Ingrese su número de teléfono (opcional)" 
+                               maxlength="15" 
+                               pattern="[0-9]+" />
+                    </div>
+                </div>
             </div>
 
-            <!-- Teléfono -->
-            <div class="info-item">
-              <label>Teléfono</label>
-              <div *ngIf="!modoEdicion" class="info-value">
-                {{ usuario.persona?.telefono || 'No especificado' }}
-              </div>
-              <input *ngIf="modoEdicion" 
-                     type="tel" 
-                     [(ngModel)]="datosEditables.telefono" 
-                     placeholder="Número de teléfono" />
+            <!-- Información de Cuenta -->
+            <div class="info-section">
+                <h3>🔐 Información de Cuenta</h3>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Nombre de Usuario</label>
+                        <div class="info-value">{{ usuario.username }}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Estado de Cuenta</label>
+                        <div class="info-value">
+                            <span class="status-badge" [class.active]="usuario.activo">
+                                {{ usuario.activo ? '✅ Activa' : '❌ Inactiva' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <label>ID de Usuario</label>
+                        <div class="info-value user-id">{{ usuario.id || 'No disponible' }}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <label>Última Actualización</label>
+                        <div class="info-value">
+                            {{ usuario.updated_at ? (usuario.updated_at | date:'dd/MM/yyyy HH:mm') : 'No disponible' }}
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+
+            <!-- Botones de Acción -->
+            <div *ngIf="modoEdicion" class="profile-actions-footer">
+                <button class="btn secondary" 
+                        (click)="cancelarEdicion()" 
+                        [disabled]="guardando"
+                        type="button">
+                    ❌ Cancelar
+                </button>
+                <button class="btn primary" 
+                        (click)="guardarCambios()" 
+                        [disabled]="guardando"
+                        type="button">
+                    <span *ngIf="!guardando">
+                        💾 Guardar Cambios
+                    </span>
+                    <span *ngIf="guardando">
+                        ⏳ Guardando...
+                    </span>
+                </button>
+            </div>
+
+            <!-- Nota de Campos Requeridos -->
+            <div *ngIf="modoEdicion" class="required-fields-note">
+                <p><strong>*</strong> Campos requeridos. Todos los campos marcados con asterisco son obligatorios.</p>
+            </div>
         </div>
-
-        <!-- Información de Cuenta -->
-        <div class="info-section">
-          <h3>Información de Cuenta</h3>
-          
-          <div class="info-grid">
-            <div class="info-item">
-              <label>Nombre de Usuario</label>
-              <div class="info-value">{{ usuario.username }}</div>
-            </div>
-
-            <div class="info-item">
-              <label>Estado de Cuenta</label>
-              <div class="info-value">
-                <span class="status-badge" [class.active]="usuario.activo">
-                  {{ usuario.activo ? 'Activa' : 'Inactiva' }}
-                </span>
-              </div>
-            </div>
-
-            <div class="info-item">
-              <label>ID de Usuario</label>
-              <div class="info-value user-id">{{ usuario.uid }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Botones de Acción -->
-      <div *ngIf="modoEdicion" class="profile-actions-footer">
-        <button class="btn secondary" (click)="cancelarEdicion()" [disabled]="guardando">
-          <img src="img/eliminar.png" alt="Cancelar" class="btn-icon" />
-          Cancelar
-        </button>
-        <button class="btn primary" (click)="guardarCambios()" [disabled]="guardando">
-          <span *ngIf="!guardando">
-            <img src="img/salvar.png" alt="Guardar" class="btn-icon" />
-            Guardar Cambios
-          </span>
-          <span *ngIf="guardando">⏳ Guardando...</span>
-        </button>
-      </div>
-
-      <!-- Nota de Campos Requeridos -->
-      <div *ngIf="modoEdicion" class="required-fields-note">
-        <p><strong>*</strong> Campos requeridos</p>
-      </div>
     </div>
-  </div> 
+</div>

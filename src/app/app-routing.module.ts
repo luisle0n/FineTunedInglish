@@ -7,6 +7,7 @@ import { DashboardCoordinadorComponent } from './roles/coordinador/dashboard-coo
 import { DocenteCoordinadorComponent } from './roles/coordinador/docente/docente-coordinador.component';
 import { CriterioCoordinadorComponent } from './roles/coordinador/criterios/criterio-coordinador.component';
 import { HorarioCoordinadorComponent } from './roles/coordinador/horarios/horario-coordinador.component';
+import { AulasCoordinadorComponent } from './roles/coordinador/aulas/aulas-coordinador.component';
 
 import { DashboardTalentoHumanoComponent } from './roles/talento-humano/dashboard-talento-humano.component';
 import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/docente-talento-humano.component';
@@ -38,6 +39,7 @@ const routes: Routes = [
       { path: 'docente', component: DocenteCoordinadorComponent },
       { path: 'criterios', component: CriterioCoordinadorComponent },
       { path: 'horarios', component: HorarioCoordinadorComponent },
+      { path: 'aulas', component: AulasCoordinadorComponent },
       { path: 'profile', component: ProfileComponent }
     ]
   },

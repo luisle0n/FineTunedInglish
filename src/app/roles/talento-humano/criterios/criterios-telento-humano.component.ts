@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-criterios',
+  selector: 'app-criterios-talento-humano',
   standalone: true,
   templateUrl: './criterios-telento-humano.component.html',
   styleUrls: ['./criterios-telento-humano.component.scss'],

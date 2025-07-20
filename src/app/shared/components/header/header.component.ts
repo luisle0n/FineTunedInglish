@@ -47,6 +47,8 @@ export class HeaderComponent implements OnInit {
       this.pageTitle = 'Criterios';
     } else if (currentUrl.includes('/horarios')) {
       this.pageTitle = 'Horarios';
+    } else if (currentUrl.includes('/aulas')) {
+      this.pageTitle = 'Vista Aulas';
     } else if (currentUrl.includes('/dashboard')) {
       this.pageTitle = 'Dashboard';
     } else if (currentUrl.includes('/profile')) {
