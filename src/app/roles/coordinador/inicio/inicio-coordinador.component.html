@@ -1,39 +1,18 @@
 <main class="dashboard-content">
-    <!-- Header Superior -->
-    <header class="dashboard-header">
-        <div class="left">
-            <h1>Inicio</h1>
-        </div>
-        <div class="right">
-            <span>Rol: Coordinador</span>
-
-            <!-- USER DROPDOWN -->
-            <div class="user-section" (click)="toggleUserMenu()">
-                <img src="img/campana.png" alt="Notificaciones" class="icon" />
-                <span>
-                    <img src="img/usuario.png" alt="Usuario" class="user-icon" />
-                    Usuario ▼
-                </span>
-
-                <div class="user-dropdown" *ngIf="userMenuOpen">
-                    <ul>
-                        <li (click)="verPerfil()">Mi Perfil</li>
-                        <li (click)="cerrarSesion()">Cerrar Sesión</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Línea separadora -->
-    <hr class="content-divider" />
+    <!-- Header General -->
+    <app-header></app-header>
 
     <!-- Bloque de métricas -->
     <section class="dashboard-metrics">
         <div class="metric-card">
             <div class="metric-text">
                 <h3>Total Docentes</h3>
-                <p class="metric-value">24</p>
+                <p class="metric-value" *ngIf="!cargandoEstadisticas">{{ estadisticas.docentes.total_docentes }}</p>
+                <div class="loading-skeleton" *ngIf="cargandoEstadisticas"></div>
+                <div class="metric-details" *ngIf="!cargandoEstadisticas">
+                    <h4>Activos: {{ estadisticas.docentes.docentes_activos }}</h4>
+                    <h4>Inactivos: {{ estadisticas.docentes.docentes_inactivos }}</h4>
+                </div>
             </div>
             <img src="img/silueta-de-multiples-usuarios.png" alt="Total Docentes" class="metric-icon" />
         </div>
@@ -72,7 +51,7 @@
         </div>
     </section>
 
-    <!-- Última fila: Actividad y Acciones -->
+    <!-- Última fila: Actividad -->
     <section class="dashboard-bottom">
         <div class="recent-activity">
             <h3>Actividad Reciente</h3>
@@ -90,28 +69,6 @@
                     Actualización de criterios - Hace 2 días
                 </li>
             </ul>
-        </div>
-
-        <div class="quick-actions">
-            <h3>Acciones Rápidas</h3>
-
-            <!-- Botón 1 -->
-            <button class="btn outline">
-                <img src="img/mas.png" alt="Nuevo Docente" class="icon" />
-                Nuevo Docente
-            </button>
-
-            <!-- Botón 2 -->
-            <button class="btn outline">
-                <img src="img/subir.png" alt="Cargar Datos" class="icon" />
-                Cargar Datos
-            </button>
-
-            <!-- Botón 3 -->
-            <button class="btn outline">
-                <img src="img/calendario2.png" alt="Generar Horario" class="icon" />
-                Generar Horario
-            </button>
         </div>
     </section>
 </main>

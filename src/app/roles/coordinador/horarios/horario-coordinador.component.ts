@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface HorarioDocente {
   nombre: string;
@@ -12,10 +16,10 @@ interface HorarioDocente {
 
 @Component({
   selector: 'app-generar-horarios',
-    standalone: false,
-
+  standalone: true,
   templateUrl: './horario-coordinador.component.html',
-  styleUrls: ['./horario-coordinador.component.scss']
+  styleUrls: ['./horario-coordinador.component.scss'],
+  imports: [HeaderComponent, CommonModule, FormsModule]
 })
 export class 
  HorarioCoordinadorComponent{
@@ -34,9 +38,9 @@ export class
 
   dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
   horarioGenerado: HorarioDocente[] = [];
-  userMenuOpen = false;
 
-  constructor(private router: Router) {}
+
+  constructor(private router: Router, private authService: AuthService) {}
 
   generarHorario(): void {
     this.horarioGenerado = [
@@ -125,21 +129,5 @@ export class
     }
   }
 
-  // === MENÚ DE USUARIO ===
-  toggleUserMenu() {
-    this.userMenuOpen = !this.userMenuOpen;
-  }
 
-  cerrarMenu() {
-    setTimeout(() => (this.userMenuOpen = false), 150);
-  }
-
-  verPerfil() {
-    alert('Abrir vista de perfil');
-    this.userMenuOpen = false;
-  }
-
-  cerrarSesion() {
-    this.router.navigate(['/login']);
-  }
 }

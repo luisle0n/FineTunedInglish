@@ -1,0 +1,28 @@
+<!-- Header Superior -->
+<header class="dashboard-header">
+    <div class="left">
+        <h1>{{ pageTitle }}</h1>
+    </div>
+    <div class="right">
+        <span>ROL: {{ userRole }}</span>
+
+        <!-- USER DROPDOWN -->
+        <div class="user-section" (click)="toggleUserMenu()">
+            <img src="img/campana.png" alt="Notificaciones" class="icon" />
+            <span>
+                <img src="img/usuario.png" alt="Usuario" class="user-icon" />
+                Usuario ▼
+            </span>
+
+            <div class="user-dropdown" *ngIf="userMenuOpen">
+                <ul>
+                    <li (click)="verPerfil()">Mi Perfil</li>
+                    <li (click)="cerrarSesion()">Cerrar Sesión</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Línea separadora -->
+<hr class="content-divider" /> 

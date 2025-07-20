@@ -1,0 +1,52 @@
+<div class="filters-card">
+    <div class="filter-group">
+        <label for="filtroContrato">Tipo de Contrato</label>
+        <select id="filtroContrato" 
+                [value]="filtroContrato" 
+                (change)="onFiltroContratoChange($event.target.value)">
+            <option value="Todos">Todos</option>
+            <option *ngFor="let contrato of contratos" [value]="contrato.nombre">
+                {{ contrato.nombre }}
+            </option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="filtroNivelIngles">Nivel de Inglés</label>
+        <select id="filtroNivelIngles" 
+                [value]="filtroNivelIngles" 
+                (change)="onFiltroNivelInglesChange($event.target.value)">
+            <option value="Todos">Todos</option>
+            <option *ngFor="let nivel of nivelesIngles" [value]="nivel.nombre">
+                {{ nivel.nombre }}
+            </option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="filtroExperiencia">Experiencia Mínima (años)</label>
+        <input type="number" 
+               id="filtroExperiencia" 
+               [value]="filtroExperiencia" 
+               min="0"
+               (input)="onFiltroExperienciaChange(+$event.target.value)"
+               (blur)="onFiltroExperienciaChange(+$event.target.value)"
+               placeholder="0" />
+    </div>
+
+    <div class="acciones-filtros">
+        <div class="botones-filtro">
+            <button class="btn primary" (click)="onResetearFiltros()">
+                🔄 Limpiar Filtros
+            </button>
+            
+            <label class="cargar-excel-label" for="excelFile">
+                📄 Cargar desde Excel
+            </label>
+            <input type="file" 
+                   id="excelFile" 
+                   accept=".csv,.xlsx,.xls" 
+                   (change)="onCargarExcel($event)" />
+        </div>
+    </div>
+</div> 

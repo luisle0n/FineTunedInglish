@@ -1,0 +1,110 @@
+<table>
+    <thead>
+        <tr>
+            <th>Nombres</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Tipo Contrato</th>
+            <th>Ex</th>
+            <th>Nivel de Inglés</th>
+            <th>Horas</th>
+            <th>Especialización</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngIf="docentes.length === 0">
+            <td colspan="9" class="no-data">
+                <div class="no-data-content">
+                    <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con los filtros aplicados.</p>
+                    <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con los filtros aplicados.</p>
+                </div>
+            </td>
+        </tr>
+        <tr *ngFor="let docente of docentes; let i = index">
+            <td>
+                {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
+                docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
+            </td>
+            <td *ngIf="editIndex !== i">{{ docente.persona?.correo }}</td>
+            <td *ngIf="editIndex === i">
+                <input [(ngModel)]="docente.editValues.correo" />
+            </td>
+            <td *ngIf="editIndex !== i">{{ docente.persona?.telefono }}</td>
+            <td *ngIf="editIndex === i">
+                <input [(ngModel)]="docente.editValues.telefono" />
+            </td>
+            <td *ngIf="editIndex !== i">{{ docente.tipo_contrato?.nombre }}</td>
+            <td *ngIf="editIndex === i">
+                <select [(ngModel)]="docente.editValues.tipo_contrato_id">
+                    <option *ngFor="let contrato of contratos" [value]="contrato.id">{{ contrato.nombre }}
+                    </option>
+                </select>
+            </td>
+            <td *ngIf="editIndex !== i">{{ docente.experiencia_anios }}</td>
+            <td *ngIf="editIndex === i">
+                <input type="number" 
+                       [(ngModel)]="docente.editValues.experiencia_anios" 
+                       min="0"
+                       (input)="onValidarExperiencia($event)"
+                       (blur)="onValidarExperiencia($event)" />
+            </td>
+            <td *ngIf="editIndex !== i">{{ docente.nivel_ingles?.nombre }}</td>
+            <td *ngIf="editIndex === i">
+                <select [(ngModel)]="docente.editValues.nivel_ingles_id">
+                    <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">{{ nivel.nombre }}
+                    </option>
+                </select>
+            </td>
+            <td *ngIf="editIndex !== i">{{ docente.horas_disponibles }}</td>
+            <td *ngIf="editIndex === i">
+                <input type="number" 
+                       [(ngModel)]="docente.editValues.horas_disponibles" 
+                       min="0"
+                       (input)="onValidarHoras($event)"
+                       (blur)="onValidarHoras($event)" />
+            </td>
+            <td *ngIf="editIndex !== i">
+                <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre
+                    }}<br /></span>
+            </td>
+            <td *ngIf="editIndex === i">
+                <div style="display: flex; flex-direction: column;">
+                    <label *ngFor="let espec of especializaciones"
+                        style="display: flex; align-items: center;">
+                        <input type="checkbox" [value]="espec.id"
+                            [checked]="docente.editValues.especializaciones?.includes(espec.id)"
+                            (change)="onToggleEspecializacion(docente, espec.id, $event)" />
+                        {{ espec.nombre }}
+                    </label>
+                </div>
+            </td>
+            <td>
+                <ng-container *ngIf="editIndex !== i">
+                    <button (click)="onEditar(i)">
+                        <img src="img/edicion.png" alt="Editar" width="20" />
+                    </button>
+                    <!-- Botón de eliminar solo para docentes activos -->
+                    <button *ngIf="!mostrarInactivos" (click)="onEliminar(i)">
+                        <img src="img/eliminar.png" alt="Eliminar" width="20" />
+                    </button>
+                    <!-- Botón de reactivar solo para docentes inactivos -->
+                    <button *ngIf="mostrarInactivos" (click)="onReactivar(i)">
+                        <img src="img/reactivado.png" alt="Reactivar" width="20" />
+                    </button>
+                    <button (click)="onVer(i)">
+                        <img src="img/ojo-abierto.png" alt="Ver" width="20" />
+                    </button>    
+                </ng-container>
+                <ng-container *ngIf="editIndex === i">
+                    <button (click)="onGuardar(i)">
+                        <img src="img/salvar.png" alt="Guardar" width="20" />
+                    </button>
+                    <button (click)="onCancelar()">
+                        <img src="img/error.png" alt="Cancelar" width="20" />
+                    </button>
+                </ng-container>
+            </td>
+        </tr>
+    </tbody>
+</table> 

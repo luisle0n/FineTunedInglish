@@ -112,6 +112,34 @@
                     font-weight: bold;
                     color: var(--primary-blue);
                 }
+
+                .loading-skeleton {
+                    width: 60px;
+                    height: 1.4rem;
+                    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+                    background-size: 200% 100%;
+                    animation: loading 1.5s infinite;
+                    border-radius: 4px;
+                    margin: 0;
+                }
+
+                .metric-details {
+                    margin-top: 0.5rem;
+
+                    h4 {
+                        font-size: 0.8rem;
+                        margin: 0.1rem 0;
+                        font-weight: 500;
+
+                        &:first-child {
+                            color: #10b981; // Verde para Activos
+                        }
+
+                        &:last-child {
+                            color: #ef4444; // Rojo para Inactivos
+                        }
+                    }
+                }
             }
 
             .metric-icon {
@@ -236,5 +264,15 @@
         height: 24px;
         margin-right: 8px;
         vertical-align: middle;
+    }
+
+    // === ANIMACIÓN DE LOADING ===
+    @keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+        100% {
+            background-position: -200% 0;
+        }
     }
 }

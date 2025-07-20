@@ -1,39 +1,18 @@
 <main class="dashboard-content">
-    <!-- Header Superior -->
-    <header class="dashboard-header">
-        <div class="left">
-            <h1>Inicio</h1>
-        </div>
-        <div class="right">
-            <span>Rol: Talento Humano</span>
-
-            <!-- USER DROPDOWN -->
-            <div class="user-section" (click)="toggleUserMenu()">
-                <img src="img/campana.png" alt="Notificaciones" class="icon" />
-                <span>
-                    <img src="img/usuario.png" alt="Usuario" class="user-icon" />
-                    Usuario ▼
-                </span>
-
-                <div class="user-dropdown" *ngIf="userMenuOpen">
-                    <ul>
-                        <li (click)="verPerfil()">Mi Perfil</li>
-                        <li (click)="cerrarSesion()">Cerrar Sesión</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Línea separadora -->
-    <hr class="content-divider" />
+    <!-- Header General -->
+    <app-header></app-header>
 
     <!-- Bloque de métricas -->
     <section class="dashboard-metrics">
         <div class="metric-card">
             <div class="metric-text">
                 <h3>Total Docentes</h3>
-                <p class="metric-value">24</p>
+                <p class="metric-value" *ngIf="!cargandoEstadisticas">{{ estadisticas.docentes.total_docentes }}</p>
+                <div class="loading-skeleton" *ngIf="cargandoEstadisticas"></div>
+                <div class="metric-details" *ngIf="!cargandoEstadisticas">
+                    <h4>Activos: {{ estadisticas.docentes.docentes_activos }}</h4>
+                    <h4>Inactivos: {{ estadisticas.docentes.docentes_inactivos }}</h4>
+                </div>
             </div>
             <img src="img/silueta-de-multiples-usuarios.png" alt="Total Docentes" class="metric-icon" />
         </div>
@@ -96,22 +75,412 @@
             <h3>Acciones Rápidas</h3>
 
             <!-- Botón 1 -->
-            <button class="btn outline">
+            <button class="btn outline" (click)="abrirModalNuevoDocente()">
                 <img src="img/mas.png" alt="Nuevo Docente" class="icon" />
                 Nuevo Docente
             </button>
 
             <!-- Botón 2 -->
-            <button class="btn outline">
+            <button class="btn outline" (click)="abrirModalCargarDatos()">
                 <img src="img/subir.png" alt="Cargar Datos" class="icon" />
                 Cargar Datos
             </button>
 
             <!-- Botón 3 -->
-            <button class="btn outline">
+            <button class="btn outline" (click)="abrirModalGenerarHorario()">
                 <img src="img/calendario2.png" alt="Generar Horario" class="icon" />
                 Generar Horario
             </button>
         </div>
     </section>
+
+    <!-- MODAL NUEVO DOCENTE -->
+    <div class="modal-backdrop" *ngIf="mostrarModalNuevoDocente">
+        <div class="modal nuevo-docente-modal">
+            <div class="modal-header">
+                <h3>Agregar Docente</h3>
+                <button class="btn-close" (click)="cerrarModalNuevoDocente()">×</button>
+            </div>
+            
+            <div class="modal-content">
+                <form (ngSubmit)="guardarDocente()">
+                    <!-- DATOS DEL DOCENTE -->
+                    <div class="form-section">
+                        <h4 class="section-title">Datos del Docente</h4>
+                        
+                        <!-- Información Personal -->
+                        <div class="form-subsection">
+                            <h5 class="subsection-title">Información Personal</h5>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="primer_nombre">Primer Nombre *</label>
+                                    <input 
+                                        id="primer_nombre"
+                                        type="text" 
+                                        [(ngModel)]="nuevoDocente.primer_nombre" 
+                                        name="primer_nombre" 
+                                        required 
+                                        placeholder="Ingrese el primer nombre" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="segundo_nombre">Segundo Nombre</label>
+                                    <input 
+                                        id="segundo_nombre"
+                                        type="text" 
+                                        [(ngModel)]="nuevoDocente.segundo_nombre" 
+                                        name="segundo_nombre" 
+                                        placeholder="Ingrese el segundo nombre" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="primer_apellido">Primer Apellido *</label>
+                                    <input 
+                                        id="primer_apellido"
+                                        type="text" 
+                                        [(ngModel)]="nuevoDocente.primer_apellido" 
+                                        name="primer_apellido" 
+                                        required 
+                                        placeholder="Ingrese el primer apellido" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="segundo_apellido">Segundo Apellido</label>
+                                    <input 
+                                        id="segundo_apellido"
+                                        type="text" 
+                                        [(ngModel)]="nuevoDocente.segundo_apellido" 
+                                        name="segundo_apellido" 
+                                        placeholder="Ingrese el segundo apellido" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="cedula">Cédula *</label>
+                                    <input 
+                                        id="cedula"
+                                        type="text" 
+                                        [(ngModel)]="nuevoDocente.cedula" 
+                                        name="cedula" 
+                                        required 
+                                        placeholder="Ingrese la cédula" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="correo">Correo Electrónico *</label>
+                                    <input 
+                                        id="correo"
+                                        type="email" 
+                                        [(ngModel)]="nuevoDocente.correo" 
+                                        name="correo" 
+                                        required 
+                                        placeholder="ejemplo@email.com" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono *</label>
+                                    <input 
+                                        id="telefono"
+                                        type="tel" 
+                                        [(ngModel)]="nuevoDocente.telefono" 
+                                        name="telefono" 
+                                        required 
+                                        placeholder="0991234567" />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información Profesional -->
+                        <div class="form-subsection">
+                            <h5 class="subsection-title">Información Profesional</h5>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="tipo_contrato">Tipo de Contrato *</label>
+                                    <select 
+                                        id="tipo_contrato"
+                                        [(ngModel)]="nuevoDocente.tipo_contrato_id" 
+                                        name="tipo_contrato_id" 
+                                        required>
+                                        <option value="" disabled selected>Seleccione un tipo de contrato</option>
+                                        <option *ngFor="let contrato of contratos" [value]="contrato.id">
+                                            {{ contrato.nombre }}
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="experiencia_anios">Experiencia (años) *</label>
+                                    <input 
+                                        id="experiencia_anios"
+                                        type="number" 
+                                        [(ngModel)]="nuevoDocente.experiencia_anios" 
+                                        name="experiencia_anios" 
+                                        required 
+                                        min="0"
+                                        (input)="validarExperienciaModal($event)"
+                                        (blur)="validarExperienciaModal($event)"
+                                        placeholder="0" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="nivel_ingles">Nivel de Inglés *</label>
+                                    <select 
+                                        id="nivel_ingles"
+                                        [(ngModel)]="nuevoDocente.nivel_ingles_id" 
+                                        name="nivel_ingles_id" 
+                                        required>
+                                        <option value="" disabled selected>Seleccione el nivel de inglés</option>
+                                        <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">
+                                            {{ nivel.nombre }}
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="horas_disponibles">Horas Disponibles *</label>
+                                    <input 
+                                        id="horas_disponibles"
+                                        type="number" 
+                                        [(ngModel)]="nuevoDocente.horas_disponibles" 
+                                        name="horas_disponibles" 
+                                        required 
+                                        min="0"
+                                        (input)="validarHorasModal($event)"
+                                        (blur)="validarHorasModal($event)"
+                                        placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Especializaciones -->
+                    <div class="form-section">
+                        <h5 class="subsection-title">Especializaciones</h5>
+                        <div class="especializaciones-container">
+                            <div class="especializaciones-grid">
+                                <div class="especializacion-item" *ngFor="let espec of especializaciones">
+                                    <label class="checkbox-container">
+                                        <input 
+                                            type="checkbox" 
+                                            [value]="espec.id"
+                                            (change)="toggleEspecializacion(espec.id, $event)" />
+                                        <span class="especializacion-label">{{ espec.nombre }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="especializaciones-summary" *ngIf="nuevoDocente.especializaciones.length > 0">
+                                <p class="summary-text">
+                                    <strong>{{ nuevoDocente.especializaciones.length }}</strong> especialización(es) seleccionada(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HORARIOS -->
+                    <div class="horarios-section">
+                        <h4 class="horarios-title">Disponibilidad Horaria</h4>
+                        <div class="horarios-container">
+                            <table class="horarios-tabla">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-header">
+                                            <input type="checkbox" 
+                                                   (change)="toggleAllHorarios($event)"
+                                                   [checked]="areAllHorariosSelected()"
+                                                   [indeterminate]="areSomeHorariosSelected()" />
+                                        </th>
+                                        <th>Día</th>
+                                        <th>Hora Inicio</th>
+                                        <th>Hora Fin</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let horario of horariosDisponibles; let i = index" 
+                                        [class.selected]="isHorarioSelected(horario.id)"
+                                        [class.even]="i % 2 === 0">
+                                        <td class="checkbox-cell">
+                                            <input type="checkbox" 
+                                                   [value]="horario.id"
+                                                   [checked]="isHorarioSelected(horario.id)"
+                                                   (change)="toggleHorario(horario.id, $event)" />
+                                        </td>
+                                        <td class="dia-cell">{{ horario.dia }}</td>
+                                        <td class="hora-cell">{{ formatTime(horario.hora_inicio) }}</td>
+                                        <td class="hora-cell">{{ formatTime(horario.hora_fin) }}</td>
+                                        <td class="estado-cell">
+                                            <span class="estado-badge" 
+                                                  [class.selected]="isHorarioSelected(horario.id)">
+                                                {{ isHorarioSelected(horario.id) ? 'Seleccionado' : 'Disponible' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="horarios-summary" *ngIf="getSelectedHorariosCount() > 0">
+                                <p class="summary-text">
+                                    <strong>{{ getSelectedHorariosCount() }}</strong> horario(s) seleccionado(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="modal-actions" style="margin-top: 1rem; text-align: right;">
+                        <button type="button" class="btn secondary" (click)="cerrarModalNuevoDocente()">Cancelar</button>
+                        <button type="submit" class="btn primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARGAR DATOS -->
+    <div class="modal-backdrop" *ngIf="mostrarModalCargarDatos">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Cargar Datos desde Excel</h3>
+                <button class="btn-close" (click)="cerrarModalCargarDatos()">×</button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="upload-section">
+                    <div class="upload-area" (click)="fileInput.click()">
+                        <img src="img/subir.png" alt="Subir archivo" class="upload-icon" />
+                        <h4>Selecciona un archivo Excel</h4>
+                        <p>Arrastra y suelta tu archivo aquí o haz clic para seleccionar</p>
+                        <input 
+                            #fileInput
+                            type="file" 
+                            accept=".xlsx,.xls,.csv" 
+                            class="file-input" 
+                            (change)="cargarDesdeExcel($event)" />
+                    </div>
+                    
+                    <div class="file-info" *ngIf="archivoSeleccionado">
+                        <h5>Archivo seleccionado:</h5>
+                        <p>{{ archivoSeleccionado.name }}</p>
+                        <button class="btn secondary" (click)="archivoSeleccionado = null; fileInput.value = ''">Cambiar archivo</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn secondary" (click)="cerrarModalCargarDatos()">Cancelar</button>
+                <button class="btn primary" [disabled]="!archivoSeleccionado">Cargar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN DE CARGA EXCEL -->
+    <div class="modal-backdrop" *ngIf="mostrarModalConfirmacion">
+        <div class="modal confirmacion-modal">
+            <div class="modal-header">
+                <h3>Confirmar Carga de Docentes</h3>
+                <button class="btn-close" (click)="cancelarCargaDocentes()">×</button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="confirmacion-info">
+                    <p class="info-text">
+                        Se van a cargar <strong>{{ docentesPendientes.length }}</strong> docente(s) desde el archivo Excel.
+                    </p>
+                    <p class="warning-text">
+                        ⚠️ Esta acción no se puede deshacer. Verifica que los datos sean correctos antes de continuar.
+                    </p>
+                </div>
+
+                <div class="docentes-preview">
+                    <h4>Vista Previa de los Docentes:</h4>
+                    <div class="preview-table-container">
+                        <table class="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre Completo</th>
+                                    <th>Cédula</th>
+                                    <th>Correo</th>
+                                    <th>Teléfono</th>
+                                    <th>Tipo Contrato</th>
+                                    <th>Experiencia</th>
+                                    <th>Nivel Inglés</th>
+                                    <th>Horas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let docente of docentesPendientes; let i = index" [class.even]="i % 2 === 0">
+                                    <td>
+                                        {{ docente.primer_nombre }} {{ docente.segundo_nombre }} 
+                                        {{ docente.primer_apellido }} {{ docente.segundo_apellido }}
+                                    </td>
+                                    <td>{{ docente.cedula }}</td>
+                                    <td>{{ docente.correo }}</td>
+                                    <td>{{ docente.telefono }}</td>
+                                    <td>{{ getContratoNombre(docente.tipo_contrato_id) }}</td>
+                                    <td>{{ docente.experiencia_anios }} años</td>
+                                    <td>{{ getNivelInglesNombre(docente.nivel_ingles_id) }}</td>
+                                    <td>{{ docente.horas_disponibles }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn secondary" (click)="cancelarCargaDocentes()">
+                    Cancelar
+                </button>
+                <button class="btn primary" (click)="confirmarCargaDocentes()">
+                    Confirmar y Cargar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GENERAR HORARIO -->
+    <div class="modal-backdrop" *ngIf="mostrarModalGenerarHorario">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Generar Horario</h3>
+                <button class="btn-close" (click)="cerrarModalGenerarHorario()">×</button>
+            </div>
+            
+            <div class="modal-content">
+                <div class="schedule-section">
+                    <h4>Configuración del Horario</h4>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="periodo">Período Académico *</label>
+                            <select id="periodo" required>
+                                <option value="" disabled selected>Seleccione el período</option>
+                                <option value="2024-1">2024-1</option>
+                                <option value="2024-2">2024-2</option>
+                                <option value="2025-1">2025-1</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="criterios">Criterios de Asignación</label>
+                            <select id="criterios" multiple>
+                                <option value="experiencia">Por experiencia</option>
+                                <option value="disponibilidad">Por disponibilidad</option>
+                                <option value="especializacion">Por especialización</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="horas_semana">Horas por semana</label>
+                            <input type="number" id="horas_semana" placeholder="20" min="1" max="40" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn secondary" (click)="cerrarModalGenerarHorario()">Cancelar</button>
+                <button class="btn primary">Generar Horario</button>
+            </div>
+        </div>
+    </div>
 </main>

@@ -13,6 +13,7 @@ import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/do
 import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios/criterios-telento-humano.component';
 
 import { DashboardGerenciaComponent } from './roles/gerencia/dashboard-gerencia.component';
+import { ProfileComponent } from './shared/components/profile/profile.component';
 
 // Guards
 import { AuthGuard } from './guards/auth.guard';
@@ -36,7 +37,8 @@ const routes: Routes = [
       },
       { path: 'docente', component: DocenteCoordinadorComponent },
       { path: 'criterios', component: CriterioCoordinadorComponent },
-      { path: 'horarios', component: HorarioCoordinadorComponent }
+      { path: 'horarios', component: HorarioCoordinadorComponent },
+      { path: 'profile', component: ProfileComponent }
     ]
   },
 
@@ -53,7 +55,8 @@ const routes: Routes = [
             .then(m => m.InicioTalentoHuemanoComponent)
       },
       { path: 'docente', component: DocenteTalentoHumanoComponent },
-      { path: 'criterios', component: CriterioTalentoHumanoComponent }
+      { path: 'criterios', component: CriterioTalentoHumanoComponent },
+      { path: 'profile', component: ProfileComponent }
     ]
   },
 
@@ -61,7 +64,10 @@ const routes: Routes = [
     path: 'gerencia',
     component: DashboardGerenciaComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'gerencia' }
+    data: { role: 'gerencia' },
+    children: [
+      { path: 'profile', component: ProfileComponent }
+    ]
   },
 
   { path: '**', redirectTo: 'login' }

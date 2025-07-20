@@ -3,66 +3,108 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Docente {
-  id?: number;
-  persona?: {
-    primer_nombre: string;
-    segundo_nombre?: string;
-    primer_apellido: string;
-    segundo_apellido?: string;
+  id: string;
+  experiencia_anios: number;
+  horas_disponibles: number;
+  activo: boolean;
+  persona: {
+    id: string;
     cedula: string;
     correo: string;
     telefono: string;
+    primer_nombre: string;
+    segundo_nombre: string;
+    primer_apellido: string;
+    segundo_apellido: string;
   };
-  tipo_contrato_id?: number;
-  experiencia_anios?: number;
-  nivel_ingles_id?: number;
-  horas_disponibles?: number;
-  especializaciones?: number[];
-  horarios?: number[];
+  tipo_contrato: {
+    nombre: string;
+  };
+  nivel_ingles: {
+    nombre: string;
+  };
+  especializaciones: Array<{
+    especializacion: {
+      nombre: string;
+    };
+  }>;
+  horarios: Array<{
+    horario: {
+      dia: string;
+      hora_fin: string;
+      hora_inicio: string;
+    };
+  }>;
 }
 
-export interface DocenteResponse {
-  data: Docente[];
-  total: number;
-  page: number;
-  limit: number;
+export interface DocentePayload {
+  docente_id: string;
+  persona_id: string;
+  primer_nombre: string;
+  segundo_nombre: string;
+  primer_apellido: string;
+  segundo_apellido: string;
+  cedula: string;
+  correo: string;
+  telefono: string;
+  tipo_contrato_id: string;
+  experiencia_anios: number;
+  nivel_ingles_id: string;
+  horas_disponibles: number;
+  especializaciones: string[];
+  horarios: string[];
+}
+
+export interface EstadoPayload {
+  docente_id: string;
+  activo: boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class DocenteService {
-  private readonly API_URL = 'http://localhost:3000';
+  private baseUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getDocentes(): Observable<Docente[]> {
-    return this.http.get<Docente[]>(`${this.API_URL}/docentes`);
+  // Obtener docentes activos
+  getDocentesActivos(): Observable<Docente[]> {
+    return this.http.get<Docente[]>(`${this.baseUrl}/docentes`);
   }
 
-  getDocenteById(id: number): Observable<Docente> {
-    return this.http.get<Docente>(`${this.API_URL}/docentes/${id}`);
+  // Obtener docentes inactivos
+  getDocentesInactivos(): Observable<Docente[]> {
+    return this.http.get<Docente[]>(`${this.baseUrl}/docentes/inactivos`);
   }
 
-  createDocente(docente: Docente): Observable<Docente> {
-    return this.http.post<Docente>(`${this.API_URL}/docentes`, docente);
+  // Crear nuevo docente
+  crearDocente(payload: Omit<DocentePayload, 'docente_id' | 'persona_id'>): Observable<any> {
+    return this.http.post(`${this.baseUrl}/docentes`, payload);
   }
 
-  updateDocente(id: number, docente: Docente): Observable<Docente> {
-    return this.http.put<Docente>(`${this.API_URL}/docentes/${id}`, docente);
+  // Actualizar datos del docente
+  actualizarDocente(payload: DocentePayload): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/docentes`, payload);
   }
 
-  deleteDocente(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/docentes/${id}`);
+  // Cambiar estado del docente
+  cambiarEstado(payload: EstadoPayload): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/docentes/estado`, payload);
   }
 
-  uploadDocentes(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post(`${this.API_URL}/docentes/upload`, formData);
+  // Eliminar docente (cambiar a inactivo)
+  eliminarDocente(docenteId: string): Observable<any> {
+    return this.cambiarEstado({ docente_id: docenteId, activo: false });
   }
 
-  searchDocentes(query: string): Observable<Docente[]> {
-    return this.http.get<Docente[]>(`${this.API_URL}/docentes/search?q=${query}`);
+  // Reactivar docente
+  reactivarDocente(docenteId: string): Observable<any> {
+    return this.cambiarEstado({ docente_id: docenteId, activo: true });
+  }
+
+  // Cargar múltiples docentes desde Excel
+  cargarDocentesMasivo(docentes: any[]): Observable<any>[] {
+    return docentes.map(docente => this.crearDocente(docente));
   }
 } 

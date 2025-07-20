@@ -1,0 +1,92 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    thead {
+        background-color: var(--primary-blue);
+        color: white;
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+        }
+    }
+
+    tbody {
+        tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: #f8f9fa;
+            }
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            td {
+                padding: 1rem;
+                border: none;
+                vertical-align: middle;
+                font-size: 0.9rem;
+
+                input, select {
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                    font-size: 0.9rem;
+
+                    &:focus {
+                        outline: none;
+                        border-color: var(--primary-blue);
+                        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+                    }
+                }
+
+                select {
+                    background-color: white;
+                    cursor: pointer;
+                }
+
+                button {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0.25rem;
+                    margin: 0 0.25rem;
+                    border-radius: 4px;
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        background-color: #e9ecef;
+                    }
+
+                    img {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.no-data {
+    text-align: center;
+    padding: 2rem;
+
+    .no-data-content {
+        p {
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+    }
+} 

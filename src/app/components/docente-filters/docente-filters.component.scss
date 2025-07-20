@@ -1,0 +1,76 @@
+.filters-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-end;
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        select,
+        input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 140px;
+        }
+    }
+
+    .acciones-filtros {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+
+        .botones-filtro {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+
+            .btn.primary {
+                background-color: var(--primary-blue);
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #1e40af;
+                }
+            }
+
+            .cargar-excel-label {
+                background-color: #e5e7eb;
+                color: #111827;
+                border-radius: 4px;
+                padding: 0.5rem 1rem;
+                font-weight: bold;
+                cursor: pointer;
+                border: 1px solid #ccc;
+                display: inline-block;
+                transition: background 0.2s;
+
+                &:hover {
+                    background-color: #d1d5db;
+                }
+            }
+
+            input[type='file'] {
+                display: none;
+            }
+        }
+    }
+} 
