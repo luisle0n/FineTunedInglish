@@ -385,9 +385,14 @@ export class DocenteTalentoHumanoComponent implements OnInit {
 
         this.http.post('http://localhost:3000/docentes', payload).subscribe({
             next: () => {
-                // Recargar todas las listas para asegurar sincronización
-                this.recargarTodosLosDatos();
+                this.mostrarInactivos = false;
                 this.cerrarModal();
+                this.cargarDocentes();
+                setTimeout(() => {
+                    this.filtrarDocentes();
+                    this.paginaActual = 1;
+                    this.aplicarPaginacion();
+                }, 300);
             },
             error: (err) => {
                 console.error('Error al agregar:', err);

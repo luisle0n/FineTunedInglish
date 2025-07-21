@@ -16,12 +16,10 @@ import { DashboardGerenciaComponent } from './roles/gerencia/dashboard-gerencia.
 import { DashboardTalentoHumanoComponent } from './roles/talento-humano/dashboard-talento-humano.component';
 
 import { DocenteCoordinadorComponent } from './roles/coordinador/docente/docente-coordinador.component';
-import { CriterioCoordinadorComponent } from './roles/coordinador/criterios/criterio-coordinador.component';
 import { HorarioCoordinadorComponent } from './roles/coordinador/horarios/horario-coordinador.component';
 import { AulasCoordinadorComponent } from './roles/coordinador/aulas/aulas-coordinador.component';
 
 import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/docente-talento-humano.component';
-import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios/criterios-telento-humano.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
 
 // Interceptors
@@ -52,10 +50,8 @@ import { reducers } from './store/app.state';
     RouterModule,
     DocenteCoordinadorComponent,
     DocenteTalentoHumanoComponent,
-    CriterioCoordinadorComponent,
     HorarioCoordinadorComponent,
     AulasCoordinadorComponent,
-    CriterioTalentoHumanoComponent,
     ProfileComponent,
     // StoreModule.forRoot(reducers),
     // EffectsModule.forRoot([]),

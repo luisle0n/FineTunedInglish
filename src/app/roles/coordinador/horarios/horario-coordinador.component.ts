@@ -5,6 +5,14 @@ import { HeaderComponent } from '../../../shared/components/header/header.compon
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({name: 'noSpaces'})
+export class NoSpacesPipe implements PipeTransform {
+  transform(value: string): string {
+    return value ? value.replace(/\s+/g, '') : '';
+  }
+}
 
 interface HorarioDocente {
   nombre: string;
@@ -20,7 +28,7 @@ interface HorarioDocente {
   standalone: true,
   templateUrl: './horario-coordinador.component.html',
   styleUrls: ['./horario-coordinador.component.scss'],
-  imports: [HeaderComponent, CommonModule, FormsModule]
+  imports: [HeaderComponent, CommonModule, FormsModule, NoSpacesPipe]
 })
 export class HorarioCoordinadorComponent implements OnInit {
   archivoHorario: File | null = null;
@@ -45,6 +53,7 @@ export class HorarioCoordinadorComponent implements OnInit {
   ocupacionAulas: any[] = [];
   resumenProgramas: any[] = [];
   docenteSeleccionado: any | null = null;
+  aulasResumen: any[] = [];
 
   // Paginación para cada vista
   paginaDocentes = 1;
@@ -124,7 +133,10 @@ export class HorarioCoordinadorComponent implements OnInit {
 
   cargarHorarioCompleto() {
     this.http.get<any>('http://localhost:3000/vistas/horario-completo').subscribe({
-      next: (response) => this.horarioCompleto = response.data || response,
+      next: (response) => {
+        this.horarioCompleto = response.data || response;
+        this.generarResumenAulas();
+      },
       error: () => this.horarioCompleto = []
     });
   }
@@ -228,5 +240,30 @@ export class HorarioCoordinadorComponent implements OnInit {
         alert('Error al resetear el ambiente');
       }
     });
+  }
+
+  private generarResumenAulas() {
+    const resumenAulas: any = {};
+    (this.horarioCompleto || []).forEach(clase => {
+      if (!resumenAulas[clase.aula]) {
+        resumenAulas[clase.aula] = {
+          aula: clase.aula,
+          categoria: clase.categoria || clase.programa,
+          grupo: clase.nivel,
+          docente: clase.docente,
+          horas: 0,
+          dias: new Set<string>(),
+          horarios: []
+        };
+      }
+      resumenAulas[clase.aula].horas += 1;
+      resumenAulas[clase.aula].dias.add(clase.dia);
+      resumenAulas[clase.aula].horarios.push(`${clase.dia} ${clase.hora_inicio.slice(0,5)}-${clase.hora_fin.slice(0,5)}`);
+    });
+    this.aulasResumen = Object.values(resumenAulas).map(aula => ({
+      ...(aula as any),
+      dias: Array.from((aula as any).dias).join(', '),
+      horarios: Array.from(new Set((aula as any).horarios))
+    }));
   }
 }

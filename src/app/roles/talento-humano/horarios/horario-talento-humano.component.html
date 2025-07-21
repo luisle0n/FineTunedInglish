@@ -1,198 +1,207 @@
 <div class="horarios-container">
-  <!-- Header General - Using HeaderComponent -->
   <app-header #headerComponent></app-header>
 
-  <!-- Estado de Carga -->
-  <div *ngIf="cargando" class="loading-state">
-    <div class="loading-spinner"></div>
-    <p>Cargando información de horarios...</p>
-  </div>
+  <h2>Generación de Horarios</h2>
+  <div class="header-divider"></div>
 
-  <!-- Estado de Error -->
-  <div *ngIf="error && !cargando" class="error-state">
-    <div class="error-icon">⚠️</div>
-    <h3>Error al cargar los horarios</h3>
-    <p>No se pudo cargar la información de los horarios. Por favor intente nuevamente.</p>
-    <button class="btn-primary" (click)="cargarHorarios()">Reintentar</button>
-  </div>
-
-  <!-- Contenido Principal -->
-  <div *ngIf="!cargando && !error">
-    <!-- FILTROS -->
-    <div class="filters-card">
-      <div class="filter-group">
-        <label for="filtroDia">Día</label>
-        <select id="filtroDia" 
-                [(ngModel)]="filtroDia" 
-                (ngModelChange)="filtrarHorarios()">
-          <option value="Todos">Todos</option>
-          <option *ngFor="let dia of dias" [value]="dia">
-            {{ dia }}
-          </option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="filtroHora">Hora de Inicio</label>
-        <select id="filtroHora" 
-                [(ngModel)]="filtroHora" 
-                (ngModelChange)="filtrarHorarios()">
-          <option value="Todos">Todas</option>
-          <option *ngFor="let hora of horas" [value]="hora">
-            {{ hora }}
-          </option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label for="textoBusqueda">Buscar</label>
-        <input type="text" 
-               id="textoBusqueda" 
-               [(ngModel)]="textoBusqueda" 
-               (input)="filtrarHorarios()"
-               placeholder="Buscar por día, hora inicio o fin..." />
-      </div>
-
-      <div class="filter-actions">
-        <button class="btn-secondary" (click)="resetearFiltros()">
-          🔄 Limpiar Filtros
-        </button>
-      </div>
-    </div>
-
-    <!-- BOTONES DE ACCIÓN -->
-    <div class="actions-card">
-      <div class="actions-left">
-        <button class="btn-primary" (click)="cargarHorarios()">
-          🔄 Actualizar
-        </button>
-      </div>
-    </div>
-
-    <!-- TABLA DE HORARIOS -->
-    <div class="table-card">
-      <div class="table-header">
-        <h2>Horarios Disponibles</h2>
-        <div class="table-info">
-          <span>Mostrando {{ obtenerRangoPagina().inicio }}-{{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} horarios</span>
-        </div>
-      </div>
-
-      <div class="table-container">
-        <table class="horarios-table">
-          <thead>
-            <tr>
-              <th>Día</th>
-              <th>Hora Inicio</th>
-              <th>Hora Fin</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let horario of horariosPaginados; let i = index">
-              
-              <td class="dia-horario">
-                <span class="badge dia" [class]="getDiaClass(horario.dia)">
-                  {{ horario.dia }}
-                </span>
-              </td>
-              
-              <td class="hora-inicio">
-                <span class="hora">{{ formatTime(horario.hora_inicio) }}</span>
-              </td>
-              
-              <td class="hora-fin">
-                <span class="hora">{{ formatTime(horario.hora_fin) }}</span>
-              </td>
-              
-              <td class="acciones-horario">
-                <button class="btn-action ver" 
-                        (click)="verHorario(i)"
-                        title="Ver detalles">
-                  👁️ Ver
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- PAGINACIÓN -->
-      <div class="pagination-container" *ngIf="totalPaginas > 1">
-        <div class="pagination-info">
-          <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
-        </div>
-        
-        <div class="pagination-controls">
-          <button class="btn-pagination" 
-                  [disabled]="paginaActual === 1"
-                  (click)="cambiarPagina(paginaActual - 1)">
-            ← Anterior
-          </button>
-          
-          <div class="pagination-numbers">
-            <button *ngFor="let pagina of obtenerPaginasVisibles()" 
-                    class="btn-pagination-number"
-                    [class.active]="pagina === paginaActual"
-                    (click)="cambiarPagina(pagina)">
-              {{ pagina }}
-            </button>
-          </div>
-          
-          <button class="btn-pagination" 
-                  [disabled]="paginaActual === totalPaginas"
-                  (click)="cambiarPagina(paginaActual + 1)">
-            Siguiente →
-          </button>
-        </div>
-      </div>
+  <div class="acciones-horarios-opt">
+    <div class="acciones-select">
+      <label for="vistaSelect"><strong>Selecciona la vista:</strong></label>
+      <select id="vistaSelect" class="combo-select-opt" [(ngModel)]="vistaSeleccionada">
+        <option value="carga-docentes">Carga de Docentes</option>
+        <option value="horario-completo">Horario completo</option>
+      </select>
     </div>
   </div>
-</div>
 
-<!-- MODAL DE VISTA (Solo Lectura) -->
-<div class="modal-overlay" *ngIf="mostrarModalVista" (click)="cerrarModalVista()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Detalles del Horario</h2>
-      <button class="btn-close" (click)="cerrarModalVista()">×</button>
+  <!-- Docentes -->
+  <div class="card-table" *ngIf="vistaSeleccionada === 'carga-docentes' && cargaDocentes && cargaDocentes.length">
+    <div class="card-title">
+      <span class="material-icons"></span>
+      Lista de Docentes
     </div>
-    
-    <div class="modal-body" *ngIf="horarioSeleccionado">
-      <div class="horario-details">
-        <div class="detail-row">
-          <div class="detail-label">Día:</div>
-          <div class="detail-value">
-            <span class="badge dia" [class]="getDiaClass(horarioSeleccionado.dia)">
-              {{ horarioSeleccionado.dia }}
-            </span>
+    <div class="table-responsive">
+      <table class="table table-docentes tabla-estilo-clases tabla-color">
+        <thead>
+          <tr>
+            <th>Docente</th>
+            <th>Nivel de Inglés</th>
+            <th>Horas Disponibles</th>
+            <th>Horas Asignadas</th>
+            <th>% Carga</th>
+            <th>Total Clases</th>
+            <th>Ver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of cargaDocentesPaginados">
+            <td><span class="badge badge-docente" [title]="d.docente">{{ d.docente }}</span></td>
+            <td><span class="badge badge-nivel" [title]="d.nivel_ingles">{{ d.nivel_ingles }}</span></td>
+            <td>{{ d.horas_disponibles }}</td>
+            <td>{{ d.horas_asignadas }}</td>
+            <td><span class="badge badge-carga" [title]="d.porcentaje_carga + '%'">{{ d.porcentaje_carga }}%</span></td>
+            <td>{{ d.total_clases }}</td>
+            <td>
+              <button class="btn-ver-docente" (click)="verDocente(d)">
+                <img src="img/ojo-abierto.png" alt="Ver" width="22" height="22" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="paginacion-docentes">
+      <div class="paginacion-info">
+        Mostrando {{ (paginaDocentes - 1) * pageSize + 1 }} - {{ min(paginaDocentes * pageSize, cargaDocentes.length) }} de {{ cargaDocentes.length }} docentes
+      </div>
+      <div class="paginacion-controles">
+        <button (click)="cambiarPaginaDocentes(paginaDocentes - 1)" [disabled]="paginaDocentes === 1">&larr; Anterior</button>
+        <button *ngFor="let p of getPages('docentes')" [class.active]="paginaDocentes === p" (click)="cambiarPaginaDocentes(p)">{{ p }}</button>
+        <button (click)="cambiarPaginaDocentes(paginaDocentes + 1)" [disabled]="paginaDocentes === getPages('docentes').length">Siguiente &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Modal de información del docente (formato reutilizado de vista docente activos) -->
+    <div class="modal-backdrop" *ngIf="docenteSeleccionado">
+      <div class="modal vista-docente-modal">
+        <div class="modal-header">
+          <h3>Información Detallada del Docente</h3>
+          <button class="btn-close" (click)="docenteSeleccionado = null">×</button>
+        </div>
+        <div class="vista-docente-content" *ngIf="docenteSeleccionado">
+          <!-- Información Profesional -->
+          <div class="info-section">
+            <h4 class="section-title">Información Profesional</h4>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Docente:</label>
+                <span>{{ docenteSeleccionado.docente }}</span>
+              </div>
+              <div class="info-item">
+                <label>Nivel de Inglés:</label>
+                <span>{{ docenteSeleccionado.nivel_ingles }}</span>
+              </div>
+              <div class="info-item">
+                <label>Experiencia (años):</label>
+                <span>{{ docenteSeleccionado.experiencia_anios ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Horas Disponibles:</label>
+                <span>{{ docenteSeleccionado.horas_disponibles ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Horas Asignadas:</label>
+                <span>{{ docenteSeleccionado.horas_asignadas ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Máx. Horas/Semana:</label>
+                <span>{{ docenteSeleccionado.max_horas_semanales ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>% Carga:</label>
+                <span>{{ docenteSeleccionado.porcentaje_carga ?? '-' }}%</span>
+              </div>
+              <div class="info-item">
+                <label>Total Clases:</label>
+                <span>{{ docenteSeleccionado.total_clases ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Categorías Enseñadas:</label>
+                <span>{{ docenteSeleccionado.categorias_ensenadas ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Niveles Enseñados:</label>
+                <span>{{ docenteSeleccionado.niveles_ensenados ?? '-' }}</span>
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div class="detail-row">
-          <div class="detail-label">Hora de Inicio:</div>
-          <div class="detail-value">{{ formatTime(horarioSeleccionado.hora_inicio) }}</div>
-        </div>
-        
-        <div class="detail-row">
-          <div class="detail-label">Hora de Fin:</div>
-          <div class="detail-value">{{ formatTime(horarioSeleccionado.hora_fin) }}</div>
-        </div>
-        
-        <div class="detail-row" *ngIf="horarioSeleccionado.descripcion">
-          <div class="detail-label">Descripción:</div>
-          <div class="detail-value">{{ horarioSeleccionado.descripcion }}</div>
-        </div>
-        
-        <div class="detail-row" *ngIf="horarioSeleccionado.observaciones">
-          <div class="detail-label">Observaciones:</div>
-          <div class="detail-value">{{ horarioSeleccionado.observaciones }}</div>
-        </div>
       </div>
     </div>
-    
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="cerrarModalVista()">Cerrar</button>
+  </div>
+
+  <!-- Horario Completo -->
+  <div *ngIf="vistaSeleccionada === 'horario-completo'">
+    <div class="card-table">
+      <h2>Horario Completo</h2>
+      <table class="horario-completo-listado">
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Programa</th>
+            <th>Categoría</th>
+            <th>Nivel</th>
+            <th>Paralelo</th>
+            <th>Docente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let clase of horarioCompleto">
+            <td>{{ clase.dia }}</td>
+            <td>{{ clase.hora_inicio }}</td>
+            <td>{{ clase.hora_fin }}</td>
+            <td><span class="badge badge-programa">{{ clase.programa }}</span></td>
+            <td><span class="badge badge-categoria {{ clase.categoria }}">{{ clase.categoria || clase.programa }}</span></td>
+            <td><span class="badge badge-nivel">{{ clase.nivel }}</span></td>
+            <td>{{ clase.paralelo }}</td>
+            <td><span class="badge badge-docente">{{ clase.docente }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Resumen por Aula: una card por clase -->
+    <h2 *ngIf="vistaSeleccionada === 'horario-completo'">Resumen por Aula</h2>
+    <div class="resumen-aulas" *ngIf="vistaSeleccionada === 'horario-completo'">
+      <div class="card-aula" *ngFor="let clase of horarioCompleto">
+        <div class="aula-header">
+          <span class="aula-nombre">Aula {{ clase.aula }}</span>
+          <span class="badge badge-categoria {{ clase.categoria }}">{{ clase.categoria }}</span>
+        </div>
+        <div class="aula-nivel">{{ clase.nivel }}</div>
+        <hr class="aula-divider" />
+        <div class="aula-detalle">
+          <span class="aula-label">Docente:</span>
+          <span class="aula-value"><strong>{{ clase.docente }}</strong></span>
+        </div>
+        <div class="aula-detalle">
+          <span class="aula-label">Programa:</span>
+          <span class="aula-value"><span class="badge badge-programa">{{ clase.programa }}</span></span>
+        </div>
+        <div class="aula-detalle">
+          <span class="aula-label">Paralelo:</span>
+          <span class="aula-value">{{ clase.paralelo }}</span>
+        </div>
+        <div class="aula-detalle">
+          <span class="aula-label">Día:</span>
+          <span class="aula-value">{{ clase.dia }}</span>
+        </div>
+        <div class="aula-detalle horario-horas">
+          <div>
+            <span class="aula-label">Hora Inicio:</span>
+            <span class="aula-value hora-badge">{{ clase.hora_inicio }}</span>
+          </div>
+          <div>
+            <span class="aula-label">Hora Fin:</span>
+            <span class="aula-value hora-badge">{{ clase.hora_fin }}</span>
+          </div>
+        </div>
+        <div class="aula-detalle aula-capacidad-row">
+          <div>
+            <span class="aula-label">Capacidad:</span>
+            <span class="aula-value">{{ clase.capacidad_aula }}</span>
+          </div>
+          <div>
+            <span class="aula-label">Asignados:</span>
+            <span class="aula-value">{{ clase.estudiantes_asignados }}</span>
+          </div>
+          <div>
+            <span class="aula-label">% Ocupación:</span>
+            <span class="aula-value">{{ clase.porcentaje_ocupacion }}%</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

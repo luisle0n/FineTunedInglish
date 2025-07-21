@@ -5,14 +5,12 @@ import { LoginComponent } from './auth/login/login.component';
 
 import { DashboardCoordinadorComponent } from './roles/coordinador/dashboard-coordinador.component';
 import { DocenteCoordinadorComponent } from './roles/coordinador/docente/docente-coordinador.component';
-import { CriterioCoordinadorComponent } from './roles/coordinador/criterios/criterio-coordinador.component';
 import { HorarioCoordinadorComponent } from './roles/coordinador/horarios/horario-coordinador.component';
 import { AulasCoordinadorComponent } from './roles/coordinador/aulas/aulas-coordinador.component';
 import { ClasesCoordinadorComponent } from './roles/coordinador/clases/clases-coordinador.component';
 
 import { DashboardTalentoHumanoComponent } from './roles/talento-humano/dashboard-talento-humano.component';
 import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/docente-talento-humano.component';
-import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios/criterios-telento-humano.component';
 import { HorarioTalentoHumanoComponent } from './roles/talento-humano/horarios/horario-talento-humano.component';
 import { AulasTalentoHumanoComponent } from './roles/talento-humano/aulas/aulas-talento-humano.component';
 
@@ -40,7 +38,6 @@ const routes: Routes = [
             .then(m => m.InicioCoordinadorComponent)
       },
       { path: 'docente', component: DocenteCoordinadorComponent },
-      { path: 'criterios', component: CriterioCoordinadorComponent },
       { path: 'horarios', component: HorarioCoordinadorComponent },
       { path: 'aulas', component: AulasCoordinadorComponent },
       { path: 'clases', component: ClasesCoordinadorComponent },
@@ -61,7 +58,6 @@ const routes: Routes = [
             .then(m => m.InicioTalentoHuemanoComponent)
       },
       { path: 'docente', component: DocenteTalentoHumanoComponent },
-      { path: 'criterios', component: CriterioTalentoHumanoComponent },
       { path: 'horarios', component: HorarioTalentoHumanoComponent },
       { path: 'aulas', component: AulasTalentoHumanoComponent },
       { path: 'profile', component: ProfileComponent }

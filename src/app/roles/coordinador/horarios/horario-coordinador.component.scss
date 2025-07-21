@@ -528,23 +528,105 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 .card-table {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(26,35,126,0.10);
+  box-shadow: 0 4px 24px rgba(33,51,84,0.10);
   margin-bottom: 2.5rem;
   padding: 1.2rem 1.5rem 1.5rem 1.5rem;
-  transition: box-shadow 0.2s;
-  position: relative;
-  overflow: visible;
 }
-.card-title {
-  font-size: 1.22rem;
+
+.horario-completo-listado {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1.08rem;
+  min-width: 900px;
+  margin-bottom: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
+}
+
+.horario-completo-listado th, .horario-completo-listado td {
+  text-align: center;
+  padding: 0.85rem 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.horario-completo-listado thead th {
+  background: #f5f7fa;
+  color: #213354;
   font-weight: 700;
-  color: var(--primary, #1a237e);
-  margin-bottom: 1.1rem;
   letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  font-size: 1.05em;
 }
+
+.horario-completo-listado tbody tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 0.2em 0.7em;
+  margin: 2px 0;
+  font-size: 0.97em;
+  font-weight: 500;
+  min-width: 70px;
+  text-align: center;
+}
+.badge-programa { background: #1976d2; color: #fff; }
+.badge-categoria { background: #43a047; color: #fff; }
+.badge-nivel { background: #fbc02d; color: #222; }
+.badge-docente { background: #0288d1; color: #fff; }
+.badge-azul { background: #b3c6f7; color: #213354; }
+.badge-verde { background: #c8f7c5; color: #1b5e20; }
+.badge-morado { background: #e1d7fa; color: #6c3483; }
+.badge-amarillo { background: #ffe9b3; color: #b26a00; }
+.badge-rojo { background: #ffd6d6; color: #b71c1c; }
+.badge-negro { background: #333; color: #fff; }
+
+.resumen-aulas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.card-aula {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid #f0f0f0;
+  min-width: 220px;
+}
+.aula-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-bottom: 0.3em;
+}
+.aula-nombre {
+  color: #213354;
+}
+.aula-info {
+  color: #888;
+  font-size: 0.98em;
+}
+.aula-docente {
+  font-size: 1em;
+  color: #222;
+}
+.aula-horas {
+  font-size: 1em;
+  color: #1976d2;
+  font-weight: 600;
+}
+
 .paginacion-aulas {
   display: flex;
   flex-wrap: wrap;
@@ -908,3 +990,94 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 .tabla-color .badge-ocupacion { background: #e53935; }
 .tabla-color .badge-categoria { background: #ff9800; color: #222; }
 .tabla-color .badge-programa { background: #1976d2; }
+.badge-categoria.Adults        { background: #43a047; color: #fff; }
+.badge-categoria.TinyKids      { background: #29b6f6; color: #fff; }
+.badge-categoria.Teens         { background: #7e57c2; color: #fff; }
+.badge-categoria.Children      { background: #fbc02d; color: #222; }
+.badge-categoria.Youth         { background: #ef5350; color: #fff; }
+.badge-nivel.B2    { background: #ffd600; color: #222; }
+.badge-nivel.A2    { background: #00bfae; color: #fff; }
+.badge-nivel.A1    { background: #ff7043; color: #fff; }
+.badge-nivel.B1    { background: #8d6e63; color: #fff; }
+
+.horario-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+
+.horario-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(33,51,84,0.08);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border: 1px solid #f0f0f0;
+}
+
+.horario-card-header {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+.horario-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.horario-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.2em;
+  align-items: center;
+  margin-bottom: 0.1em;
+}
+
+.label {
+  color: #888;
+  font-size: 0.97em;
+  min-width: 80px;
+}
+
+.value {
+  color: #222;
+  font-weight: 500;
+}
+
+.hora-label {
+  min-width: 70px;
+}
+
+.hora-badge {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 8px;
+  padding: 0.18em 0.8em;
+  font-weight: 600;
+  font-size: 1em;
+  margin-left: 0.5em;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.horario-horas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+.aula-capacidad-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5em;
+  margin-top: 0.3em;
+}

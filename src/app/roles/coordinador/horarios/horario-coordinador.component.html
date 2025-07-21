@@ -1,4 +1,6 @@
 <div class="horarios-container">
+  <app-header #headerComponent></app-header>
+
   <h2>Generación de Horarios</h2>
   <div class="header-divider"></div>
 
@@ -248,11 +250,12 @@
     </div>
   </div>
 
-  <!-- Card para Horario Completo (combo box) -->
-  <div class="card-table" *ngIf="vistaSeleccionada === 'horario-completo' && horarioCompleto && horarioCompleto.length">
-    <div class="card-title">Horario Completo</div>
-    <div class="table-responsive horario-mejorada">
-      <table class="table table-docentes tabla-estilo-clases">
+  <!-- Vista Horario Completo: tabla y resumen de aulas -->
+  <div *ngIf="vistaSeleccionada === 'horario-completo'">
+    <!-- Horario Completo (listado plano) -->
+    <div class="card-table">
+      <h2>Horario Completo</h2>
+      <table class="horario-completo-listado">
         <thead>
           <tr>
             <th>Día</th>
@@ -263,43 +266,74 @@
             <th>Nivel</th>
             <th>Paralelo</th>
             <th>Docente</th>
-            <th>Aula</th>
-            <th>Piso</th>
-            <th>Capacidad Aula</th>
-            <th>Estudiantes Asignados</th>
-            <th>% Ocupación</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let fila of horarioCompleto">
-            <td>{{ fila.dia }}</td>
-            <td>{{ fila.hora_inicio }}</td>
-            <td>{{ fila.hora_fin }}</td>
-            <td>
-              <span class="badge badge-programa" [title]="fila.programa">{{ fila.programa }}</span>
-            </td>
-            <td>
-              <span class="badge badge-categoria" [title]="fila.categoria">{{ fila.categoria }}</span>
-            </td>
-            <td>
-              <span class="badge badge-nivel" [title]="fila.nivel">{{ fila.nivel }}</span>
-            </td>
-            <td>{{ fila.paralelo }}</td>
-            <td>
-              <span class="badge badge-docente" [title]="fila.docente">{{ fila.docente }}</span>
-            </td>
-            <td>
-              <span class="badge badge-aula" [title]="fila.aula">{{ fila.aula }}</span>
-            </td>
-            <td>{{ fila.piso }}</td>
-            <td>{{ fila.capacidad_aula }}</td>
-            <td>{{ fila.estudiantes_asignados }}</td>
-            <td>
-              <span class="badge badge-ocupacion" [title]="fila.porcentaje_ocupacion">{{ fila.porcentaje_ocupacion }}</span>
-            </td>
+          <tr *ngFor="let clase of horarioCompleto">
+            <td>{{ clase.dia }}</td>
+            <td>{{ clase.hora_inicio }}</td>
+            <td>{{ clase.hora_fin }}</td>
+            <td><span class="badge badge-programa">{{ clase.programa }}</span></td>
+            <td><span class="badge badge-categoria {{ clase.categoria | noSpaces }}">{{ clase.categoria || clase.programa }}</span></td>
+            <td><span class="badge badge-nivel {{ clase.nivel | noSpaces }}">{{ clase.nivel }}</span></td>
+            <td>{{ clase.paralelo }}</td>
+            <td><span class="badge badge-docente">{{ clase.docente }}</span></td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Resumen por Aula: una card por clase -->
+    <h2 *ngIf="vistaSeleccionada === 'horario-completo'">Resumen por Aula</h2>
+    <div class="resumen-aulas" *ngIf="vistaSeleccionada === 'horario-completo'">
+      <div class="card-aula" *ngFor="let clase of horarioCompleto">
+        <div class="aula-header">
+          <span class="aula-nombre">Aula {{ clase.aula }}</span>
+          <span class="badge badge-categoria {{ clase.categoria | noSpaces }}">{{ clase.categoria }}</span>
+        </div>
+        <div class="aula-nivel">{{ clase.nivel }}</div>
+        <hr class="aula-divider" />
+        <div class="aula-detalle">
+          <span class="aula-label">Docente:</span>
+          <span class="aula-value"><strong>{{ clase.docente }}</strong></span>
+        </div>
+        <div class="aula-detalle">
+          <span class="aula-label">Programa:</span>
+          <span class="aula-value"><span class="badge badge-programa">{{ clase.programa }}</span></span>
+        </div>
+        <div class="aula-detalle">
+          <span class="aula-label">Paralelo:</span>
+          <span class="aula-value">{{ clase.paralelo }}</span>
+        </div>
+        <div class="aula-detalle">
+          <span class="aula-label">Día:</span>
+          <span class="aula-value">{{ clase.dia }}</span>
+        </div>
+        <div class="aula-detalle horario-horas">
+          <div>
+            <span class="aula-label">Hora Inicio:</span>
+            <span class="aula-value hora-badge">{{ clase.hora_inicio }}</span>
+          </div>
+          <div>
+            <span class="aula-label">Hora Fin:</span>
+            <span class="aula-value hora-badge">{{ clase.hora_fin }}</span>
+          </div>
+        </div>
+        <div class="aula-detalle aula-capacidad-row">
+          <div>
+            <span class="aula-label">Capacidad:</span>
+            <span class="aula-value">{{ clase.capacidad_aula }}</span>
+          </div>
+          <div>
+            <span class="aula-label">Asignados:</span>
+            <span class="aula-value">{{ clase.estudiantes_asignados }}</span>
+          </div>
+          <div>
+            <span class="aula-label">% Ocupación:</span>
+            <span class="aula-value">{{ clase.porcentaje_ocupacion }}%</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

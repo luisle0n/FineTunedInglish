@@ -43,8 +43,6 @@ export class HeaderComponent implements OnInit {
       this.pageTitle = 'Inicio';
     } else if (currentUrl.includes('/docente')) {
       this.pageTitle = 'Gestión de Docentes';
-    } else if (currentUrl.includes('/criterios')) {
-      this.pageTitle = 'Criterios';
     } else if (currentUrl.includes('/horarios')) {
       this.pageTitle = 'Horarios';
     } else if (currentUrl.includes('/aulas')) {
