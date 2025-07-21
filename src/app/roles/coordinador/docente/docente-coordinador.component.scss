@@ -436,6 +436,40 @@
                             span {
                                 color: #6b7280;
                                 font-size: 1rem;
+
+                                &.badge {
+                                    display: inline-block;
+                                    padding: 0.25rem 0.75rem;
+                                    border-radius: 12px;
+                                    font-size: 0.8rem;
+                                    font-weight: 600;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+
+                                    &.badge-si {
+                                        background-color: #d1fae5;
+                                        color: #065f46;
+                                        border: 1px solid #a7f3d0;
+                                    }
+
+                                    &.badge-no {
+                                        background-color: #fee2e2;
+                                        color: #991b1b;
+                                        border: 1px solid #fecaca;
+                                    }
+
+                                    &.badge-activo {
+                                        background-color: #dbeafe;
+                                        color: #1e40af;
+                                        border: 1px solid #93c5fd;
+                                    }
+
+                                    &.badge-inactivo {
+                                        background-color: #fef3c7;
+                                        color: #92400e;
+                                        border: 1px solid #fde68a;
+                                    }
+                                }
                             }
                         }
                     }

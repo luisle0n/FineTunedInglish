@@ -248,6 +248,32 @@
                                         (blur)="validarHorasModal($event)"
                                         placeholder="0" />
                                 </div>
+                                
+                                <div class="form-group">
+                                    <label for="max_horas_semanales">Máximo Horas Semanales *</label>
+                                    <input 
+                                        id="max_horas_semanales"
+                                        type="number" 
+                                        [(ngModel)]="nuevoDocente.max_horas_semanales" 
+                                        name="max_horas_semanales" 
+                                        required 
+                                        min="1"
+                                        max="40"
+                                        (input)="validarMaxHorasModal($event)"
+                                        (blur)="validarMaxHorasModal($event)"
+                                        placeholder="30" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="puede_dar_sabados">¿Puede dar clases los sábados?</label>
+                                    <select 
+                                        id="puede_dar_sabados"
+                                        [(ngModel)]="nuevoDocente.puede_dar_sabados" 
+                                        name="puede_dar_sabados">
+                                        <option [value]="true">Sí</option>
+                                        <option [value]="false">No</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>

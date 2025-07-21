@@ -929,6 +929,28 @@
                         }
                     }
                     
+                    .badge {
+                        display: inline-block;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 12px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+
+                        &.badge-si {
+                            background-color: #d1fae5;
+                            color: #065f46;
+                            border: 1px solid #a7f3d0;
+                        }
+
+                        &.badge-no {
+                            background-color: #fee2e2;
+                            color: #991b1b;
+                            border: 1px solid #fecaca;
+                        }
+                    }
+                    
                     .id-text {
                         font-family: 'Courier New', monospace;
                         font-size: 0.85rem;

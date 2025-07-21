@@ -8,10 +8,13 @@ import { DocenteCoordinadorComponent } from './roles/coordinador/docente/docente
 import { CriterioCoordinadorComponent } from './roles/coordinador/criterios/criterio-coordinador.component';
 import { HorarioCoordinadorComponent } from './roles/coordinador/horarios/horario-coordinador.component';
 import { AulasCoordinadorComponent } from './roles/coordinador/aulas/aulas-coordinador.component';
+import { ClasesCoordinadorComponent } from './roles/coordinador/clases/clases-coordinador.component';
 
 import { DashboardTalentoHumanoComponent } from './roles/talento-humano/dashboard-talento-humano.component';
 import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/docente-talento-humano.component';
 import { CriterioTalentoHumanoComponent } from './roles/talento-humano/criterios/criterios-telento-humano.component';
+import { HorarioTalentoHumanoComponent } from './roles/talento-humano/horarios/horario-talento-humano.component';
+import { AulasTalentoHumanoComponent } from './roles/talento-humano/aulas/aulas-talento-humano.component';
 
 import { DashboardGerenciaComponent } from './roles/gerencia/dashboard-gerencia.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
@@ -40,6 +43,7 @@ const routes: Routes = [
       { path: 'criterios', component: CriterioCoordinadorComponent },
       { path: 'horarios', component: HorarioCoordinadorComponent },
       { path: 'aulas', component: AulasCoordinadorComponent },
+      { path: 'clases', component: ClasesCoordinadorComponent },
       { path: 'profile', component: ProfileComponent }
     ]
   },
@@ -58,6 +62,8 @@ const routes: Routes = [
       },
       { path: 'docente', component: DocenteTalentoHumanoComponent },
       { path: 'criterios', component: CriterioTalentoHumanoComponent },
+      { path: 'horarios', component: HorarioTalentoHumanoComponent },
+      { path: 'aulas', component: AulasTalentoHumanoComponent },
       { path: 'profile', component: ProfileComponent }
     ]
   },

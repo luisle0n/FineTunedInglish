@@ -49,7 +49,7 @@ export class AulasCoordinadorComponent implements OnInit {
 
   // Listas para filtros
   pisos: string[] = [];
-  tipos: string[] = ['Tiny Kids', 'Regular'];
+  tipos: string[] = ['tiny_kids', 'children', 'teens', 'adults'];
 
   constructor(private http: HttpClient) { }
 
@@ -93,13 +93,14 @@ export class AulasCoordinadorComponent implements OnInit {
               console.log('🔍 Aula encontrada en servidor:', aulaEditada);
               console.log('🔍 Disponibilidad en servidor:', aulaEditada.disponible);
               console.log('🔍 Estado en servidor:', aulaEditada.estado);
-              console.log('🔍 Equipamiento en servidor:', aulaEditada.equipamiento);
             }
           }
           
           this.extraerPisos();
           this.filtrarAulas();
           this.actualizarEstadisticas();
+          
+          console.log('📊 Estadísticas actualizadas después de cargar aulas activas');
         } else {
           console.error('❌ Respuesta inesperada del servidor:', response);
           this.error = true;
@@ -147,12 +148,14 @@ export class AulasCoordinadorComponent implements OnInit {
     const texto = this.textoBusqueda.trim().toLowerCase();
     if (!texto) return true;
     
-    const numeroAula = aula.numero?.toLowerCase() || '';
+    const numeroAula = aula.numero?.toString().toLowerCase() || '';
     const piso = aula.piso?.toLowerCase() || '';
+    const ubicacion = aula.ubicacion?.toLowerCase() || '';
     const observaciones = aula.observaciones?.toLowerCase() || '';
     
     return numeroAula.includes(texto) || 
            piso.includes(texto) || 
+           ubicacion.includes(texto) ||
            observaciones.includes(texto);
   }
 
@@ -162,8 +165,7 @@ export class AulasCoordinadorComponent implements OnInit {
 
   filtrarPorTipo(aula: any): boolean {
     if (this.filtroTipo === 'Todos') return true;
-    const tipoAula = this.getTipoAula(aula.para_ninos);
-    return tipoAula === this.filtroTipo;
+    return aula.tipo_aula === this.filtroTipo;
   }
 
   filtrarPorEstado(aula: any): boolean {
@@ -301,51 +303,58 @@ export class AulasCoordinadorComponent implements OnInit {
     return disponible ? 'Disponible' : 'Ocupada';
   }
 
-  getTipoAula(paraNinos: boolean): string {
-    return paraNinos ? 'Tiny Kids' : 'Regular';
-  }
-
-  getTipoClass(paraNinos: boolean): string {
-    return paraNinos ? 'tipo-tiny-kids' : 'tipo-regular';
-  }
-
-  getEquipamientoList(equipamiento: any): string[] {
-    const equipos = [];
-    
-    // Equipos booleanos
-    if (equipamiento.audio) equipos.push('Audio');
-    if (equipamiento.juegos) equipos.push('Juegos');
-    if (equipamiento.proyector) equipos.push('Proyector');
-    if (equipamiento.pizarra_digital) equipos.push('Pizarra Digital');
-    
-    // Equipos numéricos
-    if (equipamiento.computadoras && equipamiento.computadoras > 0) {
-      equipos.push(`${equipamiento.computadoras} Computadora${equipamiento.computadoras > 1 ? 's' : ''}`);
+  getTipoAula(tipoAula: string): string {
+    switch (tipoAula) {
+      case 'tiny_kids':
+        return 'Tiny Kids';
+      case 'children':
+        return 'Children';
+      case 'teens':
+        return 'Teens';
+      case 'adults':
+        return 'Adults';
+      default:
+        return tipoAula;
     }
-    
-    return equipos;
+  }
+
+  getTipoClass(tipoAula: string): string {
+    switch (tipoAula) {
+      case 'tiny_kids':
+        return 'tipo-tiny-kids';
+      case 'children':
+        return 'tipo-children';
+      case 'teens':
+        return 'tipo-teens';
+      case 'adults':
+        return 'tipo-adults';
+      default:
+        return 'tipo-regular';
+    }
+  }
+
+  getRangoEdad(aula: any): string {
+    if (aula.edad_minima && aula.edad_maxima) {
+      return `${aula.edad_minima} - ${aula.edad_maxima} años`;
+    }
+    return 'No especificado';
   }
 
   editarAula(aula: any): void {
     console.log('✏️ Editando aula ORIGINAL:', aula);
     console.log('📊 Disponibilidad original:', aula.disponible);
     console.log('📊 Estado original:', aula.estado);
-    console.log('📊 Equipamiento original:', aula.equipamiento);
     
     // Crear una copia profunda del aula para editar
     this.aulaEditando = {
       id: aula.id,
       numero: aula.numero,
-      piso: aula.piso,
-      capacidad: aula.capacidad,
-      para_ninos: aula.para_ninos,
-      equipamiento: {
-        audio: aula.equipamiento?.audio === true,
-        juegos: aula.equipamiento?.juegos === true,
-        proyector: aula.equipamiento?.proyector === true,
-        pizarra_digital: aula.equipamiento?.pizarra_digital === true,
-        computadoras: aula.equipamiento?.computadoras || 0
-      },
+      ubicacion: aula.ubicacion || '',
+      piso: aula.piso || '',
+      capacidad: aula.capacidad || 0,
+      tipo_aula: aula.tipo_aula || 'tiny_kids',
+      edad_minima: aula.edad_minima || 0,
+      edad_maxima: aula.edad_maxima || 0,
       disponible: aula.disponible === true,
       estado: aula.estado === true,
       observaciones: aula.observaciones || ''
@@ -354,7 +363,6 @@ export class AulasCoordinadorComponent implements OnInit {
     console.log('📝 Aula preparada para edición:', this.aulaEditando);
     console.log('📊 Disponibilidad preparada:', this.aulaEditando.disponible);
     console.log('📊 Estado preparado:', this.aulaEditando.estado);
-    console.log('📊 Equipamiento preparado:', this.aulaEditando.equipamiento);
     this.mostrarModalEdicion = true;
   }
 
@@ -377,32 +385,37 @@ export class AulasCoordinadorComponent implements OnInit {
     
     this.guardando = true;
     
-    // Preparar datos según el DTO UpdateAulaDto con conversión de tipos
+    // Preparar datos según el DTO UpdateAulaDto
     const datosAula = {
       id: this.aulaEditando.id,
-      numero: this.aulaEditando.numero,
+      numero: String(this.aulaEditando.numero), // Convertir a string como espera el DTO
+      ubicacion: this.aulaEditando.ubicacion,
       piso: this.aulaEditando.piso,
       capacidad: Number(this.aulaEditando.capacidad),
-      para_ninos: this.convertirABoolean(this.aulaEditando.para_ninos),
-      equipamiento: this.aulaEditando.equipamiento,
+      tipo_aula: this.aulaEditando.tipo_aula,
+      edad_minima: Number(this.aulaEditando.edad_minima),
+      edad_maxima: Number(this.aulaEditando.edad_maxima),
       disponible: this.convertirABoolean(this.aulaEditando.disponible),
       estado: this.convertirABoolean(this.aulaEditando.estado),
       observaciones: this.aulaEditando.observaciones
     };
     
     console.log('🔍 === DEBUGGING DATOS ===');
+    console.log('🔍 Datos originales del formulario:', this.aulaEditando);
     console.log('🔍 Estado original:', this.aulaEditando.estado, 'tipo:', typeof this.aulaEditando.estado);
     console.log('🔍 Estado convertido:', datosAula.estado, 'tipo:', typeof datosAula.estado);
     console.log('🔍 Disponible original:', this.aulaEditando.disponible, 'tipo:', typeof this.aulaEditando.disponible);
     console.log('🔍 Disponible convertido:', datosAula.disponible, 'tipo:', typeof datosAula.disponible);
-    console.log('🔍 Para_ninos original:', this.aulaEditando.para_ninos, 'tipo:', typeof this.aulaEditando.para_ninos);
-    console.log('🔍 Para_ninos convertido:', datosAula.para_ninos, 'tipo:', typeof datosAula.para_ninos);
-    console.log('🔍 Equipamiento:', datosAula.equipamiento);
+    console.log('🔍 Número original:', this.aulaEditando.numero, 'tipo:', typeof this.aulaEditando.numero);
+    console.log('🔍 Número convertido:', datosAula.numero, 'tipo:', typeof datosAula.numero);
+    console.log('🔍 Tipo aula:', datosAula.tipo_aula);
+    console.log('🔍 Rango edad:', datosAula.edad_minima, '-', datosAula.edad_maxima);
+    console.log('🔍 Ubicación:', datosAula.ubicacion);
+    console.log('🔍 Piso:', datosAula.piso);
+    console.log('🔍 Capacidad:', datosAula.capacidad, 'tipo:', typeof datosAula.capacidad);
     
     console.log('📤 Datos finales a enviar:', datosAula);
-    console.log('📤 ID en datos finales:', datosAula.id);
-    console.log('📤 Estado en datos finales:', datosAula.estado);
-    console.log('📤 Equipamiento en datos finales:', datosAula.equipamiento);
+    console.log('📤 JSON de datos:', JSON.stringify(datosAula, null, 2));
     console.log('🔗 URL de la petición:', 'http://localhost:3000/aulas');
     console.log('📋 Método HTTP:', 'PATCH');
     
@@ -451,19 +464,15 @@ export class AulasCoordinadorComponent implements OnInit {
         // Recargar datos desde el servidor para asegurar sincronización
         setTimeout(() => {
           console.log('🔄 Recargando datos del servidor...');
+          
+          // Recargar aulas activas primero
           this.cargarAulas();
           
-          // Si estamos en la vista de aulas eliminadas, recargar también esa lista
-          if (this.mostrarAulasEliminadas) {
-            console.log('🔄 Recargando lista de aulas eliminadas...');
+          // Luego recargar aulas eliminadas
+          setTimeout(() => {
             this.cargarAulasEliminadas();
-          }
-          
-          // Si el aula se marcó como inactiva, recargar también la lista de eliminadas
-          if (datosAula.estado === false) {
-            console.log('🔄 Aula marcada como inactiva, recargando lista de eliminadas...');
-            this.cargarAulasEliminadas();
-          }
+            console.log('🔄 Datos recargados - Aulas activas y eliminadas actualizadas');
+          }, 200);
         }, 500);
         
         // Mostrar mensaje de confirmación
@@ -475,6 +484,7 @@ export class AulasCoordinadorComponent implements OnInit {
         console.error('❌ Status:', err.status);
         console.error('❌ Status Text:', err.statusText);
         console.error('❌ Detalles del error:', err.error);
+        console.error('❌ Mensaje del error:', err.error?.message || err.message);
         console.error('❌ Headers:', err.headers);
         console.error('❌ URL intentada:', 'http://localhost:3000/aulas');
         console.error('❌ Datos enviados:', datosAula);
@@ -482,8 +492,9 @@ export class AulasCoordinadorComponent implements OnInit {
         console.error('❌ Error completo:', JSON.stringify(err, null, 2));
         this.guardando = false;
         
-        // Mostrar mensaje de error
-        this.mostrarMensajeError('Error al actualizar el aula');
+        // Mostrar mensaje de error más específico
+        const mensajeError = err.error?.message || err.message || 'Error al actualizar el aula';
+        this.mostrarMensajeError(mensajeError);
       }
     });
   }
@@ -573,13 +584,14 @@ export class AulasCoordinadorComponent implements OnInit {
         console.log('📦 === RESPUESTA AULAS ELIMINADAS ===');
         console.log('📦 Datos de aulas eliminadas recibidos:', response);
         
-        if (response.success && response.aulas) {
-          this.aulasEliminadas = response.aulas;
-          console.log('📦 Aulas eliminadas cargadas:', this.aulasEliminadas.length);
-          
-          // Actualizar estadísticas después de cargar aulas eliminadas
-          this.actualizarEstadisticas();
-        } else {
+                  if (response.success && response.aulas) {
+            this.aulasEliminadas = response.aulas;
+            console.log('📦 Aulas eliminadas cargadas:', this.aulasEliminadas.length);
+            
+            // Actualizar estadísticas después de cargar aulas eliminadas
+            this.actualizarEstadisticas();
+            console.log('📊 Estadísticas actualizadas después de cargar aulas eliminadas');
+          } else {
           console.error('❌ Respuesta inesperada del servidor:', response);
           this.errorEliminadas = true;
         }
@@ -699,14 +711,12 @@ export class AulasCoordinadorComponent implements OnInit {
     this.aulaEditando = {
       id: aula.id,
       numero: aula.numero,
-      piso: aula.piso,
-      capacidad: aula.capacidad,
-      para_ninos: aula.para_ninos,
-      equipamiento: {
-        proyector: aula.equipamiento?.proyector || false,
-        computadoras: aula.equipamiento?.computadoras || 0,
-        pizarra_digital: aula.equipamiento?.pizarra_digital || false
-      },
+      ubicacion: aula.ubicacion || '',
+      piso: aula.piso || '',
+      capacidad: aula.capacidad || 0,
+      tipo_aula: aula.tipo_aula || 'tiny_kids',
+      edad_minima: aula.edad_minima || 0,
+      edad_maxima: aula.edad_maxima || 0,
       disponible: aula.disponible,
       estado: aula.estado, // Permitir cambiar el estado
       observaciones: aula.observaciones || ''
@@ -736,11 +746,18 @@ export class AulasCoordinadorComponent implements OnInit {
   }
 
   actualizarEstadisticas(): void {
-    console.log('🔄 Actualizando estadísticas...');
+    console.log('🔄 === ACTUALIZANDO ESTADÍSTICAS ===');
     console.log('📊 Total aulas activas:', this.aulas.length);
     console.log('📊 Total aulas inactivas:', this.aulasEliminadas.length);
     console.log('📊 Aulas disponibles:', this.aulas.filter(a => a.disponible === true).length);
     console.log('📊 Aulas ocupadas:', this.aulas.filter(a => a.disponible === false).length);
+    
+    // Detalles de aulas activas por disponibilidad
+    const aulasDisponibles = this.aulas.filter(a => a.disponible === true);
+    const aulasOcupadas = this.aulas.filter(a => a.disponible === false);
+    
+    console.log('📋 Detalle aulas disponibles:', aulasDisponibles.map(a => a.numero));
+    console.log('📋 Detalle aulas ocupadas:', aulasOcupadas.map(a => a.numero));
     
     // Forzar la detección de cambios en Angular
     // Esto asegura que las propiedades computadas se actualicen en la UI

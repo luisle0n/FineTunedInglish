@@ -5,6 +5,7 @@ import { AuthService } from '../../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { limpiarLineasCSV, extraerEncabezados, procesarFilas, transformarAFilaDocente } from '../../../../utils/excel-utils';
 
 @Component({
   standalone: true,
@@ -40,6 +41,8 @@ export class InicioTalentoHuemanoComponent implements OnInit {
     experiencia_anios: 0,
     nivel_ingles_id: '',
     horas_disponibles: 0,
+    max_horas_semanales: 30,
+    puede_dar_sabados: true,
     especializaciones: [],
     horarios: []
   };
@@ -195,6 +198,8 @@ export class InicioTalentoHuemanoComponent implements OnInit {
       experiencia_anios: 0,
       nivel_ingles_id: '',
       horas_disponibles: 0,
+      max_horas_semanales: 30,
+      puede_dar_sabados: true,
       especializaciones: [],
       horarios: []
     };
@@ -284,13 +289,52 @@ export class InicioTalentoHuemanoComponent implements OnInit {
     }
   }
 
+  validarMaxHorasModal(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const valor = parseInt(input.value);
+    
+    if (valor < 1) {
+      input.value = '1';
+      this.nuevoDocente.max_horas_semanales = 1;
+    } else if (valor > 40) {
+      input.value = '40';
+      this.nuevoDocente.max_horas_semanales = 40;
+    }
+  }
+
   guardarDocente() {
     console.log('💾 Guardando docente:', this.nuevoDocente);
     
-    // Aquí iría la lógica para guardar el docente
-    // Por ahora solo cerramos el modal
-    this.cerrarModalNuevoDocente();
-    alert('Docente guardado exitosamente');
+    const payload = {
+      primer_nombre: this.nuevoDocente.primer_nombre,
+      segundo_nombre: this.nuevoDocente.segundo_nombre,
+      primer_apellido: this.nuevoDocente.primer_apellido,
+      segundo_apellido: this.nuevoDocente.segundo_apellido,
+      cedula: this.nuevoDocente.cedula,
+      correo: this.nuevoDocente.correo,
+      telefono: this.nuevoDocente.telefono,
+      tipo_contrato_id: this.nuevoDocente.tipo_contrato_id,
+      experiencia_anios: this.nuevoDocente.experiencia_anios,
+      nivel_ingles_id: this.nuevoDocente.nivel_ingles_id,
+      horas_disponibles: this.nuevoDocente.horas_disponibles,
+      max_horas_semanales: this.nuevoDocente.max_horas_semanales,
+      puede_dar_sabados: this.nuevoDocente.puede_dar_sabados,
+      especializaciones: this.nuevoDocente.especializaciones,
+      horarios: this.nuevoDocente.horarios
+    };
+
+    this.http.post('http://localhost:3000/docentes', payload).subscribe({
+      next: () => {
+        console.log('✅ Docente guardado exitosamente');
+        this.cerrarModalNuevoDocente();
+        this.cargarEstadisticas(); // Recargar estadísticas
+        alert('Docente guardado exitosamente');
+      },
+      error: (err) => {
+        console.error('❌ Error al guardar docente:', err);
+        alert('Error al guardar el docente. Verifica los datos.');
+      }
+    });
   }
 
   // === CARGA DE DATOS EXCEL ===
@@ -328,69 +372,83 @@ export class InicioTalentoHuemanoComponent implements OnInit {
 
   procesarArchivoExcel(content: string, fileName: string): void {
     try {
-      // Simular procesamiento de datos
-      // En una implementación real, aquí se usarían las utilidades de excel-utils
-      const docentesSimulados = [
-        {
-          primer_nombre: 'Juan',
-          segundo_nombre: '',
-          primer_apellido: 'Pérez',
-          segundo_apellido: '',
-          cedula: '1234567890',
-          correo: 'juan.perez@email.com',
-          telefono: '0991234567',
-          tipo_contrato_id: this.contratos[0]?.id || '',
-          experiencia_anios: 5,
-          nivel_ingles_id: this.nivelesIngles[0]?.id || '',
-          horas_disponibles: 20
-        },
-        {
-          primer_nombre: 'María',
-          segundo_nombre: '',
-          primer_apellido: 'García',
-          segundo_apellido: '',
-          cedula: '0987654321',
-          correo: 'maria.garcia@email.com',
-          telefono: '0997654321',
-          tipo_contrato_id: this.contratos[0]?.id || '',
-          experiencia_anios: 3,
-          nivel_ingles_id: this.nivelesIngles[1]?.id || '',
-          horas_disponibles: 15
-        }
-      ];
+      console.log('📄 Procesando archivo:', fileName);
+      
+      // Limpiar líneas del CSV
+      const lineas = limpiarLineasCSV(content);
+      if (lineas.length < 2) {
+        throw new Error('El archivo debe tener al menos una fila de encabezados y una fila de datos');
+      }
 
-      this.docentesPendientes = docentesSimulados;
+      // Extraer encabezados
+      const encabezados = extraerEncabezados(lineas);
+      console.log('📋 Encabezados encontrados:', encabezados);
+
+      // Procesar filas de datos
+      const filas = procesarFilas(lineas.slice(1), encabezados);
+      console.log('📄 Datos crudos leídos del CSV:', filas);
+
+      // Transformar a formato de docente
+      const errores: string[] = [];
+      const docentesTransformados = filas
+        .map(fila => transformarAFilaDocente(fila, errores, this.contratos, this.nivelesIngles, this.especializaciones, this.horariosDisponibles))
+        .filter(Boolean);
+
+      console.log('📋 Docentes transformados:', docentesTransformados);
+
+      if (errores.length > 0) {
+        console.warn('⚠️ Errores encontrados durante la transformación:', errores);
+        alert(`Se encontraron ${errores.length} errores en el archivo:\n${errores.slice(0, 5).join('\n')}${errores.length > 5 ? '\n...' : ''}`);
+      }
+
+      if (docentesTransformados.length === 0) {
+        throw new Error('No se pudieron procesar docentes válidos del archivo');
+      }
+
+      this.docentesPendientes = docentesTransformados;
       this.mostrarModalConfirmacion = true;
       this.cerrarModalCargarDatos();
       
       console.log('✅ Archivo procesado:', this.docentesPendientes.length, 'docentes encontrados');
     } catch (error) {
       console.error('❌ Error procesando archivo:', error);
-      alert('Error al procesar el archivo. Verifica que el formato sea correcto.');
+      alert(`Error al procesar el archivo: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   }
 
   confirmarCargaDocentes(): void {
     console.log('🚀 Confirmando carga de', this.docentesPendientes.length, 'docentes');
     
-    // Aquí iría la lógica para guardar los docentes en la base de datos
-    // Por ahora solo simulamos la carga
-    
     let cargados = 0;
     let errores = 0;
     
-    this.docentesPendientes.forEach((docente, index) => {
-      try {
-        // Simular guardado exitoso
-        console.log('💾 Guardando docente:', docente.primer_nombre, docente.primer_apellido);
-        cargados++;
-      } catch (error) {
-        console.error('❌ Error guardando docente:', error);
-        errores++;
-      }
-    });
+    console.log('🚀 Iniciando carga de docentes:');
+    console.log('📊 Total docentes a cargar:', this.docentesPendientes.length);
+    console.log('📋 Primer docente a enviar:', this.docentesPendientes[0]);
     
-    this.finalizarCarga(cargados, errores);
+    this.docentesPendientes.forEach((docente, index) => {
+      console.log(`📤 Enviando docente ${index + 1}:`, docente);
+      this.http.post('http://localhost:3000/docentes', docente).subscribe({
+        next: () => {
+          console.log(`✅ Docente ${index + 1} cargado exitosamente`);
+          cargados++;
+          if (cargados + errores === this.docentesPendientes.length) {
+            this.finalizarCarga(cargados, errores);
+          }
+        },
+        error: (err) => {
+          console.error(`❌ Error al cargar docente ${index + 1}:`, err);
+          console.error('📋 Datos del docente que falló:', docente);
+          if (err.error && err.error.message) {
+            console.error('🔍 Mensaje de error del backend:', err.error.message);
+          }
+          errores++;
+          if (cargados + errores === this.docentesPendientes.length) {
+            this.finalizarCarga(cargados, errores);
+          }
+        }
+      });
+    });
   }
 
   cancelarCargaDocentes(): void {
@@ -405,10 +463,15 @@ export class InicioTalentoHuemanoComponent implements OnInit {
     this.archivoSeleccionado = null;
     
     if (errores === 0) {
-      alert(`✅ Se cargaron exitosamente ${cargados} docentes`);
+      alert(`✅ Se cargaron exitosamente ${cargados} docente(s).`);
+    } else if (cargados === 0) {
+      alert(`❌ No se pudo cargar ningún docente. Revisa la consola para más detalles.`);
     } else {
-      alert(`⚠️ Se cargaron ${cargados} docentes. ${errores} docentes tuvieron errores.`);
+      alert(`⚠️ Se cargaron ${cargados} docente(s) y ${errores} fallaron. Revisa la consola para más detalles.`);
     }
+    
+    // Recargar estadísticas
+    this.cargarEstadisticas();
   }
 
   getContratoNombre(contratoId: string): string {

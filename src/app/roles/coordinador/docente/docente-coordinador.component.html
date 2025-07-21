@@ -77,19 +77,20 @@
         <thead>
           <tr>
             <th>Nombres</th>
-            <th>Correo</th>
             <th>Teléfono</th>
             <th>Tipo Contrato</th>
             <th>Ex</th>
             <th>Nivel de Inglés</th>
-            <th>Horas</th>
+            <th>Horas Disponibles</th>
+            <th>Horas Asignadas</th>
+            <th>Máx. Horas</th>
             <th>Especialización</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngIf="docentesPaginados.length === 0">
-            <td colspan="9" class="no-data">
+            <td colspan="10" class="no-data">
               <div class="no-data-content">
                 <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con los filtros aplicados.</p>
                 <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con los filtros aplicados.</p>
@@ -101,12 +102,13 @@
               {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
               docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
             </td>
-            <td>{{ docente.persona?.correo }}</td>
             <td>{{ docente.persona?.telefono }}</td>
             <td>{{ docente.tipo_contrato?.nombre }}</td>
             <td>{{ docente.experiencia_anios }}</td>
             <td>{{ docente.nivel_ingles?.nombre }}</td>
             <td>{{ docente.horas_disponibles }}</td>
+            <td>{{ docente.horas_asignadas }}</td>
+            <td>{{ docente.max_horas_semanales }}</td>
             <td>
               <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre
                 }}<br /></span>
@@ -202,6 +204,26 @@
             <div class="info-item">
               <label>Horas Disponibles:</label>
               <span>{{ docenteSeleccionado.horas_disponibles }} horas</span>
+            </div>
+            <div class="info-item">
+              <label>Horas Asignadas:</label>
+              <span>{{ docenteSeleccionado.horas_asignadas }} horas</span>
+            </div>
+            <div class="info-item">
+              <label>Máximo Horas Semanales:</label>
+              <span>{{ docenteSeleccionado.max_horas_semanales }} horas</span>
+            </div>
+            <div class="info-item">
+              <label>Puede dar Sábados:</label>
+              <span class="badge" [ngClass]="docenteSeleccionado.puede_dar_sabados ? 'badge-si' : 'badge-no'">
+                {{ docenteSeleccionado.puede_dar_sabados ? 'Sí' : 'No' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>Estado:</label>
+              <span class="badge" [ngClass]="docenteSeleccionado.activo ? 'badge-activo' : 'badge-inactivo'">
+                {{ docenteSeleccionado.activo ? 'Activo' : 'Inactivo' }}
+              </span>
             </div>
           </div>
         </div>

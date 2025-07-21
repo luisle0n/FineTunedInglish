@@ -32,6 +32,16 @@ export class ErrorInterceptor implements HttpInterceptor {
           switch (error.status) {
             case 400:
               errorMessage = 'Solicitud incorrecta';
+              console.error('🔍 Error 400 completo:', error);
+              console.error('🔍 Body del error:', error.error);
+              if (error.error && error.error.message) {
+                errorMessage += `: ${error.error.message}`;
+              } else if (error.error && typeof error.error === 'string') {
+                errorMessage += `: ${error.error}`;
+              } else if (error.error && error.error.errors) {
+                const validationErrors = Object.values(error.error.errors).flat();
+                errorMessage += `: ${validationErrors.join(', ')}`;
+              }
               break;
             case 401:
               errorMessage = 'No autorizado';

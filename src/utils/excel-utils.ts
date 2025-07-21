@@ -75,11 +75,18 @@ export function transformarAFilaDocente(
     return null;
   }
 
+  // Validar que los campos requeridos estén presentes
+  if (!fila['primer_nombre'] || !fila['primer_apellido'] || !fila['cedula'] || !fila['correo'] || !fila['telefono']) {
+    erroresFila.push(`Línea ${linea}: Faltan campos requeridos (primer_nombre, primer_apellido, cedula, correo, telefono)`);
+    errores.push(...erroresFila);
+    return null;
+  }
+
   return {
     primer_nombre: fila['primer_nombre'],
-    segundo_nombre: fila['segundo_nombre'],
+    segundo_nombre: fila['segundo_nombre'] || '',
     primer_apellido: fila['primer_apellido'],
-    segundo_apellido: fila['segundo_apellido'],
+    segundo_apellido: fila['segundo_apellido'] || '',
     cedula: fila['cedula'],
     correo: fila['correo'],
     telefono: fila['telefono'],
@@ -87,6 +94,8 @@ export function transformarAFilaDocente(
     experiencia_anios: Number(fila['experiencia_anios']) || 0,
     nivel_ingles_id: nivelIngles?.id,
     horas_disponibles: Number(fila['horas_disponibles']) || 0,
+    max_horas_semanales: Number(fila['max_horas_semanales']) || 30,
+    puede_dar_sabados: fila['puede_dar_sabados'] === 'true' || fila['puede_dar_sabados'] === 'Sí' || fila['puede_dar_sabados'] === '1',
     especializaciones: especializacionesIds,
     horarios: horariosIds
   };

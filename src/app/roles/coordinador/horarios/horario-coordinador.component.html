@@ -1,76 +1,342 @@
-<main class="horario-container">
-  <!-- Header General -->
-  <app-header></app-header>
-  
+<div class="horarios-container">
   <h2>Generación de Horarios</h2>
+  <div class="header-divider"></div>
 
-  <!-- OPCIONES -->
-  <section class="generar-opciones">
-    <div class="input-card">
-      <h3>Parámetros</h3>
-
-      <label for="fecha">Fecha</label>
-      <input type="date" id="fecha" [(ngModel)]="configuracion.fecha" />
-
-      <label for="periodo">Periodo</label>
-      <select id="periodo" [(ngModel)]="configuracion.periodo">
-        <option value="2024-1">2024-1</option>
-        <option value="2024-2">2024-2</option>
+  <!-- Barra de acciones optimizada -->
+  <div class="acciones-horarios-opt">
+    <div class="acciones-select">
+      <label for="vistaSelect"><strong>Selecciona la vista:</strong></label>
+      <select id="vistaSelect" class="combo-select-opt" [(ngModel)]="vistaSeleccionada">
+        <option value="carga-docentes">Carga de Docentes</option>
+        <option value="ocupacion-aulas">Ocupación de Aulas</option>
+        <option value="resumen-programas">Resumen de Programas</option>
+        <option value="horario-por-piso">Horario de todos los pisos</option>
+        <option value="horario-completo">Horario completo</option>
       </select>
-
-      <label for="priorizar">Priorizar</label>
-      <select id="priorizar" [(ngModel)]="configuracion.priorizar">
-        <option value="balanceado">Balanceado</option>
-        <option value="horas">Horas</option>
-      </select>
-
-      <label for="distribuir">Distribuir</label>
-      <select id="distribuir" [(ngModel)]="configuracion.distribuir">
-        <option value="preferencias">Por Preferencias</option>
-        <option value="aleatorio">Aleatorio</option>
-      </select>
-
-      <div class="checkboxes">
-        <label><input type="checkbox" [(ngModel)]="configuracion.respetarPeriodo" /> Respetar periodo académico</label>
-        <label><input type="checkbox" [(ngModel)]="configuracion.balancearTipoContrato" /> Balancear tipo de contrato</label>
-      </div>
-
-      <label for="horario">Archivo Horario</label>
-      <input type="file" id="horario" (change)="subirArchivo('horario', $event)" />
-
-      <label for="empresarial">Archivo Empresarial</label>
-      <input type="file" id="empresarial" (change)="subirArchivo('empresarial', $event)" />
-
-      <label for="aulas">Archivo Aulas</label>
-      <input type="file" id="aulas" (change)="subirArchivo('aulas', $event)" />
-
-      <button class="btn-generar" (click)="generarHorario()">Generar Horario</button>
     </div>
-  </section>
+    <div class="acciones-botones">
+      <button class="btn-generar-horario" (click)="generarHorario()">
+        <span class="material-icons">Generar Horario</span>
+      </button>
+      <button class="btn-resetear-horario" (click)="resetearHorario()">
+        <span class="material-icons">Resetar Horario</span>
+      </button>
+    </div>
+  </div>
 
-  <!-- HORARIO GENERADO -->
-  <section class="horario-generado" *ngIf="horarioGenerado.length">
-    <h3>Horario Generado</h3>
+  <!-- Mejorar tablas: aplicar badges, tooltips y colores en las tablas de docentes, aulas y programas -->
+  <!-- Docentes -->
+  <div class="card-table" *ngIf="vistaSeleccionada === 'carga-docentes' && cargaDocentes && cargaDocentes.length">
+    <div class="card-title">
+      <span class="material-icons"></span>
+      Lista de Docentes
+    </div>
+    <div class="table-responsive">
+      <table class="table table-docentes tabla-estilo-clases tabla-color">
+        <thead>
+          <tr>
+            <th>Docente</th>
+            <th>Nivel de Inglés</th>
+            <th>Horas Disponibles</th>
+            <th>Horas Asignadas</th>
+            <th>% Carga</th>
+            <th>Total Clases</th>
+            <th>Ver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of cargaDocentesPaginados">
+            <td><span class="badge badge-docente" [title]="d.docente">{{ d.docente }}</span></td>
+            <td><span class="badge badge-nivel" [title]="d.nivel_ingles">{{ d.nivel_ingles }}</span></td>
+            <td>{{ d.horas_disponibles }}</td>
+            <td>{{ d.horas_asignadas }}</td>
+            <td><span class="badge badge-carga" [title]="d.porcentaje_carga + '%'">{{ d.porcentaje_carga }}%</span></td>
+            <td>{{ d.total_clases }}</td>
+            <td>
+              <button class="btn-ver-docente" (click)="verDocente(d)">
+                <img src="img/ojo-abierto.png" alt="Ver" width="22" height="22" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="paginacion-docentes">
+      <div class="paginacion-info">
+        Mostrando {{ (paginaDocentes - 1) * pageSize + 1 }} - {{ min(paginaDocentes * pageSize, cargaDocentes.length) }} de {{ cargaDocentes.length }} docentes
+      </div>
+      <div class="paginacion-controles">
+        <button (click)="cambiarPaginaDocentes(paginaDocentes - 1)" [disabled]="paginaDocentes === 1">&larr; Anterior</button>
+        <button *ngFor="let p of getPages('docentes')" [class.active]="paginaDocentes === p" (click)="cambiarPaginaDocentes(p)">{{ p }}</button>
+        <button (click)="cambiarPaginaDocentes(paginaDocentes + 1)" [disabled]="paginaDocentes === getPages('docentes').length">Siguiente &rarr;</button>
+      </div>
+    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Docente</th>
-          <th *ngFor="let dia of dias">{{ dia | titlecase }}</th>
-          <th>Total Horas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let docente of horarioGenerado">
-          <td>{{ docente.nombre }}<br /><small>{{ docente.contrato }}</small></td>
-          <td *ngFor="let dia of dias">
-            <div *ngFor="let clase of docente.horario[dia]" [ngClass]="getColorPorCarga(docente.totalHoras)" class="clase">
-              {{ clase }}
+    <!-- Modal de información del docente (formato reutilizado de vista docente activos) -->
+    <div class="modal-backdrop" *ngIf="docenteSeleccionado">
+      <div class="modal vista-docente-modal">
+        <div class="modal-header">
+          <h3>Información Detallada del Docente</h3>
+          <button class="btn-close" (click)="docenteSeleccionado = null">×</button>
+        </div>
+        <div class="vista-docente-content" *ngIf="docenteSeleccionado">
+          <!-- Información Profesional -->
+          <div class="info-section">
+            <h4 class="section-title">Información Profesional</h4>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Docente:</label>
+                <span>{{ docenteSeleccionado.docente }}</span>
+              </div>
+              <div class="info-item">
+                <label>Nivel de Inglés:</label>
+                <span>{{ docenteSeleccionado.nivel_ingles }}</span>
+              </div>
+              <div class="info-item">
+                <label>Experiencia (años):</label>
+                <span>{{ docenteSeleccionado.experiencia_anios ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Horas Disponibles:</label>
+                <span>{{ docenteSeleccionado.horas_disponibles ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Horas Asignadas:</label>
+                <span>{{ docenteSeleccionado.horas_asignadas ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Máx. Horas/Semana:</label>
+                <span>{{ docenteSeleccionado.max_horas_semanales ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>% Carga:</label>
+                <span>{{ docenteSeleccionado.porcentaje_carga ?? '-' }}%</span>
+              </div>
+              <div class="info-item">
+                <label>Total Clases:</label>
+                <span>{{ docenteSeleccionado.total_clases ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Categorías Enseñadas:</label>
+                <span>{{ docenteSeleccionado.categorias_ensenadas ?? '-' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Niveles Enseñados:</label>
+                <span>{{ docenteSeleccionado.niveles_ensenados ?? '-' }}</span>
+              </div>
             </div>
-          </td>
-          <td><strong>{{ docente.totalHoras }}</strong></td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-</main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aulas -->
+  <div class="card-table" *ngIf="vistaSeleccionada === 'ocupacion-aulas' && ocupacionAulas && ocupacionAulas.length">
+    <div class="card-title">
+      <span class="material-icons"></span>
+      Ocupación de Aulas
+    </div>
+    <div class="table-responsive">
+      <table class="table table-docentes tabla-estilo-clases tabla-color">
+        <thead>
+          <tr>
+            <th>Piso</th>
+            <th>Aula</th>
+            <th>Ubicación</th>
+            <th>Capacidad</th>
+            <th>Tipo de Aula</th>
+            <th>Total Clases</th>
+            <th>Horarios Ocupados</th>
+            <th>Total Estudiantes</th>
+            <th>Promedio Ocupación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let aula of ocupacionAulasPaginadas">
+            <td><span class="badge badge-piso" [title]="aula.piso">{{ aula.piso }}</span></td>
+            <td><span class="badge badge-aula" [title]="aula.aula">{{ aula.aula }}</span></td>
+            <td>{{ aula.ubicacion }}</td>
+            <td>{{ aula.capacidad }}</td>
+            <td>{{ aula.tipo_aula }}</td>
+            <td>{{ aula.total_clases }}</td>
+            <td>{{ aula.horarios_ocupados || '-' }}</td>
+            <td><span class="badge badge-estudiantes" [title]="'Estudiantes'">{{ aula.total_estudiantes }}</span></td>
+            <td><span class="badge badge-ocupacion" [title]="aula.promedio_ocupacion">{{ aula.promedio_ocupacion !== null ? aula.promedio_ocupacion : '-' }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="paginacion-docentes">
+      <div class="paginacion-info">
+        Mostrando {{ (paginaAulas - 1) * pageSize + 1 }} - {{ min(paginaAulas * pageSize, ocupacionAulas.length) }} de {{ ocupacionAulas.length }} aulas
+      </div>
+      <div class="paginacion-controles">
+        <button (click)="cambiarPaginaAulas(paginaAulas - 1)" [disabled]="paginaAulas === 1">&larr; Anterior</button>
+        <button *ngFor="let p of getPages('aulas')" [class.active]="paginaAulas === p" (click)="cambiarPaginaAulas(p)">{{ p }}</button>
+        <button (click)="cambiarPaginaAulas(paginaAulas + 1)" [disabled]="paginaAulas === getPages('aulas').length">Siguiente &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Programas -->
+  <div class="card-table" *ngIf="vistaSeleccionada === 'resumen-programas' && resumenProgramas && resumenProgramas.length">
+    <div class="card-title">
+      <span class="material-icons"></span>
+      Resumen de Programas
+    </div>
+    <div class="table-responsive">
+      <table class="table table-docentes tabla-estilo-clases tabla-color">
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Programa</th>
+            <th>Nivel</th>
+            <th>Piso Preferido</th>
+            <th>Total Clases</th>
+            <th>Clases Asignadas</th>
+            <th>Clases Pendientes</th>
+            <th>Total Cupos Proyectados</th>
+            <th>Total Cupos Asignados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of resumenProgramasPaginados">
+            <td><span class="badge badge-categoria" [title]="p.categoria">{{ p.categoria }}</span></td>
+            <td><span class="badge badge-programa" [title]="p.programa">{{ p.programa }}</span></td>
+            <td><span class="badge badge-nivel" [title]="p.nivel">{{ p.nivel }}</span></td>
+            <td><span class="badge badge-piso" [title]="p.piso_preferido">{{ p.piso_preferido }}</span></td>
+            <td>{{ p.total_clases }}</td>
+            <td>{{ p.clases_asignadas }}</td>
+            <td>{{ p.clases_pendientes }}</td>
+            <td>{{ p.total_cupos_proyectados !== null ? p.total_cupos_proyectados : '-' }}</td>
+            <td>{{ p.total_cupos_asignados }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="paginacion-docentes">
+      <div class="paginacion-info">
+        Mostrando {{ (paginaResumen - 1) * pageSize + 1 }} - {{ min(paginaResumen * pageSize, resumenProgramas.length) }} de {{ resumenProgramas.length }} programas
+      </div>
+      <div class="paginacion-controles">
+        <button (click)="cambiarPaginaResumen(paginaResumen - 1)" [disabled]="paginaResumen === 1">&larr; Anterior</button>
+        <button *ngFor="let p of getPages('resumen')" [class.active]="paginaResumen === p" (click)="cambiarPaginaResumen(p)">{{ p }}</button>
+        <button (click)="cambiarPaginaResumen(paginaResumen + 1)" [disabled]="paginaResumen === getPages('resumen').length">Siguiente &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de resultado de asignación (después de Generar Horario) -->
+  <div class="card-table" *ngIf="resultadoAsignacion && resultadoAsignacion.length">
+    <div class="card-title">Resultado de la Asignación</div>
+    <div class="table-responsive">
+      <table class="table table-docentes tabla-estilo-clases">
+        <thead>
+          <tr>
+            <th>Programa</th>
+            <th>Mensaje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of resultadoAsignacion">
+            <td><span class="badge badge-programa" [title]="r.programa_nombre">{{ r.programa_nombre }}</span></td>
+            <td>{{ r.mensaje }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Card para Horario Completo (combo box) -->
+  <div class="card-table" *ngIf="vistaSeleccionada === 'horario-completo' && horarioCompleto && horarioCompleto.length">
+    <div class="card-title">Horario Completo</div>
+    <div class="table-responsive horario-mejorada">
+      <table class="table table-docentes tabla-estilo-clases">
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Programa</th>
+            <th>Categoría</th>
+            <th>Nivel</th>
+            <th>Paralelo</th>
+            <th>Docente</th>
+            <th>Aula</th>
+            <th>Piso</th>
+            <th>Capacidad Aula</th>
+            <th>Estudiantes Asignados</th>
+            <th>% Ocupación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fila of horarioCompleto">
+            <td>{{ fila.dia }}</td>
+            <td>{{ fila.hora_inicio }}</td>
+            <td>{{ fila.hora_fin }}</td>
+            <td>
+              <span class="badge badge-programa" [title]="fila.programa">{{ fila.programa }}</span>
+            </td>
+            <td>
+              <span class="badge badge-categoria" [title]="fila.categoria">{{ fila.categoria }}</span>
+            </td>
+            <td>
+              <span class="badge badge-nivel" [title]="fila.nivel">{{ fila.nivel }}</span>
+            </td>
+            <td>{{ fila.paralelo }}</td>
+            <td>
+              <span class="badge badge-docente" [title]="fila.docente">{{ fila.docente }}</span>
+            </td>
+            <td>
+              <span class="badge badge-aula" [title]="fila.aula">{{ fila.aula }}</span>
+            </td>
+            <td>{{ fila.piso }}</td>
+            <td>{{ fila.capacidad_aula }}</td>
+            <td>{{ fila.estudiantes_asignados }}</td>
+            <td>
+              <span class="badge badge-ocupacion" [title]="fila.porcentaje_ocupacion">{{ fila.porcentaje_ocupacion }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Card para Horario de todos los pisos (combo box) -->
+  <div class="card-table" *ngIf="vistaSeleccionada === 'horario-por-piso' && horarioPorPiso && horarioPorPiso.length">
+    <div class="card-title">Horario de Todos los Pisos</div>
+    <div class="table-responsive horario-mejorada">
+      <table class="table table-docentes tabla-estilo-clases">
+        <thead>
+          <tr>
+            <th>Piso</th>
+            <th>Aula</th>
+            <th>Día</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Programa</th>
+            <th>Docente</th>
+            <th>Estudiantes Asignados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fila of horarioPorPiso">
+            <td>{{ fila.piso }}</td>
+            <td><span class="badge badge-aula" [title]="fila.aula">{{ fila.aula }}</span></td>
+            <td>{{ fila.dia }}</td>
+            <td>{{ fila.hora_inicio }}</td>
+            <td>{{ fila.hora_fin }}</td>
+            <td><span class="badge badge-programa" [title]="fila.programa">{{ fila.programa }}</span></td>
+            <td><span class="badge badge-docente" [title]="fila.docente">{{ fila.docente }}</span></td>
+            <td>
+              <span class="badge badge-estudiantes" [title]="'Cantidad de estudiantes'">
+                {{ fila.estudiantes }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

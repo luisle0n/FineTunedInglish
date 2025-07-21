@@ -41,6 +41,11 @@ export class CatalogoService {
     return this.http.get<Horario[]>(`${this.baseUrl}/horarios`);
   }
 
+  // Obtener todos los programas
+  getProgramas(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/programas/listar`);
+  }
+
   // Cargar todos los catálogos
   cargarTodosLosCatalogos(): Observable<{
     contratos: Catalogo[];

@@ -60,6 +60,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         experiencia_anios: 0,
         nivel_ingles_id: '',
         horas_disponibles: 0,
+        max_horas_semanales: 30,
+        puede_dar_sabados: true,
         especializaciones: [],
         horarios: []
     };
@@ -140,81 +142,93 @@ export class DocenteTalentoHumanoComponent implements OnInit {
     cargarDocentes() {
         console.log('📥 Cargando docentes desde la API...');
         this.http.get<any[]>('http://localhost:3000/docentes').subscribe(data => {
-            console.log('📦 Datos recibidos de la API:', data.length, 'docentes');
-            this.docentes = data.map(docente => {
-                // Mapear ids de especializaciones por nombre si no hay id
-                const especIds = (docente.especializaciones || []).map((e: any) => {
-                    if (e.especializacion_id) return e.especializacion_id;
-                    if (e.especializacion?.id) return e.especializacion.id;
-                    if (e.especializacion?.nombre) {
-                        const found = this.especializaciones.find(es => es.nombre === e.especializacion.nombre);
-                        return found ? found.id : null;
-                    }
-                    return null;
-                }).filter(Boolean);
-
-                const tipoContratoId = this.contratos.find(c => c.nombre === docente.tipo_contrato?.nombre)?.id || '';
-                const nivelInglesId = this.nivelesIngles.find(n => n.nombre === docente.nivel_ingles?.nombre)?.id || '';
-                return {
-                    ...docente,
-                    editValues: {
-                        correo: docente.persona?.correo,
-                        telefono: docente.persona?.telefono,
-                        tipo_contrato_id: tipoContratoId,
-                        experiencia_anios: docente.experiencia_anios,
-                        nivel_ingles_id: nivelInglesId,
-                        horas_disponibles: docente.horas_disponibles,
-                        especializaciones: especIds
-                    },
-                    backup: null // para cancelar edición
-                };
-            });
-            
-            console.log('🔄 Docentes procesados:', this.docentes.length);
-            
+            this.procesarDocentesActivos(data);
             // Aplicar filtros y paginación después de cargar los datos
             this.filtrarDocentes();
         });
     }
 
+    // Método auxiliar para procesar docentes activos
+    private procesarDocentesActivos(data: any[]) {
+        console.log('📦 Datos recibidos de la API:', data.length, 'docentes');
+        this.docentes = data.map(docente => {
+            // Mapear ids de especializaciones por nombre si no hay id
+            const especIds = (docente.especializaciones || []).map((e: any) => {
+                if (e.especializacion_id) return e.especializacion_id;
+                if (e.especializacion?.id) return e.especializacion.id;
+                if (e.especializacion?.nombre) {
+                    const found = this.especializaciones.find(es => es.nombre === e.especializacion.nombre);
+                    return found ? found.id : null;
+                }
+                return null;
+            }).filter(Boolean);
+
+            const tipoContratoId = this.contratos.find(c => c.nombre === docente.tipo_contrato?.nombre)?.id || '';
+            const nivelInglesId = this.nivelesIngles.find(n => n.nombre === docente.nivel_ingles?.nombre)?.id || '';
+            return {
+                ...docente,
+                editValues: {
+                    correo: docente.persona?.correo,
+                    telefono: docente.persona?.telefono,
+                    tipo_contrato_id: tipoContratoId,
+                    experiencia_anios: docente.experiencia_anios,
+                    nivel_ingles_id: nivelInglesId,
+                    horas_disponibles: docente.horas_disponibles,
+                    horas_asignadas: docente.horas_asignadas || 0,
+                    max_horas_semanales: docente.max_horas_semanales || 30,
+                    especializaciones: especIds
+                },
+                backup: null // para cancelar edición
+            };
+        });
+        
+        console.log('🔄 Docentes procesados:', this.docentes.length);
+    }
+
     cargarDocentesInactivos() {
         console.log('📥 Cargando docentes inactivos desde la API...');
         this.http.get<any[]>('http://localhost:3000/docentes/inactivos').subscribe(data => {
-            console.log('📦 Datos recibidos de la API (inactivos):', data.length, 'docentes');
-            this.docentesInactivos = data.map(docente => {
-                // Mapear ids de especializaciones por nombre si no hay id
-                const especIds = (docente.especializaciones || []).map((e: any) => {
-                    if (e.especializacion_id) return e.especializacion_id;
-                    if (e.especializacion?.id) return e.especializacion.id;
-                    if (e.especializacion?.nombre) {
-                        const found = this.especializaciones.find(es => es.nombre === e.especializacion.nombre);
-                        return found ? found.id : null;
-                    }
-                    return null;
-                }).filter(Boolean);
-
-                const tipoContratoId = this.contratos.find(c => c.nombre === docente.tipo_contrato?.nombre)?.id || '';
-                const nivelInglesId = this.nivelesIngles.find(n => n.nombre === docente.nivel_ingles?.nombre)?.id || '';
-                return {
-                    ...docente,
-                    editValues: {
-                        correo: docente.persona?.correo,
-                        telefono: docente.persona?.telefono,
-                        tipo_contrato_id: tipoContratoId,
-                        experiencia_anios: docente.experiencia_anios,
-                        nivel_ingles_id: nivelInglesId,
-                        horas_disponibles: docente.horas_disponibles,
-                        especializaciones: especIds
-                    },
-                    backup: null // para cancelar edición
-                };
-            });
-            
-            console.log('🔄 Docentes inactivos procesados:', this.docentesInactivos.length);
-            
+            this.procesarDocentesInactivos(data);
             // Aplicar filtros y paginación después de cargar los datos
             this.filtrarDocentesInactivos();
         });
+    }
+
+    // Método auxiliar para procesar docentes inactivos
+    private procesarDocentesInactivos(data: any[]) {
+        console.log('📦 Datos recibidos de la API (inactivos):', data.length, 'docentes');
+        this.docentesInactivos = data.map(docente => {
+            // Mapear ids de especializaciones por nombre si no hay id
+            const especIds = (docente.especializaciones || []).map((e: any) => {
+                if (e.especializacion_id) return e.especializacion_id;
+                if (e.especializacion?.id) return e.especializacion.id;
+                if (e.especializacion?.nombre) {
+                    const found = this.especializaciones.find(es => es.nombre === e.especializacion.nombre);
+                    return found ? found.id : null;
+                }
+                return null;
+            }).filter(Boolean);
+
+            const tipoContratoId = this.contratos.find(c => c.nombre === docente.tipo_contrato?.nombre)?.id || '';
+            const nivelInglesId = this.nivelesIngles.find(n => n.nombre === docente.nivel_ingles?.nombre)?.id || '';
+            return {
+                ...docente,
+                editValues: {
+                    correo: docente.persona?.correo,
+                    telefono: docente.persona?.telefono,
+                    tipo_contrato_id: tipoContratoId,
+                    experiencia_anios: docente.experiencia_anios,
+                    nivel_ingles_id: nivelInglesId,
+                    horas_disponibles: docente.horas_disponibles,
+                    horas_asignadas: docente.horas_asignadas || 0,
+                    max_horas_semanales: docente.max_horas_semanales || 30,
+                    especializaciones: especIds
+                },
+                backup: null // para cancelar edición
+            };
+        });
+        
+        console.log('🔄 Docentes inactivos procesados:', this.docentesInactivos.length);
     }
 
     abrirModal() {
@@ -231,6 +245,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             experiencia_anios: 0,
             nivel_ingles_id: '',
             horas_disponibles: 0,
+            max_horas_semanales: 30,
+            puede_dar_sabados: true,
             especializaciones: [],
             horarios: []
         };
@@ -338,6 +354,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             experiencia_anios: this.docenteSeleccionado.experiencia_anios || 0,
             nivel_ingles_id: nivelInglesId,
             horas_disponibles: this.docenteSeleccionado.horas_disponibles || 0,
+            max_horas_semanales: this.docenteSeleccionado.max_horas_semanales || 30,
+            puede_dar_sabados: this.docenteSeleccionado.puede_dar_sabados || true,
             especializaciones: especIds,
             horarios: horarioIds,
             activo: this.docenteSeleccionado.activo || false
@@ -359,13 +377,16 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             experiencia_anios: this.nuevoDocente.experiencia_anios,
             nivel_ingles_id: this.nuevoDocente.nivel_ingles_id,
             horas_disponibles: this.nuevoDocente.horas_disponibles,
+            max_horas_semanales: this.nuevoDocente.max_horas_semanales,
+            puede_dar_sabados: this.nuevoDocente.puede_dar_sabados === true || this.nuevoDocente.puede_dar_sabados === 'true',
             especializaciones: this.nuevoDocente.especializaciones,
             horarios: this.nuevoDocente.horarios
         };
 
         this.http.post('http://localhost:3000/docentes', payload).subscribe({
             next: () => {
-                this.cargarDocentes();
+                // Recargar todas las listas para asegurar sincronización
+                this.recargarTodosLosDatos();
                 this.cerrarModal();
             },
             error: (err) => {
@@ -459,16 +480,26 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         let cargados = 0;
         let errores = 0;
 
+        console.log('%c🚀 Iniciando carga de docentes:', 'color: blue; font-weight: bold;');
+        console.log('%c📊 Total docentes a cargar:', 'color: blue; font-weight: bold;', this.docentesPendientes.length);
+        console.log('%c📋 Primer docente a enviar:', 'color: blue; font-weight: bold;', this.docentesPendientes[0]);
+
         this.docentesPendientes.forEach((docente, index) => {
+            console.log(`📤 Enviando docente ${index + 1}:`, docente);
             this.http.post('http://localhost:3000/docentes', docente).subscribe({
                 next: () => {
+                    console.log(`✅ Docente ${index + 1} cargado exitosamente`);
                     cargados++;
                     if (cargados + errores === this.docentesPendientes.length) {
                         this.finalizarCarga(cargados, errores);
                     }
                 },
                 error: (err) => {
-                    console.error('Error al cargar docente:', err);
+                    console.error(`❌ Error al cargar docente ${index + 1}:`, err);
+                    console.error('📋 Datos del docente que falló:', docente);
+                    if (err.error && err.error.message) {
+                        console.error('🔍 Mensaje de error del backend:', err.error.message);
+                    }
                     errores++;
                     if (cargados + errores === this.docentesPendientes.length) {
                         this.finalizarCarga(cargados, errores);
@@ -495,8 +526,9 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             alert(`⚠️ Se cargaron ${cargados} docente(s) y ${errores} fallaron. Revisa la consola para más detalles.`);
         }
         
-        // Recargar la lista de docentes
+        // Recargar ambas listas para asegurar sincronización
         this.cargarDocentes();
+        this.cargarDocentesInactivos();
     }
 
     // Métodos auxiliares para mostrar nombres en lugar de IDs
@@ -813,7 +845,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             next: () => {
                 console.log('✅ Docente eliminado correctamente');
                 alert('✅ Docente eliminado correctamente');
-                this.cargarDocentes(); // Recargar la lista
+                // Recargar datos preservando la vista actual
+                this.recargarDatosPreservandoVista();
             },
             error: (err) => {
                 console.error('❌ Error al eliminar docente:', err);
@@ -843,7 +876,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             next: () => {
                 console.log('✅ Docente reactivado correctamente');
                 alert('✅ Docente reactivado correctamente');
-                this.cargarDocentesInactivos(); // Recargar la lista de inactivos
+                // Recargar datos preservando la vista actual
+                this.recargarDatosPreservandoVista();
             },
             error: (err) => {
                 console.error('❌ Error al reactivar docente:', err);
@@ -918,6 +952,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
                 )
             ).filter((d): d is any => !!d);
 
+            console.log('%c📋 Docentes transformados:', 'color: green; font-weight: bold;', nuevosDocentes);
+
             if (errores.length > 0) {
                 console.error('%c❌ Errores encontrados:', 'color: red; font-weight: bold;');
                 errores.forEach(err => console.error(`→ ${err}`));
@@ -969,8 +1005,10 @@ export class DocenteTalentoHumanoComponent implements OnInit {
                 tipo_contrato_id: tipoContratoId,
                 experiencia_anios: docente.experiencia_anios,
                 nivel_ingles_id: nivelInglesId,
-                horas_disponibles: docente.horas_disponibles,
-                especializaciones: especIds
+                                        horas_disponibles: docente.horas_disponibles,
+                        max_horas_semanales: docente.max_horas_semanales || 30,
+                        puede_dar_sabados: docente.puede_dar_sabados !== undefined ? docente.puede_dar_sabados : true,
+                        especializaciones: especIds
             };
         }
     }
@@ -1004,6 +1042,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         if (edit.experiencia_anios !== original.experiencia_anios) payload.experiencia_anios = edit.experiencia_anios;
         if (edit.nivel_ingles_id !== (this.nivelesIngles.find(n => n.nombre === original.nivel_ingles?.nombre)?.id || '')) payload.nivel_ingles_id = edit.nivel_ingles_id;
         if (edit.horas_disponibles !== original.horas_disponibles) payload.horas_disponibles = edit.horas_disponibles;
+        if (edit.max_horas_semanales !== (original.max_horas_semanales || 30)) payload.max_horas_semanales = edit.max_horas_semanales;
+        if (edit.puede_dar_sabados !== (original.puede_dar_sabados !== undefined ? original.puede_dar_sabados : true)) payload.puede_dar_sabados = edit.puede_dar_sabados === true || edit.puede_dar_sabados === 'true';
         // Especializaciones: comparar arrays de ids
         const origEspecIds = (original.especializaciones || []).map((e: any) => e.especializacion_id || e.especializacion?.id).filter(Boolean).sort();
         const newEspecIds = (edit.especializaciones || []).slice().sort();
@@ -1019,7 +1059,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             next: () => {
                 alert('Docente actualizado correctamente.');
                 this.editIndex = null;
-                this.cargarDocentes();
+                // Recargar datos preservando la vista actual
+                this.recargarDatosPreservandoVista();
             },
             error: (err) => {
                 console.error('Error al actualizar docente:', err);
@@ -1153,6 +1194,8 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             experiencia_anios: this.docenteEdicionVista.experiencia_anios,
             nivel_ingles_id: this.docenteEdicionVista.nivel_ingles_id,
             horas_disponibles: this.docenteEdicionVista.horas_disponibles,
+            max_horas_semanales: this.docenteEdicionVista.max_horas_semanales,
+            puede_dar_sabados: this.docenteEdicionVista.puede_dar_sabados === true || this.docenteEdicionVista.puede_dar_sabados === 'true',
             especializaciones: this.docenteEdicionVista.especializaciones,
             horarios: this.docenteEdicionVista.horarios
         };
@@ -1202,14 +1245,80 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         alert('✅ Docente actualizado correctamente.');
         this.modoEdicionVista = false;
         
-        // Recargar la lista correspondiente según el estado final
-        if (this.docenteEdicionVista.activo) {
-            this.cargarDocentes(); // Si quedó activo, recargar activos
-        } else {
-            this.cargarDocentesInactivos(); // Si quedó inactivo, recargar inactivos
-        }
+        console.log('🔄 Finalizando actualización - Vista actual:', this.mostrarInactivos ? 'Inactivos' : 'Activos');
+        
+        // Recargar datos preservando la vista actual
+        this.recargarDatosPreservandoVista();
         
         this.cerrarModalVista();
+    }
+
+    // Método para recargar todos los datos
+    recargarTodosLosDatos() {
+        console.log('🔄 Recargando todos los datos...');
+        this.cargarDocentes();
+        this.cargarDocentesInactivos();
+    }
+
+    // Método para recargar todos los datos sin afectar la vista
+    recargarTodosLosDatosSinCambiarVista() {
+        console.log('🔄 Recargando todos los datos sin cambiar vista...');
+        const wasShowingInactivos = this.mostrarInactivos;
+        console.log('📋 Vista antes de recargar:', wasShowingInactivos ? 'Inactivos' : 'Activos');
+        
+        // Recargar datos de manera controlada
+        this.recargarDatosConVistaPreservada(wasShowingInactivos);
+    }
+
+    // Método auxiliar para recargar datos preservando la vista
+    private recargarDatosConVistaPreservada(wasShowingInactivos: boolean) {
+        console.log('🔄 Iniciando recarga de datos con vista preservada...');
+        console.log('📋 Vista a preservar:', wasShowingInactivos ? 'Inactivos' : 'Activos');
+        
+        // Recargar ambas listas
+        this.http.get<any[]>('http://localhost:3000/docentes').subscribe(data => {
+            console.log('📥 Docentes activos cargados:', data.length);
+            this.procesarDocentesActivos(data);
+            
+            // Después de cargar activos, cargar inactivos
+            this.http.get<any[]>('http://localhost:3000/docentes/inactivos').subscribe(dataInactivos => {
+                console.log('📥 Docentes inactivos cargados:', dataInactivos.length);
+                this.procesarDocentesInactivos(dataInactivos);
+                
+                // Restaurar la vista original
+                this.mostrarInactivos = wasShowingInactivos;
+                console.log('✅ Vista restaurada a:', wasShowingInactivos ? 'Inactivos' : 'Activos');
+                
+                // Aplicar filtros y paginación correspondiente
+                if (wasShowingInactivos) {
+                    console.log('🔍 Aplicando filtros para inactivos...');
+                    this.filtrarDocentesInactivos();
+                    console.log('📄 Aplicando paginación para inactivos...');
+                    this.aplicarPaginacionInactivos();
+                    console.log('📊 Docentes inactivos filtrados:', this.docentesInactivosFiltrados.length);
+                    console.log('📊 Docentes inactivos paginados:', this.docentesPaginados.length);
+                } else {
+                    console.log('🔍 Aplicando filtros para activos...');
+                    this.filtrarDocentes();
+                    console.log('📄 Aplicando paginación para activos...');
+                    this.aplicarPaginacion();
+                    console.log('📊 Docentes activos filtrados:', this.docentesFiltrados.length);
+                    console.log('📊 Docentes activos paginados:', this.docentesPaginados.length);
+                }
+                console.log('✅ Filtros y paginación aplicados para vista:', wasShowingInactivos ? 'Inactivos' : 'Activos');
+            });
+        });
+    }
+
+    // Método para recargar datos preservando la vista actual
+    recargarDatosPreservandoVista() {
+        console.log('🔄 Recargando datos preservando vista actual...');
+        console.log('📋 Estado actual de mostrarInactivos:', this.mostrarInactivos);
+        
+        // Usar el método que recarga todo pero preserva la vista
+        this.recargarTodosLosDatosSinCambiarVista();
+        
+        console.log('✅ Vista preservada:', this.mostrarInactivos ? 'Inactivos' : 'Activos');
     }
 
     // Métodos para manejar especializaciones y horarios en el modal de vista

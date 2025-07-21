@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 interface HorarioDocente {
   nombre: string;
@@ -21,8 +22,7 @@ interface HorarioDocente {
   styleUrls: ['./horario-coordinador.component.scss'],
   imports: [HeaderComponent, CommonModule, FormsModule]
 })
-export class 
- HorarioCoordinadorComponent{
+export class HorarioCoordinadorComponent implements OnInit {
   archivoHorario: File | null = null;
   archivoEmpresarial: File | null = null;
   archivoAulas: File | null = null;
@@ -37,74 +37,128 @@ export class
   };
 
   dias = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-  horarioGenerado: HorarioDocente[] = [];
+  horarioGenerado: any[] = [];
+  vistaSeleccionada: string = 'carga-docentes';
+  resultadoVista: any = null;
 
+  cargaDocentes: any[] = [];
+  ocupacionAulas: any[] = [];
+  resumenProgramas: any[] = [];
+  docenteSeleccionado: any | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  // Paginación para cada vista
+  paginaDocentes = 1;
+  paginaHorario = 1;
+  paginaAulas = 1;
+  paginaResumen = 1;
+  pageSize = 10;
+
+  cargandoHorario: boolean = false;
+  resultadoAsignacion: any[] = [];
+  horarioCompleto: any[] = [];
+  horarioPorPiso: any[] = [];
+
+  get cargaDocentesPaginados() {
+    const start = (this.paginaDocentes - 1) * this.pageSize;
+    return this.cargaDocentes.slice(start, start + this.pageSize);
+  }
+  get horarioGeneradoPaginado() {
+    const start = (this.paginaHorario - 1) * this.pageSize;
+    return this.horarioGenerado.slice(start, start + this.pageSize);
+  }
+  get ocupacionAulasPaginadas() {
+    const start = (this.paginaAulas - 1) * this.pageSize;
+    return this.ocupacionAulas.slice(start, start + this.pageSize);
+  }
+  get resumenProgramasPaginados() {
+    const start = (this.paginaResumen - 1) * this.pageSize;
+    return this.resumenProgramas.slice(start, start + this.pageSize);
+  }
+
+  getPages(tipo: string): number[] {
+    let total = 0;
+    if (tipo === 'docentes') total = this.cargaDocentes.length;
+    if (tipo === 'horario') total = this.horarioGenerado.length;
+    if (tipo === 'aulas') total = this.ocupacionAulas.length;
+    if (tipo === 'resumen') total = this.resumenProgramas.length;
+    const pages = Math.ceil(total / this.pageSize);
+    return Array.from({ length: pages }, (_, i) => i + 1);
+  }
+
+  cambiarPaginaDocentes(p: number) { this.paginaDocentes = p; }
+  cambiarPaginaHorario(p: number) { this.paginaHorario = p; }
+  cambiarPaginaAulas(p: number) { this.paginaAulas = p; }
+  cambiarPaginaResumen(p: number) { this.paginaResumen = p; }
+
+  min(a: number, b: number) { return Math.min(a, b); }
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private http: HttpClient
+  ) {}
+
+  ngOnInit(): void {
+    this.generarHorario();
+    this.cargarCargaDocentes();
+    this.cargarOcupacionAulas();
+    this.cargarResumenProgramas();
+  }
 
   generarHorario(): void {
-    this.horarioGenerado = [
-      {
-        nombre: 'María López',
-        contrato: 'Tiempo Completo',
-        horario: {
-          lunes: ['A101 (8:00–10:00)', 'A203 (10:00–12:00)', 'A105 (14:00–16:00)'],
-          martes: ['A102 (10:00–12:00)', 'A304 (14:00–16:00)'],
-          miercoles: ['A101 (8:00–10:00)', 'A203 (10:00–12:00)', 'A105 (14:00–16:00)'],
-          jueves: ['A102 (10:00–12:00)', 'A304 (14:00–16:00)'],
-          viernes: ['A205 (8:00–10:00)', 'A105 (10:00–12:00)']
-        },
-        totalHoras: 20
+    this.cargandoHorario = true;
+    this.resultadoAsignacion = [];
+    this.http.post<any>('http://localhost:3000/asignacion/generar', {}).subscribe({
+      next: (response) => {
+        this.resultadoAsignacion = response.resultado;
+        this.cargandoHorario = false;
+        this.cargarHorarioCompleto();
+        this.cargarHorarioPorPiso();
       },
-      {
-        nombre: 'Juan Pérez',
-        contrato: 'Medio Tiempo',
-        horario: {
-          lunes: ['A201 (8:00–10:00)'],
-          martes: ['A103 (8:00–10:00)', 'A201 (10:00–12:00)'],
-          miercoles: ['A201 (8:00–10:00)'],
-          jueves: ['A103 (8:00–10:00)'],
-          viernes: ['A103 (14:00–16:00)']
-        },
-        totalHoras: 10
-      },
-      {
-        nombre: 'Ana Rodríguez',
-        contrato: 'Ocasional',
-        horario: {
-          lunes: [],
-          martes: ['A202 (8:00–10:00)'],
-          miercoles: ['A202 (10:00–12:00)'],
-          jueves: ['A202 (8:00–10:00)'],
-          viernes: ['A202 (10:00–12:00)']
-        },
-        totalHoras: 8
-      },
-      {
-        nombre: 'Carlos Martínez',
-        contrato: 'Tiempo Completo',
-        horario: {
-          lunes: ['A301 (8:00–10:00)', 'A302 (10:00–12:00)', 'A303 (14:00–16:00)'],
-          martes: ['A301 (8:00–10:00)', 'A302 (10:00–12:00)', 'A303 (14:00–16:00)'],
-          miercoles: ['A301 (8:00–10:00)', 'A302 (10:00–12:00)', 'A303 (14:00–16:00)'],
-          jueves: ['A301 (8:00–10:00)', 'A302 (10:00–12:00)'],
-          viernes: ['A301 (8:00–10:00)', 'A302 (10:00–12:00)']
-        },
-        totalHoras: 26
-      },
-      {
-        nombre: 'Laura Sánchez',
-        contrato: 'Tiempo Completo',
-        horario: {
-          lunes: ['A104 (8:00–10:00)', 'A204 (10:00–12:00)', 'A104 (14:00–16:00)'],
-          martes: ['A104 (8:00–10:00)', 'A204 (10:00–12:00)'],
-          miercoles: ['A104 (8:00–10:00)'],
-          jueves: ['A104 (8:00–10:00)', 'A204 (10:00–12:00)'],
-          viernes: ['A204 (10:00–12:00)']
-        },
-        totalHoras: 22
+      error: (err) => {
+        this.resultadoAsignacion = [];
+        this.cargandoHorario = false;
       }
-    ];
+    });
+  }
+
+  cargarHorarioCompleto() {
+    this.http.get<any>('http://localhost:3000/vistas/horario-completo').subscribe({
+      next: (response) => this.horarioCompleto = response.data || response,
+      error: () => this.horarioCompleto = []
+    });
+  }
+
+  cargarHorarioPorPiso() {
+    this.http.get<any>('http://localhost:3000/vistas/horario-por-piso').subscribe({
+      next: (response) => this.horarioPorPiso = response.data || response,
+      error: () => this.horarioPorPiso = []
+    });
+  }
+
+  cargarCargaDocentes() {
+    this.http.get<any>('http://localhost:3000/vistas/carga-docentes').subscribe({
+      next: (response) => this.cargaDocentes = response.data,
+      error: () => this.cargaDocentes = []
+    });
+  }
+
+  cargarOcupacionAulas() {
+    this.http.get<any>('http://localhost:3000/vistas/ocupacion-aulas').subscribe({
+      next: (response) => this.ocupacionAulas = response.data,
+      error: () => this.ocupacionAulas = []
+    });
+  }
+
+  cargarResumenProgramas() {
+    this.http.get<any>('http://localhost:3000/vistas/resumen-programas').subscribe({
+      next: (response) => this.resumenProgramas = response.data,
+      error: () => this.resumenProgramas = []
+    });
+  }
+
+  verDocente(doc: any) {
+    this.docenteSeleccionado = doc;
   }
 
   /**
@@ -115,8 +169,8 @@ export class
    */
   getColorPorCarga(horas: number): string {
     if (horas >= 24) return 'bg-red';
-    if (horas >= 16) return 'bg-yellow';
-    return 'bg-green';
+    if (horas >= 16) return 'bg-orange';
+    return 'bg-blue';
   }
 
   subirArchivo(tipo: 'horario' | 'empresarial' | 'aulas', evento: Event): void {
@@ -129,5 +183,50 @@ export class
     }
   }
 
+  cargarVistaSeleccionada() {
+    this.resultadoVista = null;
+    if (!this.vistaSeleccionada) return;
 
+    let url = '';
+    switch (this.vistaSeleccionada) {
+      case 'resumen-programas':
+        url = '/vistas/resumen-programas';
+        break;
+      case 'carga-docentes':
+        url = '/vistas/carga-docentes';
+        break;
+      case 'horario-por-piso':
+        url = '/vistas/horario-por-piso';
+        break;
+      case 'ocupacion-aulas':
+        url = '/vistas/ocupacion-aulas';
+        break;
+    }
+
+    this.http.get(url).subscribe({
+      next: (data) => this.resultadoVista = data,
+      error: (err) => this.resultadoVista = { error: 'Error al cargar la vista', detalle: err }
+    });
+  }
+
+  resetearHorario(): void {
+    const confirmado = confirm('¿Estás seguro de que deseas resetear el horario? Se eliminará la información de Horario Completo y Horario de Todos los Pisos.');
+    if (!confirmado) return;
+    this.http.post<any>('http://localhost:3000/asignacion/resetear', {}).subscribe({
+      next: (response) => {
+        alert(response.message || 'Ambiente reseteado correctamente');
+        // Limpiar solo los datos de horario y resultado
+        this.resultadoAsignacion = [];
+        this.horarioCompleto = [];
+        this.horarioPorPiso = [];
+        // Recargar las vistas de docentes, aulas y programas
+        this.cargarCargaDocentes();
+        this.cargarOcupacionAulas();
+        this.cargarResumenProgramas();
+      },
+      error: (err) => {
+        alert('Error al resetear el ambiente');
+      }
+    });
+  }
 }

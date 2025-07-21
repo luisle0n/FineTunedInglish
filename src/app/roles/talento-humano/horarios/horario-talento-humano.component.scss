@@ -1,0 +1,487 @@
+// Variables
+$primary-color: #2563eb;
+$secondary-color: #64748b;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$light-bg: #f8fafc;
+$border-color: #e2e8f0;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+
+// Mixins
+@mixin card-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+@mixin button-base {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Contenedor principal
+.horarios-container {
+  min-height: 100vh;
+  background-color: $light-bg;
+  padding: 1rem;
+  
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
+}
+
+// Estados de carga y error
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid $border-color;
+    border-top: 4px solid $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  h3 {
+    color: $text-primary;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    color: $text-secondary;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Tarjeta de filtros
+.filters-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  @include card-shadow;
+  margin-bottom: 1.5rem;
+  
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+  
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    label {
+      font-weight: 500;
+      color: $text-primary;
+      font-size: 0.875rem;
+    }
+    
+    input, select {
+      padding: 0.5rem;
+      border: 1px solid $border-color;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+    }
+  }
+  
+  .filter-actions {
+    display: flex;
+    align-items: end;
+  }
+}
+
+// Tarjeta de acciones
+.actions-card {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  @include card-shadow;
+  margin-bottom: 1.5rem;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .actions-left, .actions-right {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+// Botones
+.btn-primary {
+  @include button-base;
+  background-color: $primary-color;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background-color: darken($primary-color, 10%);
+  }
+}
+
+.btn-secondary {
+  @include button-base;
+  background-color: white;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  
+  &:hover:not(:disabled) {
+    background-color: $light-bg;
+  }
+}
+
+// Tarjeta de tabla
+.table-card {
+  background: white;
+  border-radius: 0.5rem;
+  @include card-shadow;
+  overflow: hidden;
+  
+  .table-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h2 {
+      margin: 0;
+      color: $text-primary;
+      font-size: 1.25rem;
+    }
+    
+    .table-info {
+      color: $text-secondary;
+      font-size: 0.875rem;
+    }
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+// Tabla
+.horarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+  
+  th {
+    background-color: $light-bg;
+    font-weight: 600;
+    color: $text-primary;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  tbody tr {
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: $light-bg;
+    }
+  }
+  
+  .dia-horario, .hora-inicio, .hora-fin {
+    vertical-align: middle;
+  }
+  
+  .hora-inicio, .hora-fin {
+    .hora {
+      font-weight: 600;
+      color: $text-primary;
+      font-family: 'Courier New', monospace;
+    }
+  }
+  
+  .acciones-horario {
+    .btn-action {
+      @include button-base;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+      
+      &.ver {
+        background-color: $primary-color;
+        color: white;
+        
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+    }
+  }
+}
+
+// Badges
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  
+  &.dia {
+    &.dia-lunes {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    &.dia-martes {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    
+    &.dia-miercoles {
+      background-color: #f3e8ff;
+      color: #7c3aed;
+    }
+    
+    &.dia-jueves {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    
+    &.dia-viernes {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    &.dia-sabado {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    
+    &.dia-domingo {
+      background-color: #f3e8ff;
+      color: #7c3aed;
+    }
+  }
+}
+
+// Paginación
+.pagination-container {
+  padding: 1.5rem;
+  border-top: 1px solid $border-color;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .pagination-info {
+    color: $text-secondary;
+    font-size: 0.875rem;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .btn-pagination {
+      @include button-base;
+      background-color: white;
+      color: $text-primary;
+      border: 1px solid $border-color;
+      
+      &:hover:not(:disabled) {
+        background-color: $light-bg;
+      }
+    }
+    
+    .pagination-numbers {
+      display: flex;
+      gap: 0.25rem;
+      
+      .btn-pagination-number {
+        @include button-base;
+        min-width: 2.5rem;
+        background-color: white;
+        color: $text-primary;
+        border: 1px solid $border-color;
+        
+        &:hover:not(:disabled) {
+          background-color: $light-bg;
+        }
+        
+        &.active {
+          background-color: $primary-color;
+          color: white;
+          border-color: $primary-color;
+        }
+      }
+    }
+  }
+}
+
+// Modal
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 0.5rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  @include card-shadow;
+  
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h2 {
+      margin: 0;
+      color: $text-primary;
+    }
+    
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: $text-secondary;
+      
+      &:hover {
+        color: $text-primary;
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+    
+    .horario-details {
+      .detail-row {
+        display: flex;
+        margin-bottom: 1rem;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .detail-label {
+          font-weight: 600;
+          color: $text-primary;
+          min-width: 120px;
+          flex-shrink: 0;
+        }
+        
+        .detail-value {
+          color: $text-secondary;
+          flex: 1;
+        }
+      }
+    }
+  }
+  
+  .modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid $border-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .filters-card {
+    grid-template-columns: 1fr;
+  }
+  
+  .actions-card {
+    flex-direction: column;
+    gap: 1rem;
+    
+    .actions-left, .actions-right {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .table-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    gap: 1rem;
+    
+    .pagination-controls {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  .modal-content {
+    margin: 1rem;
+    
+    .modal-body .horario-details .detail-row {
+      flex-direction: column;
+      gap: 0.25rem;
+      
+      .detail-label {
+        min-width: auto;
+      }
+    }
+  }
+}

@@ -1,0 +1,198 @@
+<div class="horarios-container">
+  <!-- Header General - Using HeaderComponent -->
+  <app-header #headerComponent></app-header>
+
+  <!-- Estado de Carga -->
+  <div *ngIf="cargando" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando información de horarios...</p>
+  </div>
+
+  <!-- Estado de Error -->
+  <div *ngIf="error && !cargando" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Error al cargar los horarios</h3>
+    <p>No se pudo cargar la información de los horarios. Por favor intente nuevamente.</p>
+    <button class="btn-primary" (click)="cargarHorarios()">Reintentar</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!cargando && !error">
+    <!-- FILTROS -->
+    <div class="filters-card">
+      <div class="filter-group">
+        <label for="filtroDia">Día</label>
+        <select id="filtroDia" 
+                [(ngModel)]="filtroDia" 
+                (ngModelChange)="filtrarHorarios()">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let dia of dias" [value]="dia">
+            {{ dia }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filtroHora">Hora de Inicio</label>
+        <select id="filtroHora" 
+                [(ngModel)]="filtroHora" 
+                (ngModelChange)="filtrarHorarios()">
+          <option value="Todos">Todas</option>
+          <option *ngFor="let hora of horas" [value]="hora">
+            {{ hora }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="textoBusqueda">Buscar</label>
+        <input type="text" 
+               id="textoBusqueda" 
+               [(ngModel)]="textoBusqueda" 
+               (input)="filtrarHorarios()"
+               placeholder="Buscar por día, hora inicio o fin..." />
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn-secondary" (click)="resetearFiltros()">
+          🔄 Limpiar Filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="actions-card">
+      <div class="actions-left">
+        <button class="btn-primary" (click)="cargarHorarios()">
+          🔄 Actualizar
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLA DE HORARIOS -->
+    <div class="table-card">
+      <div class="table-header">
+        <h2>Horarios Disponibles</h2>
+        <div class="table-info">
+          <span>Mostrando {{ obtenerRangoPagina().inicio }}-{{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} horarios</span>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="horarios-table">
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Hora Inicio</th>
+              <th>Hora Fin</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let horario of horariosPaginados; let i = index">
+              
+              <td class="dia-horario">
+                <span class="badge dia" [class]="getDiaClass(horario.dia)">
+                  {{ horario.dia }}
+                </span>
+              </td>
+              
+              <td class="hora-inicio">
+                <span class="hora">{{ formatTime(horario.hora_inicio) }}</span>
+              </td>
+              
+              <td class="hora-fin">
+                <span class="hora">{{ formatTime(horario.hora_fin) }}</span>
+              </td>
+              
+              <td class="acciones-horario">
+                <button class="btn-action ver" 
+                        (click)="verHorario(i)"
+                        title="Ver detalles">
+                  👁️ Ver
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div class="pagination-container" *ngIf="totalPaginas > 1">
+        <div class="pagination-info">
+          <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        </div>
+        
+        <div class="pagination-controls">
+          <button class="btn-pagination" 
+                  [disabled]="paginaActual === 1"
+                  (click)="cambiarPagina(paginaActual - 1)">
+            ← Anterior
+          </button>
+          
+          <div class="pagination-numbers">
+            <button *ngFor="let pagina of obtenerPaginasVisibles()" 
+                    class="btn-pagination-number"
+                    [class.active]="pagina === paginaActual"
+                    (click)="cambiarPagina(pagina)">
+              {{ pagina }}
+            </button>
+          </div>
+          
+          <button class="btn-pagination" 
+                  [disabled]="paginaActual === totalPaginas"
+                  (click)="cambiarPagina(paginaActual + 1)">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE VISTA (Solo Lectura) -->
+<div class="modal-overlay" *ngIf="mostrarModalVista" (click)="cerrarModalVista()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalles del Horario</h2>
+      <button class="btn-close" (click)="cerrarModalVista()">×</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="horarioSeleccionado">
+      <div class="horario-details">
+        <div class="detail-row">
+          <div class="detail-label">Día:</div>
+          <div class="detail-value">
+            <span class="badge dia" [class]="getDiaClass(horarioSeleccionado.dia)">
+              {{ horarioSeleccionado.dia }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label">Hora de Inicio:</div>
+          <div class="detail-value">{{ formatTime(horarioSeleccionado.hora_inicio) }}</div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-label">Hora de Fin:</div>
+          <div class="detail-value">{{ formatTime(horarioSeleccionado.hora_fin) }}</div>
+        </div>
+        
+        <div class="detail-row" *ngIf="horarioSeleccionado.descripcion">
+          <div class="detail-label">Descripción:</div>
+          <div class="detail-value">{{ horarioSeleccionado.descripcion }}</div>
+        </div>
+        
+        <div class="detail-row" *ngIf="horarioSeleccionado.observaciones">
+          <div class="detail-label">Observaciones:</div>
+          <div class="detail-value">{{ horarioSeleccionado.observaciones }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cerrarModalVista()">Cerrar</button>
+    </div>
+  </div>
+</div>
