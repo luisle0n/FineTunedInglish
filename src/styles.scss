@@ -62,3 +62,61 @@ body {
   background: #b71c1c;
   box-shadow: 0 4px 16px rgba(229,57,53,0.13);
 }
+
+.tabla-estandar {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(33,51,84,0.08);
+  overflow: hidden;
+  font-family: 'Coolvetica', Arial, sans-serif;
+  th, td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e8e8e8;
+    text-align: left;
+    font-size: 1.08rem;
+  }
+  th {
+    background: var(--primary-blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.13rem;
+    border-bottom: none;
+    letter-spacing: 0.5px;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:nth-child(even) td {
+    background: #f5faff;
+  }
+  tr:hover td {
+    background: #e6f2fd;
+    transition: background 0.2s;
+  }
+  .activo {
+    color: #52c41a;
+    font-size: 20px;
+  }
+}
+
+.titulo-seccion {
+  color: var(--primary-blue);
+  font-family: 'Coolvetica', Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .tabla-estandar th, .tabla-estandar td {
+    padding: 10px 6px;
+    font-size: 0.98rem;
+  }
+}

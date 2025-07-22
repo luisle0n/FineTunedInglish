@@ -16,6 +16,7 @@ import { AulasTalentoHumanoComponent } from './roles/talento-humano/aulas/aulas-
 
 import { DashboardGerenciaComponent } from './roles/gerencia/dashboard-gerencia.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
+import { UsuarioCoordinadorComponent } from './roles/coordinador/usuarios/usuario.coordinador.component';
 
 // Guards
 import { AuthGuard } from './guards/auth.guard';
@@ -41,7 +42,8 @@ const routes: Routes = [
       { path: 'horarios', component: HorarioCoordinadorComponent },
       { path: 'aulas', component: AulasCoordinadorComponent },
       { path: 'clases', component: ClasesCoordinadorComponent },
-      { path: 'profile', component: ProfileComponent }
+      { path: 'profile', component: ProfileComponent },
+      { path: 'usuarios', component: UsuarioCoordinadorComponent }
     ]
   },
 

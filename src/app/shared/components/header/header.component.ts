@@ -51,6 +51,10 @@ export class HeaderComponent implements OnInit {
       this.pageTitle = 'Dashboard';
     } else if (currentUrl.includes('/profile')) {
       this.pageTitle = 'Mi Perfil';
+    } else if (currentUrl.includes('/usuarios')) {
+      this.pageTitle = 'Usuarios';
+    } else if (currentUrl.includes('/clases')) {
+      this.pageTitle = 'Clases';
     } else {
       this.pageTitle = 'Inicio';
     }

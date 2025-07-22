@@ -18,6 +18,7 @@ import { DashboardTalentoHumanoComponent } from './roles/talento-humano/dashboar
 import { DocenteCoordinadorComponent } from './roles/coordinador/docente/docente-coordinador.component';
 import { HorarioCoordinadorComponent } from './roles/coordinador/horarios/horario-coordinador.component';
 import { AulasCoordinadorComponent } from './roles/coordinador/aulas/aulas-coordinador.component';
+import { UsuarioCoordinadorComponent } from './roles/coordinador/usuarios/usuario.coordinador.component';
 
 import { DocenteTalentoHumanoComponent } from './roles/talento-humano/docente/docente-talento-humano.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
@@ -53,6 +54,7 @@ import { reducers } from './store/app.state';
     HorarioCoordinadorComponent,
     AulasCoordinadorComponent,
     ProfileComponent,
+    UsuarioCoordinadorComponent,
     // StoreModule.forRoot(reducers),
     // EffectsModule.forRoot([]),
     // StoreDevtoolsModule.instrument({
