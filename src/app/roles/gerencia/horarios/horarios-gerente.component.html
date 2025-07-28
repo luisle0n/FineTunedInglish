@@ -1,10 +1,8 @@
+<app-header></app-header>
 <div class="horarios-container">
-  <app-header #headerComponent></app-header>
-
   <h2>Generación de Horarios</h2>
   <div class="header-divider"></div>
 
-  <!-- Barra de acciones optimizada -->
   <div class="acciones-horarios-opt">
     <div class="acciones-select">
       <label for="vistaSelect"><strong>Selecciona la vista:</strong></label>
@@ -16,18 +14,9 @@
         <option value="horario-completo">Horario completo</option>
       </select>
     </div>
-    <div class="acciones-botones">
-      <button class="btn-principal" (click)="generarHorario()">
-        Generar Horario
-      </button>
-      <button class="btn-limpiar-filtros" (click)="resetearHorario()">
-        Resetar Horario
-      </button>
-    </div>
   </div>
 
-  <!-- Mejorar tablas: aplicar badges, tooltips y colores en las tablas de docentes, aulas y programas -->
-  <!-- Docentes -->
+  <!-- Carga de Docentes -->
   <div class="card-table" *ngIf="vistaSeleccionada === 'carga-docentes' && cargaDocentes && cargaDocentes.length">
     <div class="card-title titulo-seccion">
       <span class="material-icons"></span>
@@ -49,14 +38,14 @@
         <tbody>
           <tr *ngFor="let d of cargaDocentesPaginados">
             <td><span class="badge badge-docente" [title]="d.docente">{{ d.docente }}</span></td>
-            <td><span class="badge badge-nivel" [title]="d.nivel_ingles">{{ d.nivel_ingles }}</span></td>
+            <td><span class="badge badge-nivel {{ d.nivel_ingles | noSpaces }}" [title]="d.nivel_ingles">{{ d.nivel_ingles }}</span></td>
             <td>{{ d.horas_disponibles }}</td>
             <td>{{ d.horas_asignadas }}</td>
             <td><span class="badge badge-carga" [title]="d.porcentaje_carga + '%'">{{ d.porcentaje_carga }}%</span></td>
             <td>{{ d.total_clases }}</td>
             <td>
               <button class="btn-ver-docente" (click)="verDocente(d)">
-                <img src="img/ojo-abierto.png" alt="Ver" width="22" height="22" />
+                <img src="/img/ojo-abierto.png" alt="Ver" width="22" height="22" />
               </button>
             </td>
           </tr>
@@ -73,8 +62,6 @@
         <button (click)="cambiarPaginaDocentes(paginaDocentes + 1)" [disabled]="paginaDocentes === getPages('docentes').length">Siguiente &rarr;</button>
       </div>
     </div>
-
-    <!-- Modal de información del docente (formato reutilizado de vista docente activos) -->
     <div class="modal-backdrop" *ngIf="docenteSeleccionado">
       <div class="modal vista-docente-modal">
         <div class="modal-header">
@@ -82,50 +69,19 @@
           <button class="btn-close" (click)="docenteSeleccionado = null">×</button>
         </div>
         <div class="vista-docente-content" *ngIf="docenteSeleccionado">
-          <!-- Información Profesional -->
           <div class="info-section">
             <h4 class="section-title">Información Profesional</h4>
             <div class="info-grid">
-              <div class="info-item">
-                <label>Docente:</label>
-                <span>{{ docenteSeleccionado.docente }}</span>
-              </div>
-              <div class="info-item">
-                <label>Nivel de Inglés:</label>
-                <span>{{ docenteSeleccionado.nivel_ingles }}</span>
-              </div>
-              <div class="info-item">
-                <label>Experiencia (años):</label>
-                <span>{{ docenteSeleccionado.experiencia_anios ?? '-' }}</span>
-              </div>
-              <div class="info-item">
-                <label>Horas Disponibles:</label>
-                <span>{{ docenteSeleccionado.horas_disponibles ?? '-' }}</span>
-              </div>
-              <div class="info-item">
-                <label>Horas Asignadas:</label>
-                <span>{{ docenteSeleccionado.horas_asignadas ?? '-' }}</span>
-              </div>
-              <div class="info-item">
-                <label>Máx. Horas/Semana:</label>
-                <span>{{ docenteSeleccionado.max_horas_semanales ?? '-' }}</span>
-              </div>
-              <div class="info-item">
-                <label>% Carga:</label>
-                <span>{{ docenteSeleccionado.porcentaje_carga ?? '-' }}%</span>
-              </div>
-              <div class="info-item">
-                <label>Total Clases:</label>
-                <span>{{ docenteSeleccionado.total_clases ?? '-' }}</span>
-              </div>
-              <div class="info-item">
-                <label>Categorías Enseñadas:</label>
-                <span>{{ docenteSeleccionado.categorias_ensenadas ?? '-' }}</span>
-              </div>
-              <div class="info-item">
-                <label>Niveles Enseñados:</label>
-                <span>{{ docenteSeleccionado.niveles_ensenados ?? '-' }}</span>
-              </div>
+              <div class="info-item"><label>Docente:</label><span>{{ docenteSeleccionado.docente }}</span></div>
+              <div class="info-item"><label>Nivel de Inglés:</label><span>{{ docenteSeleccionado.nivel_ingles }}</span></div>
+              <div class="info-item"><label>Experiencia (años):</label><span>{{ docenteSeleccionado.experiencia_anios ?? '-' }}</span></div>
+              <div class="info-item"><label>Horas Disponibles:</label><span>{{ docenteSeleccionado.horas_disponibles ?? '-' }}</span></div>
+              <div class="info-item"><label>Horas Asignadas:</label><span>{{ docenteSeleccionado.horas_asignadas ?? '-' }}</span></div>
+              <div class="info-item"><label>Máx. Horas/Semana:</label><span>{{ docenteSeleccionado.max_horas_semanales ?? '-' }}</span></div>
+              <div class="info-item"><label>% Carga:</label><span>{{ docenteSeleccionado.porcentaje_carga ?? '-' }}%</span></div>
+              <div class="info-item"><label>Total Clases:</label><span>{{ docenteSeleccionado.total_clases ?? '-' }}</span></div>
+              <div class="info-item"><label>Categorías Enseñadas:</label><span>{{ docenteSeleccionado.categorias_ensenadas ?? '-' }}</span></div>
+              <div class="info-item"><label>Niveles Enseñados:</label><span>{{ docenteSeleccionado.niveles_ensenados ?? '-' }}</span></div>
             </div>
           </div>
         </div>
@@ -133,7 +89,7 @@
     </div>
   </div>
 
-  <!-- Aulas -->
+  <!-- Ocupación de Aulas -->
   <div class="card-table" *ngIf="vistaSeleccionada === 'ocupacion-aulas' && ocupacionAulas && ocupacionAulas.length">
     <div class="card-title titulo-seccion">
       <span class="material-icons"></span>
@@ -181,7 +137,7 @@
     </div>
   </div>
 
-  <!-- Programas -->
+  <!-- Resumen de Programas -->
   <div class="card-table" *ngIf="vistaSeleccionada === 'resumen-programas' && resumenProgramas && resumenProgramas.length">
     <div class="card-title titulo-seccion">
       <span class="material-icons"></span>
@@ -229,36 +185,12 @@
     </div>
   </div>
 
-  <!-- Tabla de resultado de asignación (después de Generar Horario) -->
-  <div class="card-table" *ngIf="resultadoAsignacion && resultadoAsignacion.length">
-    <div class="card-title titulo-seccion">
-      <span class="material-icons"></span>
-      Resultado de la Asignación
-    </div>
-    <div class="table-responsive">
-      <table class="table table-docentes tabla-estilo-clases">
-        <thead>
-          <tr>
-            <th>Programa</th>
-            <th>Mensaje</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of resultadoAsignacion">
-            <td><span class="badge badge-programa" [title]="r.programa_nombre">{{ r.programa_nombre }}</span></td>
-            <td>{{ r.mensaje }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Vista Horario Completo: tabla y resumen de aulas -->
+  <!-- Horario Completo -->
   <div *ngIf="vistaSeleccionada === 'horario-completo'">
     <!-- Horario Completo (listado plano) -->
     <div class="card-table">
       <div class="card-title titulo-seccion">
-        <span class="material-icons"></span>
+        <span class="material-icons">schedule</span>
         Horario Completo
       </div>
       <table class="horario-completo-listado">
@@ -280,15 +212,14 @@
             <td>{{ clase.hora_inicio }}</td>
             <td>{{ clase.hora_fin }}</td>
             <td><span class="badge badge-programa">{{ clase.programa }}</span></td>
-            <td><span class="badge badge-categoria {{ clase.categoria | noSpaces }}">{{ clase.categoria || clase.programa }}</span></td>
-            <td><span class="badge badge-nivel {{ clase.nivel | noSpaces }}">{{ clase.nivel }}</span></td>
+            <td><span class="badge badge-categoria {{ clase.categoria }}">{{ clase.categoria || clase.programa }}</span></td>
+            <td><span class="badge badge-nivel">{{ clase.nivel }}</span></td>
             <td>{{ clase.paralelo }}</td>
             <td><span class="badge badge-docente">{{ clase.docente }}</span></td>
           </tr>
         </tbody>
       </table>
     </div>
-
     <!-- Resumen por Aula: una card por clase -->
     <div class="card-title titulo-seccion" *ngIf="vistaSeleccionada === 'horario-completo'">
       <span class="material-icons"></span>
@@ -346,7 +277,7 @@
     </div>
   </div>
 
-  <!-- Card para Horario de todos los pisos (combo box) -->
+  <!-- Horario por Piso -->
   <div class="card-table" *ngIf="vistaSeleccionada === 'horario-por-piso' && horarioPorPiso && horarioPorPiso.length">
     <div class="card-title titulo-seccion">
       <span class="material-icons"></span>
@@ -381,4 +312,4 @@
       </table>
     </div>
   </div>
-</div>
+</div> 

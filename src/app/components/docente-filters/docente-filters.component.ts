@@ -1,9 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
+  standalone: true,
   selector: 'app-docente-filters',
   templateUrl: './docente-filters.component.html',
-  styleUrls: ['./docente-filters.component.scss']
+  styleUrls: ['./docente-filters.component.scss'],
+  imports: [CommonModule, FormsModule]
 })
 export class DocenteFiltersComponent {
   @Input() filtroContrato: string = 'Todos';
@@ -20,15 +24,19 @@ export class DocenteFiltersComponent {
   @Output() resetearFiltros = new EventEmitter<void>();
   @Output() cargarExcel = new EventEmitter<Event>();
 
-  onFiltroContratoChange(value: string): void {
-    this.filtroContratoChange.emit(value);
+  onFiltroContratoChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.filtroContratoChange.emit(target?.value || '');
   }
 
-  onFiltroNivelInglesChange(value: string): void {
-    this.filtroNivelInglesChange.emit(value);
+  onFiltroNivelInglesChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.filtroNivelInglesChange.emit(target?.value || '');
   }
 
-  onFiltroExperienciaChange(value: number): void {
+  onFiltroExperienciaChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target?.value ? parseInt(target.value, 10) : 0;
     this.filtroExperienciaChange.emit(value);
   }
 

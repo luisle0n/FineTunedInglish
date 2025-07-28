@@ -71,11 +71,12 @@ export class HeaderComponent implements OnInit {
       this.router.navigate(['/coordinador/profile']);
     } else if (role === 'talento humano') {
       this.router.navigate(['/talento-humano/profile']);
-    } else if (role === 'gerencia') {
-      this.router.navigate(['/gerencia/profile']);
+    } else if (role === 'gerente') {
+      this.router.navigate(['/gerente/profile']);
     } else {
       this.router.navigate(['/coordinador/profile']); // fallback
     }
+
     this.userMenuOpen = false;
   }
 

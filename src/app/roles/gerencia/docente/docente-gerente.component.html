@@ -1,0 +1,191 @@
+<app-header></app-header>
+<main class="dashboard-content">
+  <!-- BOTONES DE VISTA -->
+  <div class="vista-buttons">
+    <button class="btn-vista" [class.active]="!mostrarInactivos" (click)="cambiarAVistaActivos()">
+      👥 Docentes Activos
+    </button>
+    <button class="btn-vista" [class.active]="mostrarInactivos" (click)="cambiarAVistaInactivos()">
+      🚫 Docentes Inactivos
+    </button>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters-card">
+    <div class="filter-group">
+      <label for="filtroContrato">Tipo de Contrato</label>
+      <select id="filtroContrato" [(ngModel)]="filtroContrato" (ngModelChange)="filtrarSegunVista()">
+        <option value="Todos">Todos</option>
+        <option *ngFor="let contrato of contratos" [value]="contrato.nombre">{{ contrato.nombre }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="filtroNivelIngles">Nivel de Inglés</label>
+      <select id="filtroNivelIngles" [(ngModel)]="filtroNivelIngles" (ngModelChange)="filtrarSegunVista()">
+        <option value="Todos">Todos</option>
+        <option *ngFor="let nivel of nivelesIngles" [value]="nivel.nombre">{{ nivel.nombre }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="filtroExperiencia">Experiencia Mínima (años)</label>
+      <input type="number" id="filtroExperiencia" [(ngModel)]="filtroExperiencia" min="0" (input)="filtrarSegunVista()" (blur)="filtrarSegunVista()" placeholder="0" />
+    </div>
+    <div class="acciones-filtros">
+      <div class="botones-filtro">
+        <button class="btn primary" (click)="resetearFiltros()">
+          🔄 Limpiar Filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTA DE DOCENTES -->
+  <section class="docentes-section">
+    <div class="docentes-header">
+      <h2>{{ mostrarInactivos ? 'Lista de Docentes Inactivos' : 'Lista de Docentes Activos' }}</h2>
+      <div class="actions">
+        <input type="text" [(ngModel)]="textoBusqueda" (ngModelChange)="filtrarSegunVista()" placeholder="Buscar por nombre..." />
+      </div>
+    </div>
+    <div class="docentes-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombres</th>
+            <th>Teléfono</th>
+            <th>Tipo Contrato</th>
+            <th>Experiencia</th>
+            <th>Nivel de Inglés</th>
+            <th>Horas Disponibles</th>
+            <th>Especialización</th>
+            <th>Ver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="docentesPaginados.length === 0">
+            <td colspan="8" class="no-data">
+              <div class="no-data-content">
+                <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con los filtros aplicados.</p>
+                <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con los filtros aplicados.</p>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let docente of docentesPaginados; let i = index">
+            <td>
+              {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{ docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
+            </td>
+            <td>{{ docente.persona?.telefono }}</td>
+            <td>{{ docente.tipo_contrato?.nombre }}</td>
+            <td>{{ docente.experiencia_anios }}</td>
+            <td>{{ docente.nivel_ingles?.nombre }}</td>
+            <td>{{ docente.horas_disponibles }}</td>
+            <td>
+              <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre }}<br /></span>
+            </td>
+            <td>
+              <button (click)="verDocente(i)">
+                <img src="/img/ojo-abierto.png" alt="Ver" width="20" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- PAGINACIÓN -->
+    <div class="pagination" *ngIf="totalPaginas > 1">
+      <div class="pagination-info">
+        <span>Mostrando {{ obtenerRangoPagina().inicio }} - {{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} docentes</span>
+      </div>
+      <div class="pagination-controls">
+        <button class="btn-pagination" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+          ← Anterior
+        </button>
+        <div class="page-numbers">
+          <button *ngFor="let pagina of obtenerPaginasVisibles()" class="btn-page" [class.active]="pagina === paginaActual" (click)="cambiarPagina(pagina)">
+            {{ pagina }}
+          </button>
+        </div>
+        <button class="btn-pagination" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">
+          Siguiente →
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL VER DETALLES -->
+  <div class="modal-backdrop" *ngIf="mostrarModalVista">
+    <div class="modal-vista">
+      <div class="modal-header">
+        <h3>Detalle del Docente</h3>
+        <button class="btn-close" (click)="cerrarModalVista()">×</button>
+      </div>
+      <div class="modal-content" *ngIf="docenteSeleccionado">
+        <div class="info-section">
+          <h4>Información Personal</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Nombre Completo:</label>
+              <span>{{ docenteSeleccionado.persona?.primer_nombre }} {{ docenteSeleccionado.persona?.segundo_nombre }} {{ docenteSeleccionado.persona?.primer_apellido }} {{ docenteSeleccionado.persona?.segundo_apellido }}</span>
+            </div>
+            <div class="info-item">
+              <label>Cédula:</label>
+              <span>{{ docenteSeleccionado.persona?.cedula }}</span>
+            </div>
+            <div class="info-item">
+              <label>Correo:</label>
+              <span>{{ docenteSeleccionado.persona?.correo }}</span>
+            </div>
+            <div class="info-item">
+              <label>Teléfono:</label>
+              <span>{{ docenteSeleccionado.persona?.telefono }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-section">
+          <h4>Información Profesional</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Tipo de Contrato:</label>
+              <span>{{ docenteSeleccionado.tipo_contrato?.nombre }}</span>
+            </div>
+            <div class="info-item">
+              <label>Experiencia:</label>
+              <span>{{ docenteSeleccionado.experiencia_anios }} años</span>
+            </div>
+            <div class="info-item">
+              <label>Nivel de Inglés:</label>
+              <span>{{ docenteSeleccionado.nivel_ingles?.nombre }}</span>
+            </div>
+            <div class="info-item">
+              <label>Horas Disponibles:</label>
+              <span>{{ docenteSeleccionado.horas_disponibles }} horas</span>
+            </div>
+            <div class="info-item">
+              <label>Estado:</label>
+              <span class="badge" [ngClass]="docenteSeleccionado.activo ? 'badge-activo' : 'badge-inactivo'">
+                {{ docenteSeleccionado.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="info-section" *ngIf="docenteSeleccionado.especializaciones?.length > 0">
+          <h4>Especializaciones</h4>
+          <div class="especializaciones-list">
+            <span *ngFor="let e of docenteSeleccionado.especializaciones" class="especializacion-tag">
+              {{ e.especializacion?.nombre }}
+            </span>
+          </div>
+        </div>
+        <div class="info-section" *ngIf="docenteSeleccionado.horarios?.length > 0">
+          <h4>Horarios Disponibles</h4>
+          <div class="horarios-list">
+            <div *ngFor="let h of docenteSeleccionado.horarios" class="horario-item">
+              <span class="dia">{{ h.horario?.dia }}</span>
+              <span class="horario">{{ formatTime(h.horario?.hora_inicio) }} - {{ formatTime(h.horario?.hora_fin) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main> 

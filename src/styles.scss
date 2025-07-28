@@ -18,11 +18,11 @@ body {
 }
 
 /* Botones de acción de horarios - estilos globales */
-.btn-generar-horario, .btn-resetear-horario {
+.btn-principal, .btn-limpiar-filtros {
   display: flex;
   align-items: center;
   gap: 0.5em;
-  font-size: 1.08rem;
+  font-size: 1rem;
   font-weight: 700;
   border-radius: 8px;
   padding: 0.55rem 1.7rem;
@@ -33,32 +33,32 @@ body {
   height: 44px;
 }
 
-.btn-generar-horario {
+.btn-principal {
   background: #213354;
   color: #fff;
 }
-.btn-generar-horario .material-icons {
+.btn-principal .material-icons {
   color: #fff;
   font-size: 1.3em;
   margin-right: 0.5em;
   vertical-align: middle;
 }
-.btn-generar-horario:hover, .btn-generar-horario:focus {
+.btn-principal:hover, .btn-principal:focus {
   background: #16213a;
   box-shadow: 0 4px 16px rgba(33,51,84,0.13);
 }
 
-.btn-resetear-horario {
+.btn-limpiar-filtros {
   background: #e53935;
   color: #fff;
 }
-.btn-resetear-horario .material-icons {
+.btn-limpiar-filtros .material-icons {
   color: #fff;
   font-size: 1.3em;
   margin-right: 0.5em;
   vertical-align: middle;
 }
-.btn-resetear-horario:hover, .btn-resetear-horario:focus {
+.btn-limpiar-filtros:hover, .btn-limpiar-filtros:focus {
   background: #b71c1c;
   box-shadow: 0 4px 16px rgba(229,57,53,0.13);
 }

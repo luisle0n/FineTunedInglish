@@ -43,11 +43,15 @@
     <section class="dashboard-charts">
         <div class="chart-card">
             <h3>Distribución por Tipo de Contrato</h3>
-            <p>Gráfico Estadístico</p>
+            <div class="chart-container">
+                <canvas id="doughnutChart"></canvas>
+            </div>
         </div>
         <div class="chart-card">
-            <h3>Distribución por Rango de Edad</h3>
-            <p>Gráfico Estadístico</p>
+            <h3>Distribución por Nivel de Inglés</h3>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
         </div>
     </section>
 
@@ -84,12 +88,6 @@
             <button class="btn outline" (click)="abrirModalCargarDatos()">
                 <img src="img/subir.png" alt="Cargar Datos" class="icon" />
                 Cargar Datos
-            </button>
-
-            <!-- Botón 3 -->
-            <button class="btn outline" (click)="abrirModalGenerarHorario()">
-                <img src="img/calendario2.png" alt="Generar Horario" class="icon" />
-                Generar Horario
             </button>
         </div>
     </section>

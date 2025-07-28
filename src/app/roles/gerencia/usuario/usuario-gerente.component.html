@@ -1,0 +1,88 @@
+<app-header></app-header>
+<div class="usuario-filtros">
+  <label>Filtrar por rol:</label>
+  <select [(ngModel)]="filtroRol" (change)="onFiltroRolChange()">
+    <option *ngFor="let rol of roles" [value]="rol.value">{{ rol.label }}</option>
+  </select>
+</div>
+
+<table class="usuario-table">
+  <thead>
+    <tr>
+      <th>Usuario</th>
+      <th>Rol</th>
+      <th>Nombre</th>
+      <th>Correo</th>
+      <th>Teléfono</th>
+      <th>Activo</th>
+      <th>Ver</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let usuario of usuariosFiltrados">
+      <td>{{ usuario.username }}</td>
+      <td>{{ usuario.rol?.nombre }}</td>
+      <td>
+        {{ usuario.persona?.primer_nombre }} {{ usuario.persona?.segundo_nombre }}
+        {{ usuario.persona?.primer_apellido }} {{ usuario.persona?.segundo_apellido }}
+      </td>
+      <td>{{ usuario.persona?.correo }}</td>
+      <td>{{ usuario.persona?.telefono }}</td>
+      <td>
+        <span [class.activo]="usuario.activo">●</span>
+      </td>
+      <td>
+        <button class="btn-ver" (click)="verUsuario(usuario)">
+          <img src="/img/ojo-abierto.png" alt="Ver" width="22" />
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- MODAL VER USUARIO -->
+<div class="modal-backdrop" *ngIf="showModalVer">
+  <div class="modal-vista">
+    <div class="modal-header">
+      <h2 class="modal-title">Detalle del Usuario</h2>
+      <button class="btn-close" (click)="cerrarModalVer()">×</button>
+    </div>
+    <div class="modal-content">
+      <div *ngIf="usuarioSeleccionado">
+        <div class="modal-section">
+          <h3 class="section-title">Información Personal</h3>
+          <table class="tabla-detalle-usuario">
+            <tr>
+              <th>Usuario</th>
+              <td>{{ usuarioSeleccionado.username }}</td>
+            </tr>
+            <tr>
+              <th>Rol</th>
+              <td>{{ usuarioSeleccionado.rol?.nombre }}</td>
+            </tr>
+            <tr>
+              <th>Nombre Completo</th>
+              <td>{{ usuarioSeleccionado.persona?.primer_nombre }} {{ usuarioSeleccionado.persona?.segundo_nombre }} {{ usuarioSeleccionado.persona?.primer_apellido }} {{ usuarioSeleccionado.persona?.segundo_apellido }}</td>
+            </tr>
+            <tr>
+              <th>Cédula</th>
+              <td>{{ usuarioSeleccionado.persona?.cedula }}</td>
+            </tr>
+            <tr>
+              <th>Correo</th>
+              <td>{{ usuarioSeleccionado.persona?.correo }}</td>
+            </tr>
+            <tr>
+              <th>Teléfono</th>
+              <td>{{ usuarioSeleccionado.persona?.telefono }}</td>
+            </tr>
+            <tr>
+              <th>Activo</th>
+              <td><span [class.activo]="usuarioSeleccionado.activo">●</span> {{ usuarioSeleccionado.activo ? 'Sí' : 'No' }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

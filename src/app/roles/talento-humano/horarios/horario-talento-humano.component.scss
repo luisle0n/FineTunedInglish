@@ -30,7 +30,7 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
   .left h1 {
     font-size: 1.8rem;
-    color: #000; // ← CAMBIO: antes $azul
+    color: #000;
   }
 
   .right {
@@ -40,7 +40,7 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     span {
       font-size: 0.9rem;
-      color: #000; // ← CAMBIO: antes $azul
+      color: #000;
     }
 
     .user-section {
@@ -70,10 +70,10 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           li {
             padding: 0.8rem 1rem;
             cursor: pointer;
-            color: #000; // ← CAMBIO: antes $azul
+            color: #000;
 
             &:hover {
-              background-color: rgba(0, 0, 0, 0.05); // más neutral
+              background-color: rgba(0, 0, 0, 0.05);
             }
 
             &:not(:last-child) {
@@ -85,7 +85,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
   }
 }
-
 
 // === ICONOS ===
 .user-icon {
@@ -195,7 +194,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
   }
 
-
   .horario-generado {
     margin-top: 3rem;
 
@@ -203,8 +201,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       font-size: 1.4rem;
       margin-bottom: 1rem;
     }
-
-    // Estilos modernos y visuales para tablas de horarios
 
     :host {
       display: block;
@@ -215,7 +211,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin-bottom: 1.5rem;
     }
 
-    // Contenedor principal
     .horarios-container {
       width: 100%;
       max-width: 1200px;
@@ -358,7 +353,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--striped, #f5f7fa);
     }
 
-    // Celdas de carga horaria
     .clase.blue {
       background: var(--info, #e3f2fd);
       color: var(--primary, #1a237e);
@@ -390,7 +384,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       font-size: 0.98rem;
     }
 
-    // Títulos y labels
     h2, h3 {
       color: var(--primary, #1a237e);
       font-weight: 800;
@@ -402,7 +395,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin-right: 0.7rem;
     }
 
-    // Scroll horizontal para tablas en pantallas pequeñas
     @media (max-width: 1200px) {
       .table {
         font-size: 0.98rem;
@@ -447,7 +439,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 .badge.carga-media { background: #fbc02d; color: #222; }
 .badge.carga-alta { background: #e53935; }
 
-// Unificación de estilo de tabla para todas las vistas (como Aulas)
 .tabla-estilo-clases {
   background: #fff;
   border-radius: 16px;
@@ -810,7 +801,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   gap: 0.5rem;
 }
 
-// Modal de vista detallada de docente (reutilizado)
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -912,12 +902,12 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   border-left: 3px solid var(--primary-blue);
 }
 
-// Mejoras visuales para las tablas de horario completo y por piso
 .tabla-estilo-clases .badge-programa    { background: #1976d2; }
 .tabla-estilo-clases .badge-categoria   { background: #388e3c; }
 .tabla-estilo-clases .badge-nivel       { background: #fbc02d; color: #222; }
 .tabla-estilo-clases .badge-docente     { background: #0288d1; }
 .tabla-estilo-clases .badge-aula        { background: #7b1fa2; }
+.tabla-estilo-clases .badge-aula-purple { background: #9c27b0; }
 .tabla-estilo-clases .badge-ocupacion   { background: #e53935; }
 .tabla-estilo-clases .badge-estudiantes { background: #43a047; }
 
@@ -980,7 +970,7 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   align-items: center;
   gap: 1.1rem;
 }
-// Badges de colores para tablas
+
 .tabla-color .badge-docente { background: #1976d2; }
 .tabla-color .badge-nivel { background: #fbc02d; color: #222; }
 .tabla-color .badge-carga { background: #43a047; }

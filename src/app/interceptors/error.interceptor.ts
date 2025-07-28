@@ -62,8 +62,10 @@ export class ErrorInterceptor implements HttpInterceptor {
           }
         }
 
-        // Aquí podrías mostrar un toast o notificación
-        console.error('Error interceptor:', errorMessage);
+        // Log errors except 404 for development (handled gracefully by components)
+        if (error.status !== 404) {
+          console.error('Error interceptor:', errorMessage);
+        }
         
         return throwError(() => new Error(errorMessage));
       })

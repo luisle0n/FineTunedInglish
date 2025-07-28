@@ -35,6 +35,15 @@ export interface Docente {
       hora_inicio: string;
     };
   }>;
+  editValues?: {
+    correo: string;
+    telefono: string;
+    tipo_contrato_id: string;
+    experiencia_anios: number;
+    nivel_ingles_id: string;
+    horas_disponibles: number;
+    especializaciones: string[];
+  };
 }
 
 export interface DocentePayload {

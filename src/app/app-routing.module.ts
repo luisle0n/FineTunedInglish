@@ -15,6 +15,12 @@ import { HorarioTalentoHumanoComponent } from './roles/talento-humano/horarios/h
 import { AulasTalentoHumanoComponent } from './roles/talento-humano/aulas/aulas-talento-humano.component';
 
 import { DashboardGerenciaComponent } from './roles/gerencia/dashboard-gerencia.component';
+import { DocenteGerenteComponent } from './roles/gerencia/docente/docente-gerente.component';
+import { HorariosGerenteComponent} from './roles/gerencia/horarios/horarios-gerente.component';
+import { UsuarioGerenteComponent } from './roles/gerencia/usuario/usuario-gerente.component';
+import { AulasGerenteComponent } from './roles/gerencia/aulas/aulas-gerente.component';
+import { ClasesGerenteComponent } from './roles/gerencia/clases/clases-gerente.component';
+import { MensajesGerenteComponent } from './roles/gerencia/mensajes/mensajes-gerente.component';
 import { ProfileComponent } from './shared/components/profile/profile.component';
 import { UsuarioCoordinadorComponent } from './roles/coordinador/usuarios/usuario.coordinador.component';
 
@@ -67,16 +73,29 @@ const routes: Routes = [
   },
 
   {
-    path: 'gerencia',
+    path: 'gerente',
     component: DashboardGerenciaComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'gerencia' },
+    data: { role: 'gerente' },
     children: [
-      { path: 'profile', component: ProfileComponent }
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+      {
+        path: 'inicio',
+        loadComponent: () =>
+          import('./roles/gerencia/inicio/inicio-gerente.component')
+            .then(m => m.InicioGerenteComponent)
+      },
+      
+      { path: 'docente', component: DocenteGerenteComponent},
+      { path: 'horarios', component: HorariosGerenteComponent },
+      { path: 'aulas', component: AulasGerenteComponent },
+      { path: 'clases', component: ClasesGerenteComponent },
+      { path: 'profile', component: ProfileComponent },
+      { path: 'usuarios', component: UsuarioGerenteComponent },
+      { path: 'mensajes', component: MensajesGerenteComponent }
+
     ]
   },
-
-  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({

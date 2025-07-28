@@ -63,8 +63,8 @@ export class LoginComponent implements OnInit {
                                 case 'talento humano':
                                     this.router.navigate(['/talento-humano/inicio']);
                                     break;
-                                case 'gerencia':
-                                    this.router.navigate(['/gerencia']);
+                                case 'gerente':
+                                    this.router.navigate(['/gerente/inicio']);
                                     break;
                                 default:
                                     alert('Rol desconocido');

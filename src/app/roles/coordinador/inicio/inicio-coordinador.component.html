@@ -43,15 +43,19 @@
     <section class="dashboard-charts">
         <div class="chart-card">
             <h3>Distribución por Tipo de Contrato</h3>
-            <p>Gráfico Estadístico</p>
+            <div class="chart-container">
+                <canvas id="doughnutChart"></canvas>
+            </div>
         </div>
         <div class="chart-card">
-            <h3>Distribución por Rango de Edad</h3>
-            <p>Gráfico Estadístico</p>
+            <h3>Distribución por Nivel de Inglés</h3>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
         </div>
     </section>
 
-    <!-- Última fila: Actividad -->
+    <!-- Última fila: Actividad y Acciones -->
     <section class="dashboard-bottom">
         <div class="recent-activity">
             <h3>Actividad Reciente</h3>
@@ -70,5 +74,186 @@
                 </li>
             </ul>
         </div>
+
+        <div class="quick-actions">
+            <h3>Acciones Rápidas</h3>
+            <button class="btn outline" (click)="mostrarModalAgregarAula()">
+                <img src="img/entrada.png" alt="Agregar Aula" class="icon" />
+                Agregar Aula
+            </button>
+            <button class="btn outline" (click)="mostrarModalAgregarClase()">
+                <img src="img/calendario2.png" alt="Agregar Clase" class="icon" />
+                Agregar Clase
+            </button>
+            <button class="btn outline" (click)="mostrarModalAgregarUsuario()">
+                <img src="img/usuario.png" alt="Agregar Usuario" class="icon" />
+                Agregar Usuario
+            </button>
+        </div>
     </section>
+
+    <!-- Modal Agregar Aula -->
+    <div class="modal-backdrop" *ngIf="mostrarModalAula" (click)="cerrarModalAula()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Agregar Aula</h3>
+                <button class="btn-close" (click)="cerrarModalAula()">×</button>
+            </div>
+            <div class="modal-content">
+                <form (ngSubmit)="agregarAula()" #formAula="ngForm">
+                    <div class="form-group">
+                        <label for="nombre_aula">Nombre del Aula *</label>
+                        <input type="text" id="nombre_aula" name="nombre_aula" [(ngModel)]="nuevaAula.nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="capacidad_aula">Capacidad *</label>
+                        <input type="number" id="capacidad_aula" name="capacidad_aula" [(ngModel)]="nuevaAula.capacidad" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="piso_aula">Piso</label>
+                        <input type="text" id="piso_aula" name="piso_aula" [(ngModel)]="nuevaAula.piso">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn primary">Agregar Aula</button>
+                        <button type="button" class="btn outline" (click)="cerrarModalAula()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Clase -->
+    <div class="modal-backdrop" *ngIf="mostrarModalClase" (click)="cerrarModalClase()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Crear Nueva Clase</h3>
+                <button class="btn-close" (click)="cerrarModalClase()">×</button>
+            </div>
+            <div class="modal-content">
+                <form (ngSubmit)="agregarClase()" #formClase="ngForm">
+                    <!-- Sección 1: Información Básica -->
+                    <div class="form-section">
+                        <h4>Información Básica</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="programa_clase">Programa *</label>
+                                <select id="programa_clase" name="programa_clase" [(ngModel)]="nuevaClase.programa_id" required>
+                                    <option value="">Selecciona un programa</option>
+                                    <option *ngFor="let programa of programas" [value]="programa.id">{{ programa.nombre }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cupos_clase">Cupos Proyectados *</label>
+                                <input type="number" id="cupos_clase" name="cupos_clase" [(ngModel)]="nuevaClase.cupos_proyectados" required min="1" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="paralelo_clase">Paralelo *</label>
+                                <input type="text" id="paralelo_clase" name="paralelo_clase" [(ngModel)]="nuevaClase.paralelo" required value="A">
+                            </div>
+                            <div class="form-group">
+                                <label for="prioridad_clase">Prioridad *</label>
+                                <input type="number" id="prioridad_clase" name="prioridad_clase" [(ngModel)]="nuevaClase.prioridad" required min="1" max="10" value="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 2: Horario y Estado -->
+                    <div class="form-section">
+                        <h4>Horario y Estado</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="horario_clase">Horario Solicitado *</label>
+                                <input type="text" id="horario_clase" name="horario_clase" [(ngModel)]="nuevaClase.horario_solicitado" required placeholder="Ej: lunes-viernes 14:00-15:00">
+                            </div>
+                            <div class="form-group">
+                                <label for="estado_clase">Estado</label>
+                                <select id="estado_clase" name="estado_clase" [(ngModel)]="nuevaClase.estado">
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="aprobado">Aprobado</option>
+                                    <option value="rechazado">Rechazado</option>
+                                    <option value="en_proceso">En Proceso</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 3: Observaciones -->
+                    <div class="form-section">
+                        <h4>Observaciones</h4>
+                        <div class="form-group">
+                            <label for="observaciones_clase">Notas Adicionales</label>
+                            <textarea id="observaciones_clase" name="observaciones_clase" [(ngModel)]="nuevaClase.observaciones" rows="4" placeholder="Descripción adicional de la clase..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit" class="btn primary">Crear Clase</button>
+                        <button type="button" class="btn outline" (click)="cerrarModalClase()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Usuario -->
+    <div class="modal-backdrop" *ngIf="mostrarModalUsuario" (click)="cerrarModalUsuario()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Crear Usuario</h3>
+                <button class="btn-close" (click)="cerrarModalUsuario()">×</button>
+            </div>
+            <div class="modal-content">
+                <h4>Información Básica</h4>
+                <form (ngSubmit)="crearUsuario()" #formUsuario="ngForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="rol">Rol *</label>
+                            <select id="rol" name="rol" [(ngModel)]="nuevoUsuario.rolNombre" required>
+                                <option value="">Selecciona un rol</option>
+                                <option value="coordinador academico">Coordinador Académico</option>
+                                <option value="talento humano">Talento Humano</option>
+                                <option value="gerente">Gerente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="primer_nombre">Primer Nombre *</label>
+                            <input type="text" id="primer_nombre" name="primer_nombre" [(ngModel)]="nuevoUsuario.primer_nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="segundo_nombre">Segundo Nombre</label>
+                            <input type="text" id="segundo_nombre" name="segundo_nombre" [(ngModel)]="nuevoUsuario.segundo_nombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="primer_apellido">Primer Apellido *</label>
+                            <input type="text" id="primer_apellido" name="primer_apellido" [(ngModel)]="nuevoUsuario.primer_apellido" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="segundo_apellido">Segundo Apellido</label>
+                            <input type="text" id="segundo_apellido" name="segundo_apellido" [(ngModel)]="nuevoUsuario.segundo_apellido">
+                        </div>
+                        <div class="form-group">
+                            <label for="cedula">Cédula *</label>
+                            <input type="text" id="cedula" name="cedula" [(ngModel)]="nuevoUsuario.cedula" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="correo">Correo *</label>
+                            <input type="email" id="correo" name="correo" [(ngModel)]="nuevoUsuario.correo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" [(ngModel)]="nuevoUsuario.telefono" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contrasena">Contraseña *</label>
+                            <input type="password" id="contrasena" name="contrasena" [(ngModel)]="nuevoUsuario.password" required>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn primary">Crear Usuario</button>
+                        <button type="button" class="btn outline" (click)="cerrarModalUsuario()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>

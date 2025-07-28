@@ -31,8 +31,8 @@ export class RoleGuard implements CanActivate {
         case 'talento humano':
           this.router.navigate(['/talento-humano/inicio']);
           break;
-        case 'gerencia':
-          this.router.navigate(['/gerencia']);
+        case 'gerente':
+          this.router.navigate(['/gerente']);
           break;
         default:
           this.router.navigate(['/login']);

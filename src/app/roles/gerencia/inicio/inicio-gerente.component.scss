@@ -132,11 +132,11 @@
                         font-weight: 500;
 
                         &:first-child {
-                            color: #10b981; // Verde para Activos
+                            color: #10b981;
                         }
 
                         &:last-child {
-                            color: #ef4444; // Rojo para Inactivos
+                            color: #ef4444;
                         }
                     }
                 }
@@ -189,7 +189,6 @@
                 }
             }
 
-            // Solo afecta botones de la sección Acciones Rápidas
             &.quick-actions {
                 button.btn {
                     display: flex;
@@ -252,6 +251,15 @@
         }
     }
 
+    // Estilo específico para dashboard-bottom cuando solo tiene actividad reciente
+    .dashboard-bottom {
+        grid-template-columns: 1fr;
+        
+        .recent-activity {
+            width: 100%;
+        }
+    }
+
     .user-icon {
         width: 20px;
         height: 20px;
@@ -279,100 +287,105 @@
         align-items: center;
         z-index: 1000;
 
-        .modal {
+    .modal {
             background-color: white;
             border-radius: 8px;
             max-width: 800px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
                 padding: 1.5rem 2rem;
                 border-bottom: 1px solid #e5e7eb;
 
-                h3 {
-                    margin: 0;
-                    color: var(--primary-blue);
+        h3 {
+            margin: 0;
+            color: var(--primary-blue);
                     font-size: 1.5rem;
-                }
+        }
 
-                .btn-close {
-                    background: none;
-                    border: none;
-                    font-size: 1.5rem;
-                    cursor: pointer;
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
                     color: #6b7280;
                     padding: 0.25rem;
                     border-radius: 4px;
                     transition: all 0.2s ease;
 
-                    &:hover {
+            &:hover {
                         background-color: #f3f4f6;
                         color: #374151;
-                    }
-                }
             }
+        }
+    }
 
-            .modal-content {
+    .modal-content {
                 padding: 2rem;
 
                 .form-section {
                     margin-bottom: 2rem;
 
-                    h4 {
-                        color: var(--primary-blue);
-                        margin-bottom: 1rem;
+        h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
                         font-size: 1.2rem;
                         border-bottom: 2px solid #e5e7eb;
                         padding-bottom: 0.5rem;
-                    }
+        }
 
                     .form-subsection {
-                        margin-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
 
                         h5 {
                             color: var(--primary-blue);
                             margin-bottom: 0.8rem;
                             font-size: 1rem;
-                        }
+    }
 
-                        .form-grid {
-                            display: grid;
+    .form-grid {
+        display: grid;
                             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                            gap: 1rem;
+        gap: 1rem;
 
-                            .form-group {
+    .form-group {
                                 display: flex;
                                 flex-direction: column;
                                 gap: 0.25rem;
 
-                                label {
+        label {
                                     font-weight: 600;
                                     color: #374151;
                                     font-size: 0.9rem;
                                 }
 
-                                input, select {
-                                    padding: 0.75rem;
+                                input, select, textarea {
+            padding: 0.75rem;
                                     border: 1px solid #d1d5db;
                                     border-radius: 4px;
                                     font-size: 1rem;
                                     transition: border-color 0.2s ease;
 
-                                    &:focus {
-                                        outline: none;
-                                        border-color: var(--primary-blue);
+            &:focus {
+                outline: none;
+                border-color: var(--primary-blue);
                                         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-                                    }
-                                }
+            }
+        }
 
                                 select[multiple] {
                                     height: 120px;
+                                }
+
+        textarea {
+                                    resize: vertical;
+                                    min-height: 80px;
                                 }
                             }
                         }
@@ -418,7 +431,7 @@
                         margin-top: 1rem;
                         padding: 1rem;
                         background-color: #f9fafb;
-                        border-radius: 6px;
+            border-radius: 6px;
                         border: 1px solid #e5e7eb;
 
                         h5 {
@@ -455,7 +468,7 @@
                             label {
                                 font-weight: 600;
                                 color: #374151;
-                                font-size: 0.9rem;
+            font-size: 0.9rem;
                             }
 
                             input, select {
@@ -465,9 +478,9 @@
                                 font-size: 1rem;
                                 transition: border-color 0.2s ease;
 
-                                &:focus {
-                                    outline: none;
-                                    border-color: var(--primary-blue);
+            &:focus {
+                outline: none;
+                border-color: var(--primary-blue);
                                     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
                                 }
                             }
@@ -503,6 +516,11 @@
                         &:hover {
                             background-color: #1e40af;
                         }
+
+                        &:disabled {
+                            background-color: #9ca3af;
+                            cursor: not-allowed;
+                        }
                     }
 
                     &.secondary {
@@ -524,8 +542,8 @@
         width: 95% !important;
 
         .modal-content {
-            .form-section {
-                margin-bottom: 2rem;
+    .form-section {
+        margin-bottom: 2rem;
 
                 .section-title {
                     color: var(--primary-blue);
@@ -584,7 +602,7 @@
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
                     gap: 0.5rem;
-                    margin-bottom: 1rem;
+            margin-bottom: 1rem;
 
                     .especializacion-item {
                         .checkbox-container {
@@ -633,8 +651,8 @@
             // Estilos para horarios
             .horarios-section {
                 .horarios-title {
-                    color: var(--primary-blue);
-                    margin-bottom: 1rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
                     font-size: 1.2rem;
                     border-bottom: 2px solid #e5e7eb;
                     padding-bottom: 0.5rem;
@@ -706,7 +724,7 @@
                                     }
 
                                     &.dia-cell {
-                                        font-weight: 600;
+            font-weight: 600;
                                         color: var(--primary-blue);
                                     }
 
@@ -747,39 +765,39 @@
                             font-size: 0.9rem;
                         }
                     }
-                }
-            }
+        }
+    }
 
-            .modal-actions {
-                display: flex;
-                justify-content: flex-end;
-                gap: 1rem;
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
                 margin-top: 2rem;
-                padding-top: 1rem;
+        padding-top: 1rem;
                 border-top: 1px solid #e5e7eb;
 
-                .btn {
-                    padding: 0.75rem 1.5rem;
-                    border-radius: 6px;
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
                     font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
+            cursor: pointer;
+            transition: all 0.2s ease;
                     border: none;
 
-                    &.primary {
-                        background-color: var(--primary-blue);
-                        color: white;
+            &.primary {
+                background-color: var(--primary-blue);
+                color: white;
 
-                        &:hover {
-                            background-color: #1e40af;
-                        }
-                    }
+                &:hover {
+                    background-color: #1e40af;
+                }
+            }
 
                     &.secondary {
                         background-color: #6b7280;
                         color: white;
 
-                        &:hover {
+                &:hover {
                             background-color: #4b5563;
                         }
                     }
@@ -841,8 +859,8 @@
                         background-color: white;
 
                         thead {
-                            background-color: var(--primary-blue);
-                            color: white;
+                    background-color: var(--primary-blue);
+                    color: white;
                             position: sticky;
                             top: 0;
                             z-index: 10;
@@ -919,4 +937,4 @@
             height: 200px;
         }
     }
-}
+} 

@@ -1,0 +1,17 @@
+<app-header></app-header>
+<div class="mensajes-gerente">
+  <h2>Mensajes</h2>
+  <div *ngIf="cargando">Cargando...</div>
+  <ul class="mensajes-lista" *ngIf="!cargando">
+    <li *ngFor="let m of mensajes">
+      <div class="mensaje-cabecera">
+        <span class="mensaje-para">Para: {{ m.destinatario }}</span>
+        <span class="mensaje-fecha">{{ m.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <div class="mensaje-texto">{{ m.texto }}</div>
+    </li>
+  </ul>
+  <div *ngIf="!cargando && mensajes.length === 0" class="sin-mensajes">
+    No hay mensajes para mostrar.
+  </div>
+</div> 

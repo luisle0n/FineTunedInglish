@@ -3,7 +3,7 @@
         <label for="filtroContrato">Tipo de Contrato</label>
         <select id="filtroContrato" 
                 [value]="filtroContrato" 
-                (change)="onFiltroContratoChange($event.target.value)">
+                (change)="onFiltroContratoChange($event)">
             <option value="Todos">Todos</option>
             <option *ngFor="let contrato of contratos" [value]="contrato.nombre">
                 {{ contrato.nombre }}
@@ -15,7 +15,7 @@
         <label for="filtroNivelIngles">Nivel de Inglés</label>
         <select id="filtroNivelIngles" 
                 [value]="filtroNivelIngles" 
-                (change)="onFiltroNivelInglesChange($event.target.value)">
+                (change)="onFiltroNivelInglesChange($event)">
             <option value="Todos">Todos</option>
             <option *ngFor="let nivel of nivelesIngles" [value]="nivel.nombre">
                 {{ nivel.nombre }}
@@ -29,8 +29,8 @@
                id="filtroExperiencia" 
                [value]="filtroExperiencia" 
                min="0"
-               (input)="onFiltroExperienciaChange(+$event.target.value)"
-               (blur)="onFiltroExperienciaChange(+$event.target.value)"
+               (input)="onFiltroExperienciaChange($event)"
+               (blur)="onFiltroExperienciaChange($event)"
                placeholder="0" />
     </div>
 

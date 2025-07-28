@@ -1,10 +1,14 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Docente } from '../../services/docente.service';
 
 @Component({
+  standalone: true,
   selector: 'app-docente-table',
   templateUrl: './docente-table.component.html',
-  styleUrls: ['./docente-table.component.scss']
+  styleUrls: ['./docente-table.component.scss'],
+  imports: [CommonModule, FormsModule]
 })
 export class DocenteTableComponent {
   @Input() docentes: Docente[] = [];

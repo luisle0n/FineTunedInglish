@@ -1,0 +1,221 @@
+<app-header></app-header>
+<div class="clases-container">
+  <!-- Estado de Carga -->
+  <div *ngIf="cargando" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Cargando información de clases...</p>
+  </div>
+
+  <!-- Estado de Error -->
+  <div *ngIf="error && !cargando" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Error al cargar las clases</h3>
+    <p>No se pudo cargar la información de las clases. Por favor intente nuevamente.</p>
+    <button class="btn-primary" (click)="cargarClases()">Reintentar</button>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!cargando && !error">
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-content">
+          <h3>{{ totalClases }}</h3>
+          <p>Total Clases</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <h3>{{ clasesPendientes }}</h3>
+          <p>Pendientes</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ clasesAsignadas }}</h3>
+          <p>Asignadas</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-content">
+          <h3>{{ clasesCanceladas }}</h3>
+          <p>Canceladas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters-card">
+      <div class="filter-group">
+        <label for="filtroEstado">Estado</label>
+        <select id="filtroEstado" [(ngModel)]="filtroEstado" (ngModelChange)="filtrarClases()">
+          <option value="Todos">Todos</option>
+          <option value="PENDIENTE">⏳ Pendiente</option>
+          <option value="ASIGNADO">✅ Asignado</option>
+          <option value="CANCELADO">❌ Cancelado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filtroCategoria">Categoría</label>
+        <select id="filtroCategoria" [(ngModel)]="filtroCategoria" (ngModelChange)="filtrarClases()">
+          <option value="Todos">Todos</option>
+          <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filtroPrioridadMin">Prioridad Mínima</label>
+        <input type="number" id="filtroPrioridadMin" [(ngModel)]="filtroPrioridadMin" min="0" max="10" (input)="validarPrioridad($event, 'min')" (blur)="validarPrioridad($event, 'min')" placeholder="0" />
+      </div>
+      <div class="filter-group">
+        <label for="filtroPrioridadMax">Prioridad Máxima</label>
+        <input type="number" id="filtroPrioridadMax" [(ngModel)]="filtroPrioridadMax" min="0" max="10" (input)="validarPrioridad($event, 'max')" (blur)="validarPrioridad($event, 'max')" placeholder="10" />
+      </div>
+      <div class="acciones-filtros">
+        <div class="botones-filtro">
+          <button class="btn-primary" (click)="resetearFiltros()">Limpiar Filtros</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Clases -->
+    <div class="clases-table-container">
+      <div class="table-header">
+        <h2>Lista de Clases</h2>
+        <div class="actions">
+          <input type="text" [(ngModel)]="textoBusqueda" (ngModelChange)="filtrarClases()" placeholder="Buscar por programa, categoría, paralelo u horario..." />
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="clases-table">
+          <thead>
+            <tr>
+              <th>Programa</th>
+              <th>Categoría</th>
+              <th>Paralelo</th>
+              <th>Cupos</th>
+              <th>Horario</th>
+              <th>Estado</th>
+              <th>Prioridad</th>
+              <th>Observaciones</th>
+              <th>Ver</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="clasesPaginadas.length === 0">
+              <td colspan="9" class="no-data">
+                <div class="no-data-content">
+                  <p>No se encontraron clases que coincidan con los filtros aplicados.</p>
+                </div>
+              </td>
+            </tr>
+            <tr *ngFor="let clase of clasesPaginadas; let i = index">
+              <td><strong>{{ clase.programa?.nombre }}</strong></td>
+              <td><span class="categoria-badge" [ngClass]="getCategoriaClass(clase.programa?.categoria)">{{ clase.programa?.categoria }}</span></td>
+              <td><span class="paralelo-badge">{{ clase.paralelo }}</span></td>
+              <td>{{ clase.cupos_proyectados }} estudiantes</td>
+              <td>{{ clase.horario_solicitado }}</td>
+              <td><span class="estado-badge" [ngClass]="getEstadoClass(clase.estado)">{{ getEstadoTexto(clase.estado) }}</span></td>
+              <td><span class="prioridad-badge" [ngClass]="getPrioridadClass(clase.prioridad)">{{ clase.prioridad }}</span></td>
+              <td>
+                <span class="observaciones" *ngIf="clase.observaciones">{{ clase.observaciones }}</span>
+                <span class="sin-observaciones" *ngIf="!clase.observaciones">Sin observaciones</span>
+              </td>
+              <td>
+                <button class="btn-view" (click)="verClase(i)" title="Ver Clase">
+                  <img src="/img/ojo-abierto.png" alt="Ver" width="20" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- PAGINACIÓN -->
+      <div class="pagination" *ngIf="totalPaginas > 1">
+        <div class="pagination-info">
+          <span>Mostrando {{ obtenerRangoPagina().inicio }} - {{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} clases</span>
+        </div>
+        <div class="pagination-controls">
+          <button class="btn-pagination" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">← Anterior</button>
+          <div class="page-numbers">
+            <button *ngFor="let pagina of obtenerPaginasVisibles()" class="btn-page" [class.active]="pagina === paginaActual" (click)="cambiarPagina(pagina)">{{ pagina }}</button>
+          </div>
+          <button class="btn-pagination" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VER DETALLES -->
+  <div class="modal-backdrop" *ngIf="mostrarModalVista">
+    <div class="modal-vista">
+      <div class="modal-header">
+        <h3>Detalle de la Clase</h3>
+        <button class="btn-close" (click)="cerrarModalVista()">×</button>
+      </div>
+      <div class="modal-content" *ngIf="claseSeleccionada">
+        <div class="info-section">
+          <h4>Información del Programa</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Programa:</label>
+              <span class="programa-nombre">{{ claseSeleccionada.programa?.nombre }}</span>
+            </div>
+            <div class="info-item">
+              <label>Categoría:</label>
+              <span class="categoria-badge" [ngClass]="getCategoriaClass(claseSeleccionada.programa?.categoria)">{{ claseSeleccionada.programa?.categoria }}</span>
+            </div>
+            <div class="info-item">
+              <label>Paralelo:</label>
+              <span class="paralelo-badge">{{ claseSeleccionada.paralelo }}</span>
+            </div>
+            <div class="info-item">
+              <label>Cupos Proyectados:</label>
+              <span>{{ claseSeleccionada.cupos_proyectados }} estudiantes</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-section">
+          <h4>Horario y Estado</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Horario Solicitado:</label>
+              <span>{{ claseSeleccionada.horario_solicitado }}</span>
+            </div>
+            <div class="info-item">
+              <label>Estado:</label>
+              <span class="estado-badge" [ngClass]="getEstadoClass(claseSeleccionada.estado)">{{ getEstadoTexto(claseSeleccionada.estado) }}</span>
+            </div>
+            <div class="info-item">
+              <label>Prioridad:</label>
+              <span class="prioridad-badge" [ngClass]="getPrioridadClass(claseSeleccionada.prioridad)">{{ claseSeleccionada.prioridad }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-section" *ngIf="claseSeleccionada.observaciones">
+          <h4>Observaciones</h4>
+          <div class="info-item">
+            <label>Notas Adicionales:</label>
+            <span class="observaciones-texto">{{ claseSeleccionada.observaciones }}</span>
+          </div>
+        </div>
+        <div class="info-section">
+          <h4>Información del Sistema</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Fecha de Creación:</label>
+              <span>{{ claseSeleccionada.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-item">
+              <label>ID de la Clase:</label>
+              <span class="id-clase">{{ claseSeleccionada.id }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

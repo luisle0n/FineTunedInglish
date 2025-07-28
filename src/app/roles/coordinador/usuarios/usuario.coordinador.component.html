@@ -2,7 +2,10 @@
 <app-header #headerComponent></app-header>
 
 <div style="margin-bottom: 16px;">
-  <button (click)="mostrarFormulario()" *ngIf="!showForm" class="btn-generar-horario">Crear usuario</button>
+  <button (click)="mostrarFormulario()" *ngIf="!showForm" class="btn-principal">
+    <img src="/img/mas.png" width="20" alt="icono" />
+    Crear usuario
+  </button>
 </div>
 
 <!-- MODAL CREAR USUARIO -->
@@ -123,7 +126,7 @@
   </select>
 </div>
 
-<table class="usuario-table">
+<table class="tabla-estandar">
   <thead>
     <tr>
       <th>Usuario</th>

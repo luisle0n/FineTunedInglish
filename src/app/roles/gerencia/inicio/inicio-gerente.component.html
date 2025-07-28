@@ -1,0 +1,78 @@
+<main class="dashboard-content">
+    <!-- Header General -->
+    <app-header></app-header>
+
+    <!-- Bloque de métricas -->
+    <section class="dashboard-metrics">
+        <div class="metric-card">
+            <div class="metric-text">
+                <h3>Total Docentes</h3>
+                <p class="metric-value" *ngIf="!cargandoEstadisticas">{{ estadisticas.docentes.total_docentes }}</p>
+                <div class="loading-skeleton" *ngIf="cargandoEstadisticas"></div>
+                <div class="metric-details" *ngIf="!cargandoEstadisticas">
+                    <h4>Activos: {{ estadisticas.docentes.docentes_activos }}</h4>
+                    <h4>Inactivos: {{ estadisticas.docentes.docentes_inactivos }}</h4>
+                </div>
+            </div>
+            <img src="img/silueta-de-multiples-usuarios.png" alt="Total Docentes" class="metric-icon" />
+        </div>
+        <div class="metric-card">
+            <div class="metric-text">
+                <h3>Aulas Asignadas</h3>
+                <p class="metric-value">18</p>
+            </div>
+            <img src="img/entrada.png" alt="Aulas Asignadas" class="metric-icon" />
+        </div>
+        <div class="metric-card">
+            <div class="metric-text">
+                <h3>Horas Programadas</h3>
+                <p class="metric-value">320</p>
+            </div>
+            <img src="img/reloj-circular.png" alt="Horas Programadas" class="metric-icon" />
+        </div>
+        <div class="metric-card">
+            <div class="metric-text">
+                <h3>Horas Disponibles</h3>
+                <p class="metric-value">80</p>
+            </div>
+            <img src="img/calendario.png" alt="Horas Disponibles" class="metric-icon" />
+        </div>
+    </section>
+
+    <!-- Bloques de Gráficas -->
+    <section class="dashboard-charts">
+        <div class="chart-card">
+            <h3>Distribución por Tipo de Contrato</h3>
+            <div class="chart-container">
+                <canvas id="doughnutChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Distribución por Nivel de Inglés</h3>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Última fila: Actividad y Acciones -->
+    <section class="dashboard-bottom">
+        <div class="recent-activity">
+            <h3>Actividad Reciente</h3>
+            <ul>
+                <li>
+                    <img src="img/subir2.png" alt="Carga" class="icon" />
+                    Carga de datos de docentes - Hace 2 horas
+                </li>
+                <li>
+                    <img src="img/calendario3.png" alt="Horario" class="icon" />
+                    Generación de horarios completada - Hace 1 día
+                </li>
+                <li>
+                    <img src="img/actualizar.png" alt="Criterios" class="icon" />
+                    Actualización de criterios - Hace 2 días
+                </li>
+            </ul>
+        </div>
+    </section>
+</main>

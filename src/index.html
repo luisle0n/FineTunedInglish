@@ -8,6 +8,19 @@
 
   <!-- Favicon / Icono de la pestaña -->
   <link rel="icon" type="image/png" href="img/fine-tuned.png" />
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Verificar que Chart.js se cargó correctamente
+    window.addEventListener('load', function() {
+      if (typeof Chart !== 'undefined') {
+        console.log('✅ Chart.js cargado correctamente');
+      } else {
+        console.error('❌ Chart.js no se cargó correctamente');
+      }
+    });
+  </script>
 </head>
 <body>
   <app-root></app-root>
