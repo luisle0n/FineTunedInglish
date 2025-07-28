@@ -37,6 +37,7 @@ import { UsuarioGerenteComponent } from './roles/gerencia/usuario/usuario-gerent
 import { MensajesGerenteComponent } from './roles/gerencia/mensajes/mensajes-gerente.component';
 
 import { ProfileComponent } from './shared/components/profile/profile.component';
+import { ToastNotificationComponent } from './shared/components/toast-notification/toast-notification.component';
 
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -83,6 +84,7 @@ import { reducers } from './store/app.state';
     ClasesGerenteComponent,
     UsuarioGerenteComponent,
     MensajesGerenteComponent,
+    ToastNotificationComponent,
     // StoreModule.forRoot(reducers),
     // EffectsModule.forRoot([]),
     // StoreDevtoolsModule.instrument({

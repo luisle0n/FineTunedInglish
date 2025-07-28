@@ -7,13 +7,14 @@ import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { DocenteService, Docente } from '../../../services/docente.service';
 import { limpiarLineasCSV, extraerEncabezados, procesarFilas, transformarAFilaDocente } from '../../../../utils/excel-utils';
+import { ToastNotificationComponent } from '../../../shared/components/toast-notification/toast-notification.component';
 
 @Component({
   standalone: true,
   selector: 'app-inicio-coordinador',
   templateUrl: './inicio-talento-humano.component.html',
   styleUrls: ['./inicio-talento-humano.component.scss'],
-  imports: [CommonModule, FormsModule, HeaderComponent]
+  imports: [CommonModule, FormsModule, HeaderComponent, ToastNotificationComponent]
 })
 
 export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
@@ -67,6 +68,11 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
   };
   cargandoEstadisticas = true;
 
+  // Toast notification properties
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
+
   constructor(
     private router: Router, 
     private authService: AuthService, 
@@ -78,6 +84,16 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
     this.cargarCatalogos();
     this.cargarEstadisticas();
     this.cargarDocentesParaGraficos();
+  }
+
+  showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    
+    setTimeout(() => {
+      this.showToast = false;
+    }, 4000);
   }
 
   ngAfterViewInit(): void {
@@ -505,11 +521,11 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
         console.log('✅ Docente guardado exitosamente');
         this.cerrarModalNuevoDocente();
         this.cargarEstadisticas(); // Recargar estadísticas
-        alert('Docente guardado exitosamente');
+        this.showToastMessage('Docente guardado exitosamente', 'success');
       },
       error: (err) => {
         console.error('❌ Error al guardar docente:', err);
-        alert('Error al guardar el docente. Verifica los datos.');
+        this.showToastMessage('Error al guardar el docente. Verifica los datos.', 'error');
       }
     });
   }
@@ -520,7 +536,7 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
     const file = input.files?.[0];
     
     if (!file) {
-      alert('Por favor selecciona un archivo');
+      this.showToastMessage('Por favor selecciona un archivo', 'warning');
       return;
     }
 
@@ -532,7 +548,7 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
     ];
     
     if (!allowedTypes.includes(file.type) && !file.name.endsWith('.csv')) {
-      alert('Por favor selecciona un archivo Excel (.xlsx, .xls) o CSV (.csv)');
+      this.showToastMessage('Por favor selecciona un archivo Excel (.xlsx, .xls) o CSV (.csv)', 'warning');
       return;
     }
 
@@ -575,7 +591,7 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
 
       if (errores.length > 0) {
         console.warn('⚠️ Errores encontrados durante la transformación:', errores);
-        alert(`Se encontraron ${errores.length} errores en el archivo:\n${errores.slice(0, 5).join('\n')}${errores.length > 5 ? '\n...' : ''}`);
+        this.showToastMessage(`Se encontraron ${errores.length} errores en el archivo:\n${errores.slice(0, 5).join('\n')}${errores.length > 5 ? '\n...' : ''}`, 'warning');
       }
 
       if (docentesTransformados.length === 0) {
@@ -589,7 +605,7 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
       console.log('✅ Archivo procesado:', this.docentesPendientes.length, 'docentes encontrados');
     } catch (error) {
       console.error('❌ Error procesando archivo:', error);
-      alert(`Error al procesar el archivo: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      this.showToastMessage(`Error al procesar el archivo: ${error instanceof Error ? error.message : 'Error desconocido'}`, 'error');
     }
   }
 
@@ -640,11 +656,11 @@ export class InicioTalentoHuemanoComponent implements OnInit, AfterViewInit {
     this.archivoSeleccionado = null;
     
     if (errores === 0) {
-      alert(`✅ Se cargaron exitosamente ${cargados} docente(s).`);
+      this.showToastMessage(`✅ Se cargaron exitosamente ${cargados} docente(s).`, 'success');
     } else if (cargados === 0) {
-      alert(`❌ No se pudo cargar ningún docente. Revisa la consola para más detalles.`);
+      this.showToastMessage(`❌ No se pudo cargar ningún docente. Revisa la consola para más detalles.`, 'error');
     } else {
-      alert(`⚠️ Se cargaron ${cargados} docente(s) y ${errores} fallaron. Revisa la consola para más detalles.`);
+      this.showToastMessage(`⚠️ Se cargaron ${cargados} docente(s) y ${errores} fallaron. Revisa la consola para más detalles.`, 'warning');
     }
     
     // Recargar estadísticas

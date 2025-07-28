@@ -55,42 +55,31 @@ export class ClasesCoordinadorComponent implements OnInit {
   constructor(private http: HttpClient, private catalogoService: CatalogoService) { }
 
   ngOnInit(): void {
-    console.log('🎓 Componente Vista Clases - Coordinador cargado');
     this.cargarProgramas();
     this.cargarClases();
   }
 
   cargarClases() {
-    console.log('🚀 === CARGANDO CLASES DESDE SERVIDOR ===');
     this.cargando = true;
     this.error = false;
     
-    console.log('🚀 Haciendo petición GET a: http://localhost:3000/clases');
-    
     this.http.get('http://localhost:3000/clases').subscribe({
       next: (response: any) => {
-        console.log('📦 === RESPUESTA DEL SERVIDOR ===');
-        console.log('📦 Datos de clases recibidos:', response);
         
         if (response.success && response.clases) {
           this.clases = response.clases;
-          console.log('📦 Clases cargadas del servidor:', this.clases.length);
           
           this.extraerCategorias();
           this.filtrarClases();
           this.actualizarEstadisticas();
           
-          console.log('📊 Estadísticas actualizadas después de cargar clases');
         } else {
-          console.error('❌ Respuesta inesperada del servidor:', response);
           this.error = true;
         }
         
         this.cargando = false;
       },
       error: (err) => {
-        console.error('❌ === ERROR CARGANDO CLASES ===');
-        console.error('❌ Error cargando clases:', err);
         this.error = true;
         this.cargando = false;
       }
@@ -125,8 +114,6 @@ export class ClasesCoordinadorComponent implements OnInit {
 
   // === FILTRADO Y PAGINACIÓN ===
   filtrarClases(): void {
-    console.log('🔍 Filtrando clases...');
-    console.log('📋 Total clases:', this.clases.length);
     
     this.clasesFiltradas = this.clases.filter(clase => {
       return this.filtrarPorBusqueda(clase) &&
@@ -135,7 +122,6 @@ export class ClasesCoordinadorComponent implements OnInit {
         this.filtrarPorPrioridad(clase);
     });
     
-    console.log('✅ Clases filtradas:', this.clasesFiltradas.length);
     this.aplicarPaginacion();
   }
 
@@ -314,7 +300,6 @@ export class ClasesCoordinadorComponent implements OnInit {
 
   // === MÉTODOS PARA VER CLASE ===
   verClase(index: number): void {
-    console.log('👁️ Viendo clase en índice:', index);
     this.claseSeleccionada = this.clasesPaginadas[index];
     this.mostrarModalVista = true;
   }
@@ -326,7 +311,6 @@ export class ClasesCoordinadorComponent implements OnInit {
 
   // === MÉTODOS PARA EDITAR CLASE ===
   editarClase(clase: any): void {
-    console.log('✏️ Editando clase:', clase);
     
     this.claseEditando = {
       id: clase.id,
@@ -339,7 +323,6 @@ export class ClasesCoordinadorComponent implements OnInit {
       observaciones: clase.observaciones || ''
     };
     
-    console.log('📝 Clase preparada para edición:', this.claseEditando);
     this.mostrarModalEdicion = true;
   }
 
@@ -350,12 +333,9 @@ export class ClasesCoordinadorComponent implements OnInit {
   }
 
   guardarClase(): void {
-    console.log('💾 === GUARDANDO CLASE ===');
-    console.log('📝 Datos a guardar:', this.claseEditando);
     
     const confirmacion = confirm('¿Estás seguro de que quieres guardar los cambios en la clase?');
     if (!confirmacion) {
-      console.log('❌ Usuario canceló la operación');
       return;
     }
     
@@ -363,7 +343,6 @@ export class ClasesCoordinadorComponent implements OnInit {
     
     this.http.patch('http://localhost:3000/clases', this.claseEditando).subscribe({
       next: (response: any) => {
-        console.log('✅ Clase actualizada exitosamente:', response);
         
         // Actualizar la lista local
         const index = this.clases.findIndex(c => c.id === this.claseEditando.id);
@@ -379,7 +358,6 @@ export class ClasesCoordinadorComponent implements OnInit {
         this.mostrarMensajeExito('Clase actualizada correctamente');
       },
       error: (err) => {
-        console.error('❌ Error actualizando clase:', err);
         this.guardando = false;
         this.mostrarMensajeError('Error al actualizar la clase');
       }
@@ -388,7 +366,6 @@ export class ClasesCoordinadorComponent implements OnInit {
 
   // === MÉTODOS PARA CREAR CLASE ===
   abrirModalCreacion(): void {
-    console.log('➕ Abriendo modal de creación');
     
     this.nuevaClase = {
       programa_id: '',
@@ -410,12 +387,9 @@ export class ClasesCoordinadorComponent implements OnInit {
   }
 
   crearClase(): void {
-    console.log('➕ === CREANDO NUEVA CLASE ===');
-    console.log('📝 Datos a crear:', this.nuevaClase);
     
     const confirmacion = confirm('¿Estás seguro de que quieres crear esta nueva clase?');
     if (!confirmacion) {
-      console.log('❌ Usuario canceló la operación');
       return;
     }
     
@@ -423,7 +397,6 @@ export class ClasesCoordinadorComponent implements OnInit {
     
     this.http.post('http://localhost:3000/clases', this.nuevaClase).subscribe({
       next: (response: any) => {
-        console.log('✅ Clase creada exitosamente:', response);
         
         // Agregar a la lista local
         if (response.success && response.clase) {
@@ -435,7 +408,6 @@ export class ClasesCoordinadorComponent implements OnInit {
         this.mostrarMensajeExito('Clase creada correctamente');
       },
       error: (err) => {
-        console.error('❌ Error creando clase:', err);
         this.creando = false;
         this.mostrarMensajeError('Error al crear la clase');
       }
@@ -444,7 +416,6 @@ export class ClasesCoordinadorComponent implements OnInit {
 
   // === MÉTODOS PARA ELIMINAR CLASE ===
   eliminarClase(clase: any): void {
-    console.log('🗑️ Eliminando clase:', clase);
     
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar la clase ${clase.programa?.nombre} - Paralelo ${clase.paralelo}? Esta acción no se puede deshacer.`);
     if (!confirmacion) {
@@ -453,7 +424,6 @@ export class ClasesCoordinadorComponent implements OnInit {
     
     this.http.delete(`http://localhost:3000/clases/${clase.id}`).subscribe({
       next: (response: any) => {
-        console.log('✅ Clase eliminada exitosamente:', response);
         
         // Remover de la lista local
         this.clases = this.clases.filter(c => c.id !== clase.id);
@@ -462,7 +432,6 @@ export class ClasesCoordinadorComponent implements OnInit {
         this.mostrarMensajeExito('Clase eliminada correctamente');
       },
       error: (err) => {
-        console.error('❌ Error eliminando clase:', err);
         this.mostrarMensajeError('Error al eliminar la clase');
       }
     });
@@ -526,10 +495,6 @@ export class ClasesCoordinadorComponent implements OnInit {
   }
 
   actualizarEstadisticas(): void {
-    console.log('🔄 === ACTUALIZANDO ESTADÍSTICAS ===');
-    console.log('📊 Total clases:', this.clases.length);
-    console.log('📊 Clases pendientes:', this.clases.filter(c => c.estado === 'PENDIENTE').length);
-    console.log('📊 Clases asignadas:', this.clases.filter(c => c.estado === 'ASIGNADO').length);
-    console.log('📊 Clases canceladas:', this.clases.filter(c => c.estado === 'CANCELADO').length);
+    
   }
 } 

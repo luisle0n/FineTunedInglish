@@ -30,10 +30,16 @@
         </nav>
 
     </aside>
-
     <!-- Contenedor principal derecho -->
     <div class="main-content">
         <router-outlet></router-outlet>
     </div>
+
+    <!-- Toast Notification -->
+    <app-toast-notification 
+        [visible]="showToast" 
+        [message]="toastMessage" 
+        [type]="toastType">
+    </app-toast-notification>
 
 </div>

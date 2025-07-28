@@ -54,45 +54,28 @@ export class AulasCoordinadorComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    console.log('🎓 Componente Vista Aulas - Coordinador cargado');
     this.cargarAulas();
     this.cargarAulasEliminadas(); // Cargar también las aulas inactivas para las estadísticas
   }
 
   cargarAulas() {
-    console.log('🚀 === CARGANDO AULAS DESDE SERVIDOR ===');
     this.cargando = true;
     this.error = false;
     
-    console.log('🚀 Haciendo petición GET a: http://localhost:3000/aulas');
-    
     this.http.get('http://localhost:3000/aulas').subscribe({
       next: (response: any) => {
-        console.log('📦 === RESPUESTA DEL SERVIDOR ===');
-        console.log('📦 Datos de aulas recibidos:', response);
         
         if (response.success && response.aulas) {
           this.aulas = response.aulas;
-          console.log('📦 Aulas cargadas del servidor:', this.aulas.length);
           
           // Debugging para aulas inactivas
           const aulasInactivas = this.aulas.filter(a => a.estado === false);
-          console.log('🔧 Aulas inactivas en servidor:', aulasInactivas.length);
-          console.log('🔧 Detalle de aulas inactivas:', aulasInactivas.map(a => ({
-            id: a.id,
-            numero: a.numero,
-            estado: a.estado,
-            disponible: a.disponible
-          })));
           
           // Buscar el aula que se editó para verificar si se actualizó
           if (this.aulaEditando) {
             const aulaEditada = this.aulas.find(a => a.id === this.aulaEditando.id);
             if (aulaEditada) {
-              console.log('🔍 === VERIFICANDO AULA EDITADA ===');
-              console.log('🔍 Aula encontrada en servidor:', aulaEditada);
-              console.log('🔍 Disponibilidad en servidor:', aulaEditada.disponible);
-              console.log('🔍 Estado en servidor:', aulaEditada.estado);
+              
             }
           }
           
@@ -100,17 +83,13 @@ export class AulasCoordinadorComponent implements OnInit {
           this.filtrarAulas();
           this.actualizarEstadisticas();
           
-          console.log('📊 Estadísticas actualizadas después de cargar aulas activas');
         } else {
-          console.error('❌ Respuesta inesperada del servidor:', response);
           this.error = true;
         }
         
         this.cargando = false;
       },
       error: (err) => {
-        console.error('❌ === ERROR CARGANDO AULAS ===');
-        console.error('❌ Error cargando aulas:', err);
         this.error = true;
         this.cargando = false;
       }
@@ -129,8 +108,6 @@ export class AulasCoordinadorComponent implements OnInit {
 
   // === FILTRADO Y PAGINACIÓN ===
   filtrarAulas(): void {
-    console.log('🔍 Filtrando aulas...');
-    console.log('📋 Total aulas:', this.aulas.length);
     
     this.aulasFiltradas = this.aulas.filter(aula => {
       return this.filtrarPorBusqueda(aula) &&
@@ -140,7 +117,6 @@ export class AulasCoordinadorComponent implements OnInit {
         this.filtrarPorCapacidad(aula);
     });
     
-    console.log('✅ Aulas filtradas:', this.aulasFiltradas.length);
     this.aplicarPaginacion();
   }
 
@@ -275,17 +251,6 @@ export class AulasCoordinadorComponent implements OnInit {
     // Las aulas inactivas están en la lista de aulasEliminadas
     const totalInactivas = this.aulasEliminadas.length;
     
-    console.log('🔧 === DEBUGGING AULAS INACTIVAS ===');
-    console.log('🔧 Total aulas activas:', this.aulas.length);
-    console.log('🔧 Total aulas eliminadas/inactivas:', this.aulasEliminadas.length);
-    console.log('🔧 Detalle de aulas inactivas:', this.aulasEliminadas.map(a => ({
-      id: a.id,
-      numero: a.numero,
-      estado: a.estado,
-      tipoEstado: typeof a.estado,
-      disponible: a.disponible
-    })));
-    
     return totalInactivas;
   }
 
@@ -341,9 +306,6 @@ export class AulasCoordinadorComponent implements OnInit {
   }
 
   editarAula(aula: any): void {
-    console.log('✏️ Editando aula ORIGINAL:', aula);
-    console.log('📊 Disponibilidad original:', aula.disponible);
-    console.log('📊 Estado original:', aula.estado);
     
     // Crear una copia profunda del aula para editar
     this.aulaEditando = {
@@ -360,9 +322,6 @@ export class AulasCoordinadorComponent implements OnInit {
       observaciones: aula.observaciones || ''
     };
     
-    console.log('📝 Aula preparada para edición:', this.aulaEditando);
-    console.log('📊 Disponibilidad preparada:', this.aulaEditando.disponible);
-    console.log('📊 Estado preparado:', this.aulaEditando.estado);
     this.mostrarModalEdicion = true;
   }
 
@@ -373,13 +332,10 @@ export class AulasCoordinadorComponent implements OnInit {
   }
 
   guardarAula(): void {
-    console.log('💾 === GUARDANDO AULA ===');
-    console.log('📝 Datos a guardar:', this.aulaEditando);
     
     // Mostrar confirmación antes de guardar
     const confirmacion = confirm('¿Estás seguro de que quieres guardar los cambios en el aula?');
     if (!confirmacion) {
-      console.log('❌ Usuario canceló la operación');
       return;
     }
     
@@ -400,36 +356,13 @@ export class AulasCoordinadorComponent implements OnInit {
       observaciones: this.aulaEditando.observaciones
     };
     
-    console.log('🔍 === DEBUGGING DATOS ===');
-    console.log('🔍 Datos originales del formulario:', this.aulaEditando);
-    console.log('🔍 Estado original:', this.aulaEditando.estado, 'tipo:', typeof this.aulaEditando.estado);
-    console.log('🔍 Estado convertido:', datosAula.estado, 'tipo:', typeof datosAula.estado);
-    console.log('🔍 Disponible original:', this.aulaEditando.disponible, 'tipo:', typeof this.aulaEditando.disponible);
-    console.log('🔍 Disponible convertido:', datosAula.disponible, 'tipo:', typeof datosAula.disponible);
-    console.log('🔍 Número original:', this.aulaEditando.numero, 'tipo:', typeof this.aulaEditando.numero);
-    console.log('🔍 Número convertido:', datosAula.numero, 'tipo:', typeof datosAula.numero);
-    console.log('🔍 Tipo aula:', datosAula.tipo_aula);
-    console.log('🔍 Rango edad:', datosAula.edad_minima, '-', datosAula.edad_maxima);
-    console.log('🔍 Ubicación:', datosAula.ubicacion);
-    console.log('🔍 Piso:', datosAula.piso);
-    console.log('🔍 Capacidad:', datosAula.capacidad, 'tipo:', typeof datosAula.capacidad);
-    
-    console.log('📤 Datos finales a enviar:', datosAula);
-    console.log('📤 JSON de datos:', JSON.stringify(datosAula, null, 2));
-    console.log('🔗 URL de la petición:', 'http://localhost:3000/aulas');
-    console.log('📋 Método HTTP:', 'PATCH');
-    
     this.http.patch('http://localhost:3000/aulas', datosAula).subscribe({
       next: (response: any) => {
-        console.log('✅ === RESPUESTA EXITOSA ===');
-        console.log('✅ Aula actualizada exitosamente:', response);
         
         // Actualizar la lista local correctamente
         const index = this.aulas.findIndex(a => a.id === this.aulaEditando.id);
-        console.log('🔄 Índice del aula en la lista:', index);
         
         if (index !== -1) {
-          console.log('🔄 Aula antes de actualizar:', this.aulas[index]);
           
           // Actualizar solo los campos que se enviaron
           this.aulas[index] = {
@@ -437,14 +370,12 @@ export class AulasCoordinadorComponent implements OnInit {
             ...datosAula
           };
           
-          console.log('🔄 Aula después de actualizar:', this.aulas[index]);
-          console.log('🔄 Disponibilidad después de actualizar:', this.aulas[index].disponible);
           this.filtrarAulas(); // Reaplicar filtros
         } else {
           // Si no está en la lista de aulas activas, puede estar en eliminadas
           const indexEliminadas = this.aulasEliminadas.findIndex(a => a.id === this.aulaEditando.id);
           if (indexEliminadas !== -1) {
-            console.log('🔄 Actualizando aula en lista de eliminadas');
+            
             this.aulasEliminadas[indexEliminadas] = {
               ...this.aulasEliminadas[indexEliminadas],
               ...datosAula
@@ -452,9 +383,8 @@ export class AulasCoordinadorComponent implements OnInit {
             
             // Si el aula se activó (estado = true), removerla de la lista de eliminadas
             if (datosAula.estado === true) {
-              console.log('🔄 Aula activada, removiendo de lista de eliminadas');
+              
               this.aulasEliminadas = this.aulasEliminadas.filter(a => a.id !== this.aulaEditando.id);
-              console.log('🔄 Aulas eliminadas restantes:', this.aulasEliminadas.length);
             }
           }
         }
@@ -463,7 +393,6 @@ export class AulasCoordinadorComponent implements OnInit {
         
         // Recargar datos desde el servidor para asegurar sincronización
         setTimeout(() => {
-          console.log('🔄 Recargando datos del servidor...');
           
           // Recargar aulas activas primero
           this.cargarAulas();
@@ -471,7 +400,6 @@ export class AulasCoordinadorComponent implements OnInit {
           // Luego recargar aulas eliminadas
           setTimeout(() => {
             this.cargarAulasEliminadas();
-            console.log('🔄 Datos recargados - Aulas activas y eliminadas actualizadas');
           }, 200);
         }, 500);
         
@@ -479,17 +407,6 @@ export class AulasCoordinadorComponent implements OnInit {
         this.mostrarMensajeExito('Aula actualizada correctamente');
       },
       error: (err) => {
-        console.error('❌ === ERROR EN LA PETICIÓN ===');
-        console.error('❌ Error actualizando aula:', err);
-        console.error('❌ Status:', err.status);
-        console.error('❌ Status Text:', err.statusText);
-        console.error('❌ Detalles del error:', err.error);
-        console.error('❌ Mensaje del error:', err.error?.message || err.message);
-        console.error('❌ Headers:', err.headers);
-        console.error('❌ URL intentada:', 'http://localhost:3000/aulas');
-        console.error('❌ Datos enviados:', datosAula);
-        console.error('❌ Tipo de error:', typeof err);
-        console.error('❌ Error completo:', JSON.stringify(err, null, 2));
         this.guardando = false;
         
         // Mostrar mensaje de error más específico
@@ -561,7 +478,6 @@ export class AulasCoordinadorComponent implements OnInit {
   }
 
   verAula(index: number): void {
-    console.log('👁️ Viendo aula en índice:', index);
     this.aulaSeleccionada = this.aulasPaginadas[index];
     this.mostrarModalVista = true;
   }
@@ -573,34 +489,24 @@ export class AulasCoordinadorComponent implements OnInit {
 
   // === MÉTODOS PARA AULAS ELIMINADAS ===
   cargarAulasEliminadas() {
-    console.log('🚀 === CARGANDO AULAS ELIMINADAS ===');
     this.cargandoEliminadas = true;
     this.errorEliminadas = false;
     
-    console.log('🚀 Haciendo petición GET a: http://localhost:3000/aulas/eliminadas');
-    
     this.http.get('http://localhost:3000/aulas/eliminadas').subscribe({
       next: (response: any) => {
-        console.log('📦 === RESPUESTA AULAS ELIMINADAS ===');
-        console.log('📦 Datos de aulas eliminadas recibidos:', response);
         
                   if (response.success && response.aulas) {
             this.aulasEliminadas = response.aulas;
-            console.log('📦 Aulas eliminadas cargadas:', this.aulasEliminadas.length);
             
             // Actualizar estadísticas después de cargar aulas eliminadas
             this.actualizarEstadisticas();
-            console.log('📊 Estadísticas actualizadas después de cargar aulas eliminadas');
           } else {
-          console.error('❌ Respuesta inesperada del servidor:', response);
           this.errorEliminadas = true;
         }
         
         this.cargandoEliminadas = false;
       },
       error: (err) => {
-        console.error('❌ === ERROR CARGANDO AULAS ELIMINADAS ===');
-        console.error('❌ Error cargando aulas eliminadas:', err);
         this.errorEliminadas = true;
         this.cargandoEliminadas = false;
       }
@@ -621,7 +527,6 @@ export class AulasCoordinadorComponent implements OnInit {
   }
 
   eliminarAula(aula: any): void {
-    console.log('🗑️ Eliminando aula:', aula);
     
     // Mostrar confirmación antes de eliminar
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el aula ${aula.numero}? Esta acción no se puede deshacer.`);
@@ -633,12 +538,8 @@ export class AulasCoordinadorComponent implements OnInit {
       estado: false
     };
     
-    console.log('🚀 Haciendo petición DELETE a:', `http://localhost:3000/aulas/${aula.id}`);
-    console.log('📤 Datos a enviar:', datosEliminacion);
-    
     this.http.delete(`http://localhost:3000/aulas/${aula.id}`, { body: datosEliminacion }).subscribe({
       next: (response: any) => {
-        console.log('✅ Aula eliminada exitosamente:', response);
         
         // Remover de la lista local
         this.aulas = this.aulas.filter(a => a.id !== aula.id);
@@ -651,14 +552,12 @@ export class AulasCoordinadorComponent implements OnInit {
         this.mostrarMensajeExito('Aula eliminada correctamente');
       },
       error: (err) => {
-        console.error('❌ Error eliminando aula:', err);
         this.mostrarMensajeError('Error al eliminar el aula');
       }
     });
   }
 
   restaurarAula(aula: any): void {
-    console.log('🔄 Restaurando aula:', aula);
     
     // Mostrar confirmación antes de restaurar
     const confirmacion = confirm(`¿Estás seguro de que quieres restaurar el aula ${aula.numero}?`);
@@ -672,21 +571,13 @@ export class AulasCoordinadorComponent implements OnInit {
     
     // URL correcta para restaurar aulas
     const urlRestaurar = `http://localhost:3000/aulas/${aula.id}/restaurar`;
-    console.log('🚀 Haciendo petición PATCH a:', urlRestaurar);
-    console.log('📤 Datos a enviar:', datosRestauracion);
-    
     this.http.patch(urlRestaurar, datosRestauracion).subscribe({
       next: (response: any) => {
-        console.log('✅ Aula restaurada exitosamente:', response);
         
         // Remover de la lista de eliminadas inmediatamente
         const aulasAntes = this.aulasEliminadas.length;
         this.aulasEliminadas = this.aulasEliminadas.filter(a => a.id !== aula.id);
         const aulasDespues = this.aulasEliminadas.length;
-        
-        console.log('🔄 Aulas eliminadas antes:', aulasAntes);
-        console.log('🔄 Aulas eliminadas después:', aulasDespues);
-        console.log('🔄 Aula removida de la lista de eliminadas:', aula.numero);
         
         // Recargar aulas activas
         this.cargarAulas();
@@ -698,14 +589,12 @@ export class AulasCoordinadorComponent implements OnInit {
         this.mostrarMensajeExito('Aula restaurada correctamente');
       },
       error: (err) => {
-        console.error('❌ Error restaurando aula:', err);
         this.mostrarMensajeError('Error al restaurar el aula');
       }
     });
   }
 
   editarAulaEliminada(aula: any): void {
-    console.log('✏️ Editando aula eliminada:', aula);
     
     // Preparar datos para edición
     this.aulaEditando = {
@@ -722,12 +611,10 @@ export class AulasCoordinadorComponent implements OnInit {
       observaciones: aula.observaciones || ''
     };
     
-    console.log('📝 Datos preparados para edición:', this.aulaEditando);
     this.mostrarModalEdicion = true;
   }
 
   verAulaEliminada(index: number): void {
-    console.log('👁️ Viendo aula eliminada en índice:', index);
     this.aulaSeleccionada = this.aulasEliminadas[index];
     this.mostrarModalVista = true;
   }
@@ -746,23 +633,9 @@ export class AulasCoordinadorComponent implements OnInit {
   }
 
   actualizarEstadisticas(): void {
-    console.log('🔄 === ACTUALIZANDO ESTADÍSTICAS ===');
-    console.log('📊 Total aulas activas:', this.aulas.length);
-    console.log('📊 Total aulas inactivas:', this.aulasEliminadas.length);
-    console.log('📊 Aulas disponibles:', this.aulas.filter(a => a.disponible === true).length);
-    console.log('📊 Aulas ocupadas:', this.aulas.filter(a => a.disponible === false).length);
-    
-    // Detalles de aulas activas por disponibilidad
-    const aulasDisponibles = this.aulas.filter(a => a.disponible === true);
-    const aulasOcupadas = this.aulas.filter(a => a.disponible === false);
-    
-    console.log('📋 Detalle aulas disponibles:', aulasDisponibles.map(a => a.numero));
-    console.log('📋 Detalle aulas ocupadas:', aulasOcupadas.map(a => a.numero));
-    
     // Forzar la detección de cambios en Angular
     // Esto asegura que las propiedades computadas se actualicen en la UI
     setTimeout(() => {
-      console.log('🔄 Forzando actualización de UI...');
       // Angular debería detectar automáticamente los cambios, pero el setTimeout ayuda
     }, 100);
   }

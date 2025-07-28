@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastNotificationComponent } from '../toast-notification/toast-notification.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ToastNotificationComponent]
 })
 export class ProfileComponent implements OnInit {
   usuario: any = null;
@@ -18,6 +19,11 @@ export class ProfileComponent implements OnInit {
   cargando = true;
   error = false;
   guardando = false;
+
+  // Toast notification properties
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
 
   // Datos editables
   datosEditables = {
@@ -41,6 +47,16 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarPerfilUsuario();
+  }
+
+  showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    
+    setTimeout(() => {
+      this.showToast = false;
+    }, 4000);
   }
 
   cargarPerfilUsuario() {
@@ -118,7 +134,7 @@ export class ProfileComponent implements OnInit {
     // Validar que los campos requeridos no estén vacíos
     if (!this.datosEditables.primer_nombre || !this.datosEditables.primer_apellido || 
         !this.datosEditables.cedula || !this.datosEditables.correo) {
-      alert('Por favor complete todos los campos requeridos');
+      this.showToastMessage('Por favor complete todos los campos requeridos', 'warning');
       this.guardando = false;
       return;
     }
@@ -126,7 +142,7 @@ export class ProfileComponent implements OnInit {
     // Validar formato de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.datosEditables.correo)) {
-      alert('Por favor ingrese un correo electrónico válido');
+      this.showToastMessage('Por favor ingrese un correo electrónico válido', 'warning');
       this.guardando = false;
       return;
     }
@@ -134,7 +150,7 @@ export class ProfileComponent implements OnInit {
     // Validar formato de teléfono (solo números)
     const phoneRegex = /^\d+$/;
     if (this.datosEditables.telefono && !phoneRegex.test(this.datosEditables.telefono)) {
-      alert('El teléfono debe contener solo números');
+      this.showToastMessage('El teléfono debe contener solo números', 'warning');
       this.guardando = false;
       return;
     }
@@ -142,7 +158,7 @@ export class ProfileComponent implements OnInit {
     // Obtener el UID del usuario usando AuthService
     const decodedToken = this.authService.getDecodedToken();
     if (!decodedToken) {
-      alert('Error: No se pudo obtener la información del usuario');
+      this.showToastMessage('Error: No se pudo obtener la información del usuario', 'error');
       this.guardando = false;
       return;
     }
@@ -181,7 +197,7 @@ export class ProfileComponent implements OnInit {
         this.modoEdicion = false;
         this.guardando = false;
         
-        alert('Perfil actualizado correctamente');
+        this.showToastMessage('Perfil actualizado correctamente', 'success');
       },
       error: (err) => {
         console.error('❌ Error actualizando perfil:', err);
@@ -189,7 +205,7 @@ export class ProfileComponent implements OnInit {
         console.error('❌ Status Text:', err.statusText);
         console.error('❌ Error completo:', JSON.stringify(err, null, 2));
         this.guardando = false;
-        alert(`Error al actualizar el perfil (${err.status}): ${err.message || 'Error desconocido'}`);
+        this.showToastMessage(`Error al actualizar el perfil (${err.status}): ${err.message || 'Error desconocido'}`, 'error');
       }
     });
   }

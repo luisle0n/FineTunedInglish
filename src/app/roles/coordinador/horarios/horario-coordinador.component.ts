@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Pipe, PipeTransform } from '@angular/core';
+import { ToastNotificationComponent } from '../../../shared/components/toast-notification/toast-notification.component';
 
 @Pipe({name: 'noSpaces'})
 export class NoSpacesPipe implements PipeTransform {
@@ -28,7 +29,7 @@ interface HorarioDocente {
   standalone: true,
   templateUrl: './horario-coordinador.component.html',
   styleUrls: ['./horario-coordinador.component.scss'],
-  imports: [HeaderComponent, CommonModule, FormsModule, NoSpacesPipe]
+  imports: [HeaderComponent, CommonModule, FormsModule, NoSpacesPipe, ToastNotificationComponent]
 })
 export class HorarioCoordinadorComponent implements OnInit {
   archivoHorario: File | null = null;
@@ -66,6 +67,11 @@ export class HorarioCoordinadorComponent implements OnInit {
   resultadoAsignacion: any[] = [];
   horarioCompleto: any[] = [];
   horarioPorPiso: any[] = [];
+
+  // Toast notification properties
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
 
   get cargaDocentesPaginados() {
     const start = (this.paginaDocentes - 1) * this.pageSize;
@@ -112,6 +118,16 @@ export class HorarioCoordinadorComponent implements OnInit {
     this.cargarCargaDocentes();
     this.cargarOcupacionAulas();
     this.cargarResumenProgramas();
+  }
+
+  showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    
+    setTimeout(() => {
+      this.showToast = false;
+    }, 4000);
   }
 
   generarHorario(): void {
@@ -226,7 +242,7 @@ export class HorarioCoordinadorComponent implements OnInit {
     if (!confirmado) return;
     this.http.post<any>('http://localhost:3000/asignacion/resetear', {}).subscribe({
       next: (response) => {
-        alert(response.message || 'Ambiente reseteado correctamente');
+        this.showToastMessage(response.message || 'Ambiente reseteado correctamente', 'success');
         // Limpiar solo los datos de horario y resultado
         this.resultadoAsignacion = [];
         this.horarioCompleto = [];
@@ -237,7 +253,7 @@ export class HorarioCoordinadorComponent implements OnInit {
         this.cargarResumenProgramas();
       },
       error: (err) => {
-        alert('Error al resetear el ambiente');
+        this.showToastMessage('Error al resetear el ambiente', 'error');
       }
     });
   }

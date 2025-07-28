@@ -60,7 +60,6 @@ export class DocenteCoordinadorComponent implements OnInit {
       const verificarCompletado = () => {
         catalogosCargados++;
         if (catalogosCargados === totalCatalogos) {
-          console.log('✅ Todos los catálogos cargados');
           resolve();
         }
       };
@@ -68,11 +67,9 @@ export class DocenteCoordinadorComponent implements OnInit {
       this.http.get<any[]>('http://localhost:3000/catalogos/tipos-contrato').subscribe({
         next: (data) => {
           this.contratos = data;
-          console.log('📋 Contratos cargados:', data.length);
           verificarCompletado();
         },
         error: (err) => {
-          console.error('❌ Error cargando contratos:', err);
           verificarCompletado();
         }
       });
@@ -80,11 +77,9 @@ export class DocenteCoordinadorComponent implements OnInit {
       this.http.get<any[]>('http://localhost:3000/catalogos/niveles-ingles').subscribe({
         next: (data) => {
           this.nivelesIngles = data;
-          console.log('📋 Niveles de inglés cargados:', data.length);
           verificarCompletado();
         },
         error: (err) => {
-          console.error('❌ Error cargando niveles de inglés:', err);
           verificarCompletado();
         }
       });
@@ -92,11 +87,9 @@ export class DocenteCoordinadorComponent implements OnInit {
       this.http.get<any[]>('http://localhost:3000/catalogos/especializaciones').subscribe({
         next: (data) => {
           this.especializaciones = data;
-          console.log('📋 Especializaciones cargadas:', data.length);
           verificarCompletado();
         },
         error: (err) => {
-          console.error('❌ Error cargando especializaciones:', err);
           verificarCompletado();
         }
       });
@@ -104,11 +97,9 @@ export class DocenteCoordinadorComponent implements OnInit {
       this.http.get<any[]>('http://localhost:3000/catalogos/horarios').subscribe({
         next: (data) => {
           this.horariosDisponibles = data;
-          console.log('📋 Horarios cargados:', data.length);
           verificarCompletado();
         },
         error: (err) => {
-          console.error('❌ Error cargando horarios:', err);
           verificarCompletado();
         }
       });
@@ -116,18 +107,14 @@ export class DocenteCoordinadorComponent implements OnInit {
   }
 
   cargarDocentes() {
-    console.log('📥 Cargando docentes desde la API...');
     this.http.get<any[]>('http://localhost:3000/docentes').subscribe(data => {
-      console.log('📦 Datos recibidos de la API:', data.length, 'docentes');
       this.docentes = data;
       this.filtrarDocentes();
     });
   }
 
   cargarDocentesInactivos() {
-    console.log('📥 Cargando docentes inactivos desde la API...');
     this.http.get<any[]>('http://localhost:3000/docentes/inactivos').subscribe(data => {
-      console.log('📦 Datos recibidos de la API (inactivos):', data.length, 'docentes');
       this.docentesInactivos = data;
       this.filtrarDocentesInactivos();
     });
@@ -135,8 +122,6 @@ export class DocenteCoordinadorComponent implements OnInit {
 
   // === FILTRADO Y PAGINACIÓN ===
   filtrarDocentes(): void {
-    console.log('🔍 Filtrando docentes activos...');
-    console.log('📋 Total docentes activos:', this.docentes.length);
     
     this.docentesFiltrados = this.docentes.filter(docente => {
       return this.filtrarPorContrato(docente) &&
@@ -145,13 +130,10 @@ export class DocenteCoordinadorComponent implements OnInit {
         this.filtrarPorBusqueda(docente);
     });
     
-    console.log('✅ Docentes activos filtrados:', this.docentesFiltrados.length);
     this.aplicarPaginacion();
   }
 
   filtrarDocentesInactivos(): void {
-    console.log('🔍 Filtrando docentes inactivos...');
-    console.log('📋 Total docentes inactivos:', this.docentesInactivos.length);
     
     this.docentesInactivosFiltrados = this.docentesInactivos.filter(docente => {
       return this.filtrarPorContrato(docente) &&
@@ -160,7 +142,6 @@ export class DocenteCoordinadorComponent implements OnInit {
         this.filtrarPorBusqueda(docente);
     });
     
-    console.log('✅ Docentes inactivos filtrados:', this.docentesInactivosFiltrados.length);
     this.aplicarPaginacionInactivos();
   }
 
@@ -273,12 +254,9 @@ export class DocenteCoordinadorComponent implements OnInit {
 
   // === VER DOCENTE ===
   verDocente(index: number) {
-    console.log('🔍 Ver docente - Índice:', index);
-    console.log('🔍 Total docentes paginados:', this.docentesPaginados.length);
     
     // Limpiar docente anterior si existe
     if (this.docenteSeleccionado) {
-      console.log('🧹 Limpiando docente anterior:', this.docenteSeleccionado.persona?.primer_nombre);
       this.docenteSeleccionado = null;
     }
     
@@ -286,13 +264,7 @@ export class DocenteCoordinadorComponent implements OnInit {
     const docente = this.docentesPaginados[index];
     
     if (docente) {
-      console.log('✅ Docente encontrado:', {
-        nombre: `${docente.persona?.primer_nombre} ${docente.persona?.primer_apellido}`,
-        cedula: docente.persona?.cedula,
-        correo: docente.persona?.correo
-      });
     } else {
-      console.error('❌ No se encontró docente en el índice:', index);
     }
     
     this.docenteSeleccionado = docente;
@@ -300,9 +272,7 @@ export class DocenteCoordinadorComponent implements OnInit {
     
     // Debug: Verificar estructura de especializaciones
     if (docente && docente.especializaciones) {
-      console.log('🔍 Estructura de especializaciones para', docente.persona?.primer_nombre, ':', docente.especializaciones);
       docente.especializaciones.forEach((esp: any, index: number) => {
-        console.log(`  ${index}:`, esp);
       });
     }
     
@@ -310,7 +280,6 @@ export class DocenteCoordinadorComponent implements OnInit {
   }
 
   cerrarModalVista() {
-    console.log('🔒 Cerrando modal, limpiando docente seleccionado');
     this.mostrarModalVista = false;
     this.docenteSeleccionado = null;
   }
@@ -333,24 +302,18 @@ export class DocenteCoordinadorComponent implements OnInit {
   // Método para verificar si un docente tiene una especialización específica
   tieneEspecializacion(docente: any, especializacionId: number): boolean {
     if (!docente) {
-      console.log('❌ No hay docente para verificar especialización');
       return false;
     }
     
     if (!docente.especializaciones || !Array.isArray(docente.especializaciones)) {
-      console.log('❌ Docente no tiene especializaciones o no es un array:', docente.persona?.primer_nombre);
       return false;
     }
     
     // Buscar la especialización por ID en el catálogo
     const especializacionCatalogo = this.especializaciones.find(esp => esp.id === especializacionId);
     if (!especializacionCatalogo) {
-      console.log('❌ No se encontró especialización en catálogo con ID:', especializacionId);
       return false;
     }
-    
-    console.log('🔍 Verificando especialización:', especializacionCatalogo.nombre, 'ID:', especializacionId, 'para docente:', docente.persona?.primer_nombre);
-    console.log('🔍 Especializaciones del docente:', docente.especializaciones);
     
     const tieneEspecializacion = docente.especializaciones.some((e: any) => {
       // Comparar por ID
@@ -359,13 +322,11 @@ export class DocenteCoordinadorComponent implements OnInit {
       const matchByName = e.especializacion?.nombre?.toLowerCase() === especializacionCatalogo.nombre?.toLowerCase();
       
       if (matchById || matchByName) {
-        console.log('✅ Encontrada especialización:', e.especializacion?.nombre, 'ID:', e.especializacion?.id);
         return true;
       }
       return false;
     });
     
-    console.log('🎯 Resultado para', especializacionCatalogo.nombre, 'ID', especializacionId, ':', tieneEspecializacion);
     return tieneEspecializacion;
   }
 }

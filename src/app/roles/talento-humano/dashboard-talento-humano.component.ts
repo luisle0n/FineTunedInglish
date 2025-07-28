@@ -11,6 +11,11 @@ import { AuthService } from '../../services/auth.service';
 export class DashboardTalentoHumanoComponent {
   userMenuOpen = false;
 
+  // Toast notification properties
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
+
   constructor(private router: Router, private authService: AuthService) {}
 
   toggleUserMenu() {
@@ -21,8 +26,18 @@ export class DashboardTalentoHumanoComponent {
     setTimeout(() => this.userMenuOpen = false, 150);  // Delay para permitir clics
   }
 
+  showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    
+    setTimeout(() => {
+      this.showToast = false;
+    }, 4000);
+  }
+
   verPerfil() {
-    alert('Abrir vista de perfil');
+    this.showToastMessage('Abrir vista de perfil', 'info');
     this.userMenuOpen = false;
   }
 

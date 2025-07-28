@@ -6,6 +6,7 @@ import { limpiarLineasCSV, extraerEncabezados, procesarFilas, transformarAFilaDo
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastNotificationComponent } from '../../../shared/components/toast-notification/toast-notification.component';
 
 
 @Component({
@@ -13,7 +14,7 @@ import { FormsModule } from '@angular/forms';
     standalone: true,
     templateUrl: './docente-talento-humano.component.html',
     styleUrls: ['./docente-talento-humano.component.scss'],
-    imports: [HeaderComponent, CommonModule, FormsModule]
+    imports: [HeaderComponent, CommonModule, FormsModule, ToastNotificationComponent]
 })
 export class DocenteTalentoHumanoComponent implements OnInit {
     contratos: any[] = [];
@@ -65,6 +66,11 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         especializaciones: [],
         horarios: []
     };
+
+    // Toast properties
+    showToast = false;
+    toastMessage = '';
+    toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
 
     constructor(private http: HttpClient, private router: Router, private authService: AuthService) { }
 
@@ -396,7 +402,7 @@ export class DocenteTalentoHumanoComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error al agregar:', err);
-                alert('No se pudo agregar el docente. Verifica los campos.');
+                this.showToastMessage('No se pudo agregar el docente. Verifica los campos.', 'error');
             }
         });
     }
@@ -477,7 +483,7 @@ export class DocenteTalentoHumanoComponent implements OnInit {
     // Métodos para el modal de confirmación
     confirmarCargaDocentes() {
         if (this.docentesPendientes.length === 0) {
-            alert('No hay docentes para cargar.');
+            this.showToastMessage('No hay docentes para cargar.', 'warning');
             return;
         }
 
@@ -524,11 +530,11 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         this.docentesPendientes = [];
         
         if (errores === 0) {
-            alert(`✅ Se cargaron exitosamente ${cargados} docente(s).`);
+            this.showToastMessage(`Se cargaron exitosamente ${cargados} docente(s).`, 'success');
         } else if (cargados === 0) {
-            alert(`❌ No se pudo cargar ningún docente. Revisa la consola para más detalles.`);
+            this.showToastMessage(`No se pudo cargar ningún docente. Revisa la consola para más detalles.`, 'error');
         } else {
-            alert(`⚠️ Se cargaron ${cargados} docente(s) y ${errores} fallaron. Revisa la consola para más detalles.`);
+            this.showToastMessage(`Se cargaron ${cargados} docente(s) y ${errores} fallaron. Revisa la consola para más detalles.`, 'warning');
         }
         
         // Recargar ambas listas para asegurar sincronización
@@ -832,7 +838,7 @@ export class DocenteTalentoHumanoComponent implements OnInit {
     eliminarFila(index: number) {
         const docente = this.docentesPaginados[index];
         if (!docente || !docente.id) {
-            alert('Error: No se puede eliminar el docente. ID no encontrado.');
+            this.showToastMessage('Error: No se puede eliminar el docente. ID no encontrado.', 'error');
             return;
         }
         
@@ -849,13 +855,13 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         this.http.patch('http://localhost:3000/docentes/estado', payload).subscribe({
             next: () => {
                 console.log('✅ Docente eliminado correctamente');
-                alert('✅ Docente eliminado correctamente');
+                this.showToastMessage('Docente eliminado correctamente', 'success');
                 // Recargar datos preservando la vista actual
                 this.recargarDatosPreservandoVista();
             },
             error: (err) => {
                 console.error('❌ Error al eliminar docente:', err);
-                alert('❌ No se pudo eliminar el docente. Verifica la conexión.');
+                this.showToastMessage('No se pudo eliminar el docente. Verifica la conexión.', 'error');
             }
         });
     }
@@ -863,7 +869,7 @@ export class DocenteTalentoHumanoComponent implements OnInit {
     reactivarDocente(index: number) {
         const docente = this.docentesPaginados[index];
         if (!docente || !docente.id) {
-            alert('Error: No se puede reactivar el docente. ID no encontrado.');
+            this.showToastMessage('Error: No se puede reactivar el docente. ID no encontrado.', 'error');
             return;
         }
         
@@ -880,13 +886,13 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         this.http.patch('http://localhost:3000/docentes/estado', payload).subscribe({
             next: () => {
                 console.log('✅ Docente reactivado correctamente');
-                alert('✅ Docente reactivado correctamente');
+                this.showToastMessage('Docente reactivado correctamente', 'success');
                 // Recargar datos preservando la vista actual
                 this.recargarDatosPreservandoVista();
             },
             error: (err) => {
                 console.error('❌ Error al reactivar docente:', err);
-                alert('❌ No se pudo reactivar el docente. Verifica la conexión.');
+                this.showToastMessage('No se pudo reactivar el docente. Verifica la conexión.', 'error');
             }
         });
     }
@@ -1427,6 +1433,16 @@ export class DocenteTalentoHumanoComponent implements OnInit {
         } else {
             this.docenteEdicionVista.horas_disponibles = numero;
         }
+    }
+
+    showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+        this.toastMessage = message;
+        this.toastType = type;
+        this.showToast = true;
+        
+        setTimeout(() => {
+            this.showToast = false;
+        }, 4000);
     }
 
 }

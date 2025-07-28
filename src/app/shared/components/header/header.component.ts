@@ -28,9 +28,7 @@ export class HeaderComponent implements OnInit {
     if (role) {
       // Convertir a mayúsculas
       this.userRole = role.toUpperCase();
-      console.log('👤 Rol del usuario:', this.userRole);
     } else {
-      console.error('❌ No se pudo obtener el rol del usuario');
       this.userRole = 'USUARIO';
     }
   }

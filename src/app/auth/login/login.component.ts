@@ -14,12 +14,17 @@ import { CustomValidators } from '../../shared/validators/custom-validators';
     selector: 'app-login',
     standalone: false,
     templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss'],
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
     loginForm!: FormGroup;
     loading$: Observable<boolean>;
     error$: Observable<string | null>;
+    
+    // Toast properties
+    showToast = false;
+    toastMessage = '';
+    toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
 
     constructor(
         private router: Router,
@@ -54,31 +59,65 @@ export class LoginComponent implements OnInit {
                     this.loadingService.hide('login');
                     
                     if (response.token) {
+                        const successMessage = response.message || '¡Bienvenido! Sesión iniciada correctamente';
+                        this.showToastMessage(successMessage, 'success');
                         const decoded = this.authService.getDecodedToken();
                         if (decoded) {
-                            switch (decoded.rol) {
-                                case 'coordinador academico':
-                                    this.router.navigate(['/coordinador/inicio']);
-                                    break;
-                                case 'talento humano':
-                                    this.router.navigate(['/talento-humano/inicio']);
-                                    break;
-                                case 'gerente':
-                                    this.router.navigate(['/gerente/inicio']);
-                                    break;
-                                default:
-                                    alert('Rol desconocido');
-                            }
+                            setTimeout(() => {
+                                switch (decoded.rol) {
+                                    case 'coordinador academico':
+                                        this.router.navigate(['/coordinador/inicio']);
+                                        break;
+                                    case 'talento humano':
+                                        this.router.navigate(['/talento-humano/inicio']);
+                                        break;
+                                    case 'gerente':
+                                        this.router.navigate(['/gerente/inicio']);
+                                        break;
+                                    default:
+                                        this.showToastMessage('Rol desconocido', 'error');
+                                }
+                            }, 1500);
                         }
                     }
                 },
                 error: (error) => {
                     this.loadingService.hide('login');
                     console.error('Error en login:', error);
+                    
+                    let errorMessage = 'Error al iniciar sesión';
+                    let errorType: 'success' | 'error' | 'info' | 'warning' = 'error';
+                    
+                    if (error.status === 401) {
+                        if (error.error && error.error.message) {
+                            errorMessage = error.error.message;
+                        } else {
+                            errorMessage = 'Usuario o contraseña incorrectos';
+                        }
+                    } else if (error.status === 404) {
+                        if (error.error && error.error.message) {
+                            errorMessage = error.error.message;
+                        } else {
+                            errorMessage = 'Usuario no encontrado';
+                        }
+                    } else if (error.status === 0) {
+                        errorMessage = 'Error de conexión. Verifica tu internet';
+                    } else if (error.status === 500) {
+                        if (error.error && error.error.message) {
+                            errorMessage = error.error.message;
+                        } else {
+                            errorMessage = 'Error interno del servidor';
+                        }
+                    } else if (error.error && error.error.message) {
+                        errorMessage = error.error.message;
+                    }
+                    
+                    this.showToastMessage(errorMessage, errorType);
                 }
             });
         } else {
             this.markFormGroupTouched();
+            this.showToastMessage('Por favor, completa todos los campos', 'warning');
         }
     }
 
@@ -99,5 +138,15 @@ export class LoginComponent implements OnInit {
         }
         
         return '';
+    }
+
+    showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+        this.toastMessage = message;
+        this.toastType = type;
+        this.showToast = true;
+        
+        setTimeout(() => {
+            this.showToast = false;
+        }, 4000);
     }
 }

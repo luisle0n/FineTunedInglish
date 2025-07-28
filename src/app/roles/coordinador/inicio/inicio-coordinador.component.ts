@@ -7,13 +7,14 @@ import { HeaderComponent } from '../../../shared/components/header/header.compon
 import { DocenteService, Docente } from '../../../services/docente.service';
 import { FormsModule } from '@angular/forms';
 import { Chart } from 'chart.js/auto';
+import { ToastNotificationComponent } from '../../../shared/components/toast-notification/toast-notification.component';
 
 @Component({
   standalone: true,
   selector: 'app-inicio-coordinador',
   templateUrl: './inicio-coordinador.component.html',
   styleUrls: ['./inicio-coordinador.component.scss'],
-  imports: [CommonModule, HeaderComponent, FormsModule]
+  imports: [CommonModule, HeaderComponent, FormsModule, ToastNotificationComponent]
 })
 
 export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
@@ -68,6 +69,11 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
 
   programas: any[] = [];
 
+  // Toast notification properties
+  showToast = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' | 'warning' = 'success';
+
   constructor(
     private router: Router, 
     private http: HttpClient, 
@@ -81,9 +87,18 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
     this.cargarProgramas();
   }
 
+  showToastMessage(message: string, type: 'success' | 'error' | 'info' | 'warning'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+    
+    setTimeout(() => {
+      this.showToast = false;
+    }, 4000);
+  }
+
   ngAfterViewInit(): void {
     setTimeout(() => {
-      console.log('⏰ ngAfterViewInit ejecutado, creando gráficos...');
       this.crearGraficos();
     }, 500);
   }
@@ -91,15 +106,11 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   // === CARGA DE ESTADÍSTICAS ===
   cargarEstadisticas(): void {
     this.cargandoEstadisticas = true;
-    console.log('📊 Cargando estadísticas del dashboard...');
     
     this.http.get<any>('http://localhost:3000/dashboard/estadisticas').subscribe({
       next: (response) => {
-        console.log('📊 Respuesta completa de la API:', response);
         if (response.success && response.dashboard) {
           this.estadisticas = response.dashboard;
-          console.log('✅ Estadísticas cargadas:', this.estadisticas);
-          console.log('📈 Total docentes:', this.estadisticas.docentes.total_docentes);
         } else {
           console.error('❌ Respuesta inválida de la API');
         }
@@ -114,17 +125,13 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
 
   // === CARGA DE DOCENTES PARA GRÁFICOS ===
   cargarDocentesParaGraficos(): void {
-    console.log('📊 Cargando docentes para gráficos...');
     this.docenteService.getDocentesActivos().subscribe({
       next: (docentes) => {
-        console.log('✅ Docentes recibidos del servicio:', docentes);
         this.docentes = docentes;
-        console.log('✅ Docentes cargados:', docentes.length);
         this.procesarDatosParaGraficos();
       },
       error: (err) => {
         console.error('❌ Error cargando docentes:', err);
-        console.log('⚠️ Usando datos de ejemplo debido al error...');
         this.usarDatosEjemplo();
       }
     });
@@ -132,7 +139,6 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
 
   // === PROCESAMIENTO DE DATOS PARA GRÁFICOS ===
   procesarDatosParaGraficos(): void {
-    console.log('🔄 Procesando datos para gráficos...');
     
     // Procesar distribución por tipo de contrato
     this.distribucionContratos = {};
@@ -148,13 +154,11 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
       this.distribucionEdades[nivelIngles] = (this.distribucionEdades[nivelIngles] || 0) + 1;
     });
     
-    console.log('📊 Distribución por contratos:', this.distribucionContratos);
-    console.log('📊 Distribución por nivel de inglés:', this.distribucionEdades);
   }
 
   // === DATOS DE EJEMPLO SI NO HAY DATOS REALES ===
   usarDatosEjemplo(): void {
-    console.log('⚠️ Usando datos de ejemplo...');
+    
     this.distribucionContratos = {
       'Tiempo Completo': 15,
       'Medio Tiempo': 12,
@@ -175,19 +179,14 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   }
 
   crearGraficos(): void {
-    console.log('🎨 Creando gráficos...');
-    console.log('📊 Datos de contratos disponibles:', this.distribucionContratos);
-    console.log('📊 Datos de niveles de inglés disponibles:', this.distribucionEdades);
     
     try {
       // Gráfico de dona para distribución por tipo de contrato
       const ctxDoughnut = document.getElementById('doughnutChart') as HTMLCanvasElement;
       if (ctxDoughnut) {
-        console.log('📊 Creando gráfico de dona...');
+        
         const labels = Object.keys(this.distribucionContratos);
         const data = Object.values(this.distribucionContratos);
-        console.log('📊 Labels del gráfico de dona:', labels);
-        console.log('📊 Data del gráfico de dona:', data);
         
         const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'];
         
@@ -213,7 +212,6 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
             }
           }
         });
-        console.log('✅ Gráfico de dona creado exitosamente con datos reales');
       } else {
         console.error('❌ No se encontró el canvas para el gráfico de dona');
       }
@@ -221,11 +219,9 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
       // Gráfico de barras para distribución por nivel de inglés
       const ctxBar = document.getElementById('barChart') as HTMLCanvasElement;
       if (ctxBar) {
-        console.log('📊 Creando gráfico de barras...');
+        
         const labels = Object.keys(this.distribucionEdades);
         const data = Object.values(this.distribucionEdades);
-        console.log('📊 Labels del gráfico de barras:', labels);
-        console.log('📊 Data del gráfico de barras:', data);
         
         const colors = ['#4BC0C0', '#FF9F40', '#9966FF', '#FF6384', '#36A2EB', '#FF6384'];
         
@@ -258,7 +254,6 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
             }
           }
         });
-        console.log('✅ Gráfico de barras creado exitosamente con datos reales');
       } else {
         console.error('❌ No se encontró el canvas para el gráfico de barras');
       }
@@ -297,67 +292,49 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
 
   // === MÉTODOS DE FORMULARIOS ===
   agregarAula(): void {
-    console.log('🏫 Agregando aula:', this.nuevaAula);
     this.http.post('http://localhost:3000/aulas', this.nuevaAula).subscribe({
       next: (response) => {
-        console.log('✅ Aula agregada exitosamente:', response);
-        alert('Aula agregada exitosamente. Puedes ir a la vista de Aulas para verla.');
+        this.showToastMessage('Aula agregada exitosamente. Puedes ir a la vista de Aulas para verla.', 'success');
         this.cerrarModalAula();
       },
       error: (error) => {
-        console.error('❌ Error agregando aula:', error);
-        alert('Error al agregar el aula');
+        this.showToastMessage('Error al agregar el aula', 'error');
       }
     });
   }
 
   agregarClase(): void {
-    console.log('📚 Agregando clase:', this.nuevaClase);
     this.http.post('http://localhost:3000/clases', this.nuevaClase).subscribe({
       next: (response) => {
-        console.log('✅ Clase agregada exitosamente:', response);
-        alert('Clase agregada exitosamente. Puedes ir a la vista de Clases para verla.');
+        this.showToastMessage('Clase agregada exitosamente. Puedes ir a la vista de Clases para verla.', 'success');
         this.cerrarModalClase();
       },
       error: (error) => {
-        console.error('❌ Error agregando clase:', error);
-        alert('Error al agregar la clase');
+        this.showToastMessage('Error al agregar la clase', 'error');
       }
     });
   }
 
   crearUsuario(): void {
-    console.log('👤 Creando usuario:', this.nuevoUsuario);
     this.http.post('http://localhost:3000/usuarios', this.nuevoUsuario).subscribe({
       next: (response) => {
-        console.log('✅ Usuario creado exitosamente:', response);
-        alert('Usuario creado exitosamente. Puedes ir a la vista de Usuarios para verlo.');
+        this.showToastMessage('Usuario creado exitosamente. Puedes ir a la vista de Usuarios para verlo.', 'success');
         this.cerrarModalUsuario();
       },
       error: (error) => {
-        console.error('❌ Error creando usuario:', error);
-        alert('Error al crear el usuario');
+        this.showToastMessage('Error al crear el usuario', 'error');
       }
     });
   }
 
   // === MÉTODOS AUXILIARES ===
   cargarProgramas(): void {
-    this.http.get<any[]>('http://localhost:3000/programas').subscribe({
-      next: (response) => {
-        this.programas = response;
-        console.log('✅ Programas cargados:', this.programas);
-      },
-      error: (error) => {
-        console.error('❌ Error cargando programas:', error);
-        // Si falla, usar programas de ejemplo
-        this.programas = [
-          { id: 1, nombre: 'Inglés Básico', nivel: 'A1' },
-          { id: 2, nombre: 'Inglés Intermedio', nivel: 'B1' },
-          { id: 3, nombre: 'Inglés Avanzado', nivel: 'C1' }
-        ];
-      }
-    });
+    // Usar programas de ejemplo ya que el endpoint /programas no existe en el backend
+    this.programas = [
+      { id: 1, nombre: 'Inglés Básico', nivel: 'A1' },
+      { id: 2, nombre: 'Inglés Intermedio', nivel: 'B1' },
+      { id: 3, nombre: 'Inglés Avanzado', nivel: 'C1' }
+    ];
   }
 
   limpiarFormularioAula(): void {
