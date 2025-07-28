@@ -1,6 +1,5 @@
 @use 'sass:color';
 
-// === VARIABLES ===
 $azul: #1a73e8;
 $azul-claro: #e8f0fe;
 $verde: #d4edda;
@@ -11,7 +10,6 @@ $gris-claro: #f5f5f5;
 $gris-borde: #e0e0e0;
 $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-// === ESTILOS GENERALES ===
 * {
   box-sizing: border-box;
   font-family: $fuente;
@@ -19,425 +17,123 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 0;
 }
 
-//// === HEADER CON USUARIO ===
-.dashboard-header {
+.horarios-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem 1rem;
+}
+
+h2 {
+  color: var(--primary, #1a237e);
+  font-weight: 800;
+  margin-bottom: 2rem;
+}
+
+.header-divider {
+  width: 100%;
+  height: 3px;
+  background: var(--primary, #1a237e);
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  opacity: 0.12;
+}
+
+.acciones-horarios-opt {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #ddd;
-  padding: 1rem 2rem;
-
-  .left h1 {
-    font-size: 1.8rem;
-    color: #000;
-  }
-
-  .right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
-    span {
-      font-size: 0.9rem;
-      color: #000;
-    }
-
-    .user-section {
-      position: relative;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: bold;
-
-      .user-dropdown {
-        position: absolute;
-        top: 120%;
-        right: 0;
-        background-color: white;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        min-width: 180px;
-        z-index: 200;
-
-        ul {
-          margin: 0;
-          padding: 0;
-          list-style: none;
-
-          li {
-            padding: 0.8rem 1rem;
-            cursor: pointer;
-            color: #000;
-
-            &:hover {
-              background-color: rgba(0, 0, 0, 0.05);
-            }
-
-            &:not(:last-child) {
-              border-bottom: 1px solid #eee;
-            }
-          }
-        }
-      }
-    }
-  }
+  justify-content: space-between;
+  background: #f8fafc;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 2.2rem;
+  gap: 1.5rem;
+}
+.acciones-select {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+.combo-select-opt {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--primary-blue);
+  font-size: 1.08rem;
+  background: var(--white);
+  color: var(--primary-blue);
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(33,51,84,0.04);
+  height: 44px;
+}
+.combo-select-opt:focus {
+  outline: none;
+  border: 2px solid var(--primary-blue);
+  box-shadow: 0 2px 8px rgba(33,51,84,0.10);
 }
 
-// === ICONOS ===
-.user-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
+.card-table {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(33,51,84,0.10);
+  margin-bottom: 2.5rem;
+  padding: 1.2rem 1.5rem 1.5rem 1.5rem;
 }
 
-.icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 2.5rem;
 }
 
-// === CONTENIDO DE GENERAR HORARIOS ===
-.horario-container {
-  padding: 2rem;
-  background-color: white;
-  min-height: 100vh;
-
-  h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    color: #333;
-  }
-
-  .generar-opciones {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-
-    .input-card {
-      flex: 1 1 350px;
-      background-color: $gris-claro;
-      border: 1px solid $gris-borde;
-      border-radius: 8px;
-      padding: 1.5rem;
-
-      h3 {
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        color: #222;
-      }
-
-      label {
-        display: block;
-        font-weight: 600;
-        margin: 0.8rem 0 0.4rem;
-        color: #444;
-      }
-
-      select,
-      input[type='date'],
-      input[type='file'] {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid $gris-borde;
-        border-radius: 4px;
-        background-color: white;
-        margin-bottom: 0.8rem;
-      }
-
-      .checkboxes {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        margin: 1rem 0;
-
-        label {
-          font-weight: normal;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        input[type='checkbox'] {
-          transform: scale(1.2);
-        }
-      }
-
-      .btn-generar,
-      .btn-exportar {
-        margin-top: 1rem;
-        margin-right: 0.5rem;
-        background-color: $azul;
-        color: white;
-        padding: 0.6rem 1.2rem;
-        border: none;
-        border-radius: 4px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s;
-
-        &:hover {
-          background-color: color.adjust($azul, $lightness: -10%);
-        }
-      }
-
-      .btn-exportar {
-        background-color: gray;
-
-        &:hover {
-          background-color: color.adjust(gray, $lightness: -10%);
-        }
-      }
-    }
-  }
-
-  .horario-generado {
-    margin-top: 3rem;
-
-    h3 {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
-
-    :host {
-      display: block;
-      width: 100%;
-    }
-
-    .mb-3 {
-      margin-bottom: 1.5rem;
-    }
-
-    .horarios-container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem 3rem 1rem;
-    }
-
-    h2 {
-      color: var(--primary, #1a237e);
-      font-weight: 800;
-      margin-bottom: 2rem;
-    }
-
-    .acciones-horarios {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .combo-box {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-    .combo-select {
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      border: 1.5px solid var(--primary-blue);
-      font-size: 1.08rem;
-      background: var(--white);
-      color: var(--primary-blue);
-      transition: border 0.2s, box-shadow 0.2s;
-      box-shadow: 0 1px 4px rgba(33,51,84,0.04);
-      height: 44px;
-    }
-    .combo-select:focus {
-      outline: none;
-      border: 2px solid var(--primary-blue);
-      box-shadow: 0 2px 8px rgba(33,51,84,0.10);
-    }
-
-    .btn-generar-horario, .btn-resetear-horario {
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-      font-size: 1.08rem;
-      font-weight: 700;
-      border-radius: 8px;
-      padding: 0.55rem 1.7rem;
-      border: none;
-      box-shadow: 0 2px 8px rgba(33,51,84,0.08);
-      cursor: pointer;
-      transition: background 0.18s, box-shadow 0.18s;
-      height: 44px;
-    }
-
-    .btn-generar-horario {
-      background: var(--primary-blue, #213354);
-      color: #fff;
-    }
-    .btn-generar-horario .material-icons {
-      color: #fff;
-      font-size: 1.3em;
-      margin-right: 0.5em;
-      vertical-align: middle;
-    }
-    .btn-generar-horario:hover, .btn-generar-horario:focus {
-      background: #16213a;
-      box-shadow: 0 4px 16px rgba(33,51,84,0.13);
-    }
-
-    .btn-resetear-horario {
-      background: #e53935;
-      color: #fff;
-    }
-    .btn-resetear-horario .material-icons {
-      color: #fff;
-      font-size: 1.3em;
-      margin-right: 0.5em;
-      vertical-align: middle;
-    }
-    .btn-resetear-horario:hover, .btn-resetear-horario:focus {
-      background: #b71c1c;
-      box-shadow: 0 4px 16px rgba(229,57,53,0.13);
-    }
-
-    .table-responsive {
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      margin-bottom: 2.5rem;
-    }
-
-    .table {
-      margin-top: 0.5rem;
-      width: 100%;
-      background: var(--background, #fff);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 1.08rem;
-      min-width: 900px;
-      transition: box-shadow 0.2s;
-    }
-
-    .table th, .table td {
-      text-align: center;
-      vertical-align: middle;
-      padding: 0.85rem 0.6rem;
-      border-bottom: 1px solid var(--border, #e0e0e0);
-    }
-
-    .table thead th {
-      background: var(--primary, #1a237e);
-      color: var(--on-primary, #fff);
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      border-bottom: 2px solid var(--primary-dark, #0d1333);
-    }
-
-    .table tbody tr {
-      transition: background 0.18s;
-    }
-
-    .table tbody tr:hover {
-      background: var(--hover, #e3f2fd);
-    }
-
-    .table-bordered {
-      border: 1px solid var(--border, #bdbdbd);
-    }
-
-    .table-striped tbody tr:nth-of-type(odd) {
-      background: var(--striped, #f5f7fa);
-    }
-
-    .clase.blue {
-      background: var(--info, #e3f2fd);
-      color: var(--primary, #1a237e);
-      border-radius: 8px;
-      padding: 3px 10px;
-      margin: 2px 0;
-      display: inline-block;
-      font-weight: 600;
-      font-size: 0.98rem;
-    }
-    .clase.orange {
-      background: var(--warning, #ffe0b2);
-      color: var(--orange-text, #e65100);
-      border-radius: 8px;
-      padding: 3px 10px;
-      margin: 2px 0;
-      display: inline-block;
-      font-weight: 600;
-      font-size: 0.98rem;
-    }
-    .clase.red {
-      background: var(--danger, #ffcdd2);
-      color: var(--red-text, #b71c1c);
-      border-radius: 8px;
-      padding: 3px 10px;
-      margin: 2px 0;
-      display: inline-block;
-      font-weight: 600;
-      font-size: 0.98rem;
-    }
-
-    h2, h3 {
-      color: var(--primary, #1a237e);
-      font-weight: 800;
-      margin-bottom: 1.2rem;
-    }
-    label[for="vistaSelect"] {
-      font-size: 1.1rem;
-      color: var(--primary, #1a237e);
-      margin-right: 0.7rem;
-    }
-
-    @media (max-width: 1200px) {
-      .table {
-        font-size: 0.98rem;
-        min-width: 700px;
-      }
-    }
-    @media (max-width: 900px) {
-      .table {
-        font-size: 0.93rem;
-        min-width: 600px;
-      }
-      .table th, .table td {
-        padding: 0.5rem 0.2rem;
-      }
-    }
-    @media (max-width: 700px) {
-      .table {
-        font-size: 0.89rem;
-        min-width: 500px;
-      }
-    }
-  }
+.table {
+  margin-top: 0.5rem;
+  width: 100%;
+  background: var(--background, #fff);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1.08rem;
+  min-width: 900px;
+  transition: box-shadow 0.2s;
 }
 
-.badge {
-  display: inline-block;
-  padding: 0.25em 0.7em;
-  border-radius: 12px;
-  font-size: 0.95em;
-  font-weight: 600;
-  color: #fff;
-  background: #90caf9;
-  margin: 0 2px;
+.table th, .table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.85rem 0.6rem;
+  border-bottom: 1px solid var(--border, #e0e0e0);
 }
 
-.badge.nivel-c1 { background: #1976d2; }
-.badge.nivel-c2 { background: #388e3c; }
-.badge.nivel-b2 { background: #fbc02d; color: #222; }
-.badge.nivel-b1 { background: #ff9800; }
+.table thead th {
+  background: var(--primary, #1a237e);
+  color: var(--on-primary, #fff);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 2px solid var(--primary-dark, #0d1333);
+}
 
-.badge.carga-baja { background: #1976d2; }
-.badge.carga-media { background: #fbc02d; color: #222; }
-.badge.carga-alta { background: #e53935; }
+.table tbody tr {
+  transition: background 0.18s;
+}
+
+.table tbody tr:hover {
+  background: var(--hover, #e3f2fd);
+}
+
+.table-bordered {
+  border: 1px solid var(--border, #bdbdbd);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background: var(--striped, #f5f7fa);
+}
 
 .tabla-estilo-clases {
   background: #fff;
@@ -481,240 +177,6 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0 auto;
   display: inline-block;
   min-width: 2.5em;
-}
-
-.paginacion {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.2rem;
-}
-.paginacion button {
-  background: #fff;
-  border: 1.5px solid var(--primary, #1a237e);
-  color: var(--primary, #1a237e);
-  border-radius: 8px;
-  padding: 0.35em 1.1em;
-  font-size: 1.05rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-}
-.paginacion button.active,
-.paginacion button:hover {
-  background: var(--primary, #1a237e);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(26,35,126,0.10);
-}
-
-.header-divider {
-  width: 100%;
-  height: 3px;
-  background: var(--primary, #1a237e);
-  border-radius: 2px;
-  margin-bottom: 1.5rem;
-  opacity: 0.12;
-}
-
-.card-table {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(33,51,84,0.10);
-  margin-bottom: 2.5rem;
-  padding: 1.2rem 1.5rem 1.5rem 1.5rem;
-}
-
-.horario-completo-listado {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 1.08rem;
-  min-width: 900px;
-  margin-bottom: 2rem;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
-}
-
-.horario-completo-listado th, .horario-completo-listado td {
-  text-align: center;
-  padding: 0.85rem 0.5rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.horario-completo-listado thead th {
-  background: #f5f7fa;
-  color: #213354;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  font-size: 1.05em;
-}
-
-.horario-completo-listado tbody tr:nth-child(even) td {
-  background: #f8fafc;
-}
-
-.badge {
-  display: inline-block;
-  border-radius: 8px;
-  padding: 0.2em 0.7em;
-  margin: 2px 0;
-  font-size: 0.97em;
-  font-weight: 500;
-  min-width: 70px;
-  text-align: center;
-}
-.badge-programa { background: #1976d2; color: #fff; }
-.badge-categoria { background: #43a047; color: #fff; }
-.badge-nivel { background: #fbc02d; color: #222; }
-.badge-docente { background: #0288d1; color: #fff; }
-.badge-azul { background: #b3c6f7; color: #213354; }
-.badge-verde { background: #c8f7c5; color: #1b5e20; }
-.badge-morado { background: #e1d7fa; color: #6c3483; }
-.badge-amarillo { background: #ffe9b3; color: #b26a00; }
-.badge-rojo { background: #ffd6d6; color: #b71c1c; }
-.badge-negro { background: #333; color: #fff; }
-
-.resumen-aulas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-.card-aula {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
-  padding: 1.2rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  border: 1px solid #f0f0f0;
-  min-width: 220px;
-}
-.aula-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 700;
-  font-size: 1.1em;
-  margin-bottom: 0.3em;
-}
-.aula-nombre {
-  color: #213354;
-}
-.aula-info {
-  color: #888;
-  font-size: 0.98em;
-}
-.aula-docente {
-  font-size: 1em;
-  color: #222;
-}
-.aula-horas {
-  font-size: 1em;
-  color: #1976d2;
-  font-weight: 600;
-}
-
-.paginacion-aulas {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(26,35,126,0.06);
-  padding: 0.7rem 1.2rem 0.7rem 1.2rem;
-  margin-top: 1.2rem;
-  margin-bottom: 0.5rem;
-  min-height: 56px;
-}
-.paginacion-info {
-  font-size: 1.01rem;
-  color: #222;
-  font-weight: 500;
-  flex: 1 1 200px;
-  text-align: left;
-}
-.paginacion-controles {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  flex: 2 1 300px;
-  justify-content: center;
-}
-.paginacion-controles button {
-  background: #fff;
-  border: 1.5px solid var(--primary, #1a237e);
-  color: var(--primary, #1a237e);
-  border-radius: 8px;
-  padding: 0.32em 1.05em;
-  font-size: 1.04rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-  margin: 0 1px;
-}
-.paginacion-controles button.active,
-.paginacion-controles button:focus,
-.paginacion-controles button:hover:not(:disabled) {
-  background: var(--primary, #1a237e);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(26,35,126,0.10);
-}
-.paginacion-controles button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #f5f7fa;
-  color: #bdbdbd;
-  border-color: #e0e0e0;
-}
-
-:root {
-  --border: #e0e0e0;
-  --striped: #f8fafc;
-}
-
-.table-docentes {
-  width: 100%;
-  background: var(--white);
-  border-radius: 14px;
-  box-shadow: 0 4px 24px rgba(33,51,84,0.10);
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 1.08rem;
-  min-width: 900px;
-  overflow: hidden;
-}
-
-.table-docentes th {
-  background: var(--primary-blue);
-  color: var(--white);
-  font-weight: 700;
-  border-bottom: 2px solid var(--border);
-  text-align: center;
-  font-size: 1.05rem;
-  letter-spacing: 0.5px;
-  padding: 0.8rem 0.5rem;
-}
-
-.table-docentes td {
-  background: var(--white);
-  border-bottom: 1.5px solid var(--border);
-  text-align: center;
-  vertical-align: middle;
-  font-size: 1.04rem;
-  padding: 0.7rem 0.5rem;
-}
-
-.table-docentes tbody tr:nth-child(even) td {
-  background: var(--striped);
-}
-
-.table-docentes tbody tr:last-child td {
-  border-bottom: none;
 }
 
 .paginacion-docentes {
@@ -771,279 +233,72 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   border-color: var(--border);
 }
 
-.spinner-horario {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80px;
-  font-size: 1.2rem;
-  color: var(--primary-blue);
-  gap: 0.7rem;
-}
-.spinner-horario .spinner {
-  font-size: 2.2rem;
-  animation: spin 1.1s linear infinite;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.mensaje-vacio {
-  text-align: center;
-  color: #bdbdbd;
-  font-size: 1.08rem;
-  font-weight: 600;
-  margin: 1.5rem 0;
-  opacity: 0.8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal.vista-docente-modal {
-  background-color: var(--white);
-  border-radius: 8px;
-  max-width: 800px;
-  width: 95%;
-  max-height: 85vh;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e9ecef;
-  background-color: var(--primary-blue);
-  color: var(--white);
-  border-radius: 8px 8px 0 0;
-}
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-.btn-close {
-  background: none;
-  border: none;
-  color: var(--white);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-}
-.btn-close:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-.vista-docente-content {
-  padding: 2rem;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-.info-section {
-  margin-bottom: 2rem;
-}
-.info-section:last-child {
-  margin-bottom: 0;
-}
-.section-title {
-  color: var(--primary-blue);
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e9ecef;
-}
-.info-grid {
+.resumen-aulas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-.info-item label {
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.info-item span {
-  color: #212529;
-  font-size: 1rem;
-  padding: 0.5rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  border-left: 3px solid var(--primary-blue);
-}
-
-.tabla-estilo-clases .badge-programa    { background: #1976d2; }
-.tabla-estilo-clases .badge-categoria   { background: #388e3c; }
-.tabla-estilo-clases .badge-nivel       { background: #fbc02d; color: #222; }
-.tabla-estilo-clases .badge-docente     { background: #0288d1; }
-.tabla-estilo-clases .badge-aula        { background: #7b1fa2; }
-.tabla-estilo-clases .badge-aula-purple { background: #9c27b0; }
-.tabla-estilo-clases .badge-ocupacion   { background: #e53935; }
-.tabla-estilo-clases .badge-estudiantes { background: #43a047; }
-
-.tabla-estilo-clases .badge {
-  display: inline-block;
-  padding: 0.25em 0.7em;
-  border-radius: 12px;
-  font-size: 0.95em;
-  font-weight: 600;
-  color: #fff;
-  margin: 0 2px;
-  cursor: pointer;
-  transition: background 0.18s;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-}
-.tabla-estilo-clases .badge:hover {
-  filter: brightness(0.92);
-}
-.btn-generar-horario .material-icons,
-.btn-resetear-horario .material-icons {
-  font-size: 1.3em;
-  margin-right: 0.5em;
-  vertical-align: middle;
-}
-
-.acciones-horarios-opt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #f8fafc;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
-  padding: 1.1rem 1.5rem;
-  margin-bottom: 2.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
+  margin-top: 1.5rem;
 }
-.acciones-select {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-}
-.combo-select-opt {
-  padding: 0.5rem 1.2rem;
-  border-radius: 8px;
-  border: 1.5px solid var(--primary-blue);
-  font-size: 1.08rem;
-  background: var(--white);
-  color: var(--primary-blue);
-  transition: border 0.2s, box-shadow 0.2s;
-  box-shadow: 0 1px 4px rgba(33,51,84,0.04);
-  height: 44px;
-}
-.combo-select-opt:focus {
-  outline: none;
-  border: 2px solid var(--primary-blue);
-  box-shadow: 0 2px 8px rgba(33,51,84,0.10);
-}
-.acciones-botones {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-}
-
-.tabla-color .badge-docente { background: #1976d2; }
-.tabla-color .badge-nivel { background: #fbc02d; color: #222; }
-.tabla-color .badge-carga { background: #43a047; }
-.tabla-color .badge-piso { background: #7b1fa2; }
-.tabla-color .badge-aula { background: #0288d1; }
-.tabla-color .badge-estudiantes { background: #388e3c; }
-.tabla-color .badge-ocupacion { background: #e53935; }
-.tabla-color .badge-categoria { background: #ff9800; color: #222; }
-.tabla-color .badge-programa { background: #1976d2; }
-.badge-categoria.Adults        { background: #43a047; color: #fff; }
-.badge-categoria.TinyKids      { background: #29b6f6; color: #fff; }
-.badge-categoria.Teens         { background: #7e57c2; color: #fff; }
-.badge-categoria.Children      { background: #fbc02d; color: #222; }
-.badge-categoria.Youth         { background: #ef5350; color: #fff; }
-.badge-nivel.B2    { background: #ffd600; color: #222; }
-.badge-nivel.A2    { background: #00bfae; color: #fff; }
-.badge-nivel.A1    { background: #ff7043; color: #fff; }
-.badge-nivel.B1    { background: #8d6e63; color: #fff; }
-
-.horario-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.2rem;
-  margin: 2rem 0;
-}
-
-.horario-card {
+.card-aula {
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(33,51,84,0.08);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(33,51,84,0.06);
   padding: 1.2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.5rem;
   border: 1px solid #f0f0f0;
+  min-width: 220px;
 }
-
-.horario-card-header {
+.aula-header {
   display: flex;
-  gap: 0.5em;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5em;
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-bottom: 0.3em;
 }
-
-.horario-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3em;
+.aula-nombre {
+  color: #213354;
 }
-
-.horario-row {
+.aula-info {
+  color: #888;
+  font-size: 0.98em;
+}
+.aula-docente {
+  font-size: 1em;
+  color: #222;
+}
+.aula-horas {
+  font-size: 1em;
+  color: #1976d2;
+  font-weight: 600;
+}
+.aula-nivel {
+  font-size: 1em;
+  color: #1976d2;
+  font-weight: 600;
+}
+.aula-divider {
+  border: none;
+  border-top: 1.5px solid #e0e0e0;
+  margin: 0.5em 0 1em 0;
+}
+.aula-detalle {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em 1.2em;
+  gap: 0.7em;
   align-items: center;
-  margin-bottom: 0.1em;
+  margin-bottom: 0.2em;
 }
-
-.label {
+.aula-label {
   color: #888;
   font-size: 0.97em;
   min-width: 80px;
 }
-
-.value {
+.aula-value {
   color: #222;
   font-weight: 500;
 }
-
-.hora-label {
-  min-width: 70px;
-}
-
 .hora-badge {
   display: inline-block;
   background: #e3f2fd;
@@ -1058,16 +313,165 @@ $fuente: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin-bottom: 0;
   vertical-align: middle;
 }
-
 .horario-horas {
   display: flex;
   flex-direction: column;
   gap: 0.1em;
 }
-
 .aula-capacidad-row {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5em;
   margin-top: 0.3em;
 }
+
+// Badges de colores para tablas
+.tabla-color .badge-docente { background: #1976d2; }
+.tabla-color .badge-nivel { background: #fbc02d; color: #222; }
+.tabla-color .badge-carga { background: #43a047; }
+.tabla-color .badge-piso { background: #7b1fa2; }
+.tabla-color .badge-aula { background: #0288d1; }
+.tabla-color .badge-aula-purple { background: #9c27b0; }
+.tabla-color .badge-estudiantes { background: #388e3c; }
+.tabla-color .badge-ocupacion { background: #e53935; }
+.tabla-color .badge-categoria { background: #ff9800; color: #222; }
+.tabla-color .badge-programa { background: #1976d2; }
+.badge-categoria.Adults        { background: #43a047; color: #fff; }
+.badge-categoria.TinyKids      { background: #29b6f6; color: #fff; }
+.badge-categoria.Teens         { background: #7e57c2; color: #fff; }
+.badge-categoria.Children      { background: #fbc02d; color: #222; }
+.badge-categoria.Youth         { background: #ef5350; color: #fff; }
+.badge-nivel.B2    { background: #ffd600; color: #222; }
+.badge-nivel.A2    { background: #00bfae; color: #fff; }
+.badge-nivel.A1    { background: #ff7043; color: #fff; }
+.badge-nivel.B1    { background: #8d6e63; color: #fff; }
+
+// Estilos específicos para la tabla Horario Completo
+.horario-completo-listado {
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1.08rem;
+  min-width: 900px;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.2s;
+}
+
+.horario-completo-listado th, .horario-completo-listado td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 1rem 0.6rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.horario-completo-listado thead th {
+  background: #f5f7fa;
+  color: #1a237e;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e0e0e0;
+  font-size: 1.08rem;
+}
+
+.horario-completo-listado tbody tr {
+  transition: background 0.18s;
+}
+
+.horario-completo-listado tbody tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.horario-completo-listado tbody tr:hover td {
+  background: #e3f2fd;
+}
+
+.horario-completo-listado .badge {
+  margin: 0 auto;
+  display: inline-block;
+  min-width: 2.5em;
+  border-radius: 8px;
+  padding: 0.18em 0.8em;
+  font-weight: 600;
+  font-size: 1em;
+}
+
+.horario-completo-listado .badge-programa { 
+  background: #1976d2; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-docente { 
+  background: #039be5; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-categoria.Adults { 
+  background: #43a047; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-categoria.TinyKids { 
+  background: #29b6f6; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-categoria.Teens { 
+  background: #7e57c2; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-categoria.Children { 
+  background: #fbc02d; 
+  color: #222; 
+}
+
+.horario-completo-listado .badge-categoria.Youth { 
+  background: #ef5350; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-nivel.B2 { 
+  background: #ffd600; 
+  color: #222; 
+}
+
+.horario-completo-listado .badge-nivel.A2 { 
+  background: #00bfae; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-nivel.A1 { 
+  background: #ff7043; 
+  color: #fff; 
+}
+
+.horario-completo-listado .badge-nivel.B1 { 
+  background: #8d6e63; 
+  color: #fff; 
+}
+
+@media (max-width: 1200px) {
+  .table {
+    font-size: 0.98rem;
+    min-width: 700px;
+  }
+}
+@media (max-width: 900px) {
+  .table {
+    font-size: 0.93rem;
+    min-width: 600px;
+  }
+  .table th, .table td {
+    padding: 0.5rem 0.2rem;
+  }
+}
+@media (max-width: 700px) {
+  .table {
+    font-size: 0.89rem;
+    min-width: 500px;
+  }
+} 
