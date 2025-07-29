@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -41,6 +41,20 @@ export class AulasCoordinadorComponent implements OnInit {
   aulaEditando: any = null;
   guardando: boolean = false;
 
+  // Modal de crear aula
+  mostrarModalCrearAula: boolean = false;
+  nuevaAula: any = {
+    numero: '',
+    ubicacion: '',
+    piso: '',
+    tipo_aula: 'tiny_kids',
+    edad_minima: 0,
+    edad_maxima: 0,
+    capacidad: 1,
+    observaciones: ''
+  };
+  guardandoNuevaAula: boolean = false;
+
   // Vista de aulas eliminadas
   mostrarAulasEliminadas: boolean = false;
   aulasEliminadas: any[] = [];
@@ -51,7 +65,10 @@ export class AulasCoordinadorComponent implements OnInit {
   pisos: string[] = [];
   tipos: string[] = ['tiny_kids', 'children', 'teens', 'adults'];
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.cargarAulas();
@@ -638,5 +655,101 @@ export class AulasCoordinadorComponent implements OnInit {
     setTimeout(() => {
       // Angular debería detectar automáticamente los cambios, pero el setTimeout ayuda
     }, 100);
+  }
+
+  // === MÉTODOS PARA CREAR AULA ===
+  mostrarModalAgregarAula(): void {
+    this.mostrarModalCrearAula = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarModalCrearAula(): void {
+    this.mostrarModalCrearAula = false;
+    this.limpiarFormularioNuevaAula();
+    this.cdr.detectChanges();
+  }
+
+  limpiarFormularioNuevaAula(): void {
+    this.nuevaAula = {
+      numero: '',
+      ubicacion: '',
+      piso: '',
+      tipo_aula: 'tiny_kids',
+      edad_minima: 0,
+      edad_maxima: 0,
+      capacidad: 1,
+      observaciones: ''
+    };
+  }
+
+  crearAula(): void {
+    if (!this.validarFormularioNuevaAula()) {
+      return;
+    }
+
+    this.guardandoNuevaAula = true;
+
+    // Preparar datos según el DTO CreateAulaDto
+    const datosAula = {
+      numero: Number(this.nuevaAula.numero),
+      ubicacion: this.nuevaAula.ubicacion,
+      piso: this.nuevaAula.piso,
+      tipo_aula: this.nuevaAula.tipo_aula,
+      edad_minima: Number(this.nuevaAula.edad_minima),
+      edad_maxima: Number(this.nuevaAula.edad_maxima),
+      capacidad: Number(this.nuevaAula.capacidad),
+      observaciones: this.nuevaAula.observaciones || ''
+    };
+
+    console.log('📤 JSON a enviar al crear aula:', JSON.stringify(datosAula, null, 2));
+    console.log('📋 Objeto datosAula completo:', datosAula);
+
+    this.http.post('http://localhost:3000/aulas', datosAula).subscribe({
+      next: (response: any) => {
+        this.guardandoNuevaAula = false;
+        
+        if (response.success) {
+          this.cerrarModalCrearAula();
+          
+          // Recargar la lista de aulas
+          this.cargarAulas();
+          
+          // Mostrar mensaje de éxito
+          this.mostrarMensajeExito('Aula creada correctamente');
+        } else {
+          this.mostrarMensajeError(response.message || 'Error al crear el aula');
+        }
+      },
+      error: (err) => {
+        this.guardandoNuevaAula = false;
+        
+        const mensajeError = err.error?.message || err.message || 'Error al crear el aula';
+        this.mostrarMensajeError(mensajeError);
+      }
+    });
+  }
+
+  validarFormularioNuevaAula(): boolean {
+    if (!this.nuevaAula.numero || !this.nuevaAula.ubicacion || !this.nuevaAula.piso) {
+      this.mostrarMensajeError('Por favor complete todos los campos obligatorios');
+      return false;
+    }
+
+    if (this.nuevaAula.capacidad < 1) {
+      this.mostrarMensajeError('La capacidad debe ser mayor a 0');
+      return false;
+    }
+
+    if (this.nuevaAula.edad_minima < 0 || this.nuevaAula.edad_maxima < 0) {
+      this.mostrarMensajeError('Las edades no pueden ser negativas');
+      return false;
+    }
+
+    if (this.nuevaAula.edad_minima > this.nuevaAula.edad_maxima) {
+      this.mostrarMensajeError('La edad mínima no puede ser mayor que la edad máxima');
+      return false;
+    }
+
+    return true;
   }
 } 

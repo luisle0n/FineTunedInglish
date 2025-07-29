@@ -3,60 +3,56 @@
   <app-header></app-header>
 
   <!-- BOTONES DE VISTA -->
-  <div class="vista-buttons">
-    <button class="btn-vista" 
-            [class.active]="!mostrarInactivos" 
-            (click)="cambiarAVistaActivos()">
-      👥 Docentes Activos
+  <div class="view-toggle">
+    <button class="btn-primary" [class.active]="!mostrarInactivos" (click)="cambiarVista(false)">
+      Docentes Activos
     </button>
-    <button class="btn-vista" 
-            [class.active]="mostrarInactivos" 
-            (click)="cambiarAVistaInactivos()">
-      🚫 Docentes Inactivos
+    <button class="btn-secundario" [class.active]="mostrarInactivos" (click)="cambiarVista(true)">
+      Docentes Inactivos
     </button>
   </div>
 
   <!-- FILTROS -->
   <div class="filters-card">
     <div class="filter-group">
-      <label for="filtroContrato">Tipo de Contrato</label>
-      <select id="filtroContrato" 
-              [(ngModel)]="filtroContrato" 
+      <label for="tipoContrato">Tipo de Contrato</label>
+      <select class="form-select"
+              [(ngModel)]="filtroContrato"
               (ngModelChange)="filtrarSegunVista()">
-        <option value="Todos">Todos</option>
+        <option value="Todos">Todos los tipos de contrato</option>
         <option *ngFor="let contrato of contratos" [value]="contrato.nombre">
-          {{ contrato.nombre }}
+          <span class="tipo-badge" [attr.data-tipo]="contrato.nombre">{{ contrato.nombre }}</span>
         </option>
       </select>
     </div>
 
     <div class="filter-group">
-      <label for="filtroNivelIngles">Nivel de Inglés</label>
-      <select id="filtroNivelIngles" 
-              [(ngModel)]="filtroNivelIngles" 
-              (ngModelChange)="filtrarSegunVista()">
+      <label for="nivelIngles">Nivel de Inglés</label>
+      <select id="nivelIngles" [(ngModel)]="filtroNivelIngles" (ngModelChange)="filtrarSegunVista()">
         <option value="Todos">Todos</option>
-        <option *ngFor="let nivel of nivelesIngles" [value]="nivel.nombre">
-          {{ nivel.nombre }}
-        </option>
+        <option value="A1">A1</option>
+        <option value="A2">A2</option>
+        <option value="B1">B1</option>
+        <option value="B2">B2</option>
+        <option value="C1">C1</option>
+        <option value="C2">C2</option>
       </select>
     </div>
 
     <div class="filter-group">
-      <label for="filtroExperiencia">Experiencia Mínima (años)</label>
-      <input type="number" 
-             id="filtroExperiencia" 
-             [(ngModel)]="filtroExperiencia" 
+      <label for="experienciaMinima">Experiencia Mínima (años)</label>
+      <input type="number"
+             class="form-control"
+             [(ngModel)]="filtroExperiencia"
+             (ngModelChange)="filtrarSegunVista()"
              min="0"
-             (input)="filtrarSegunVista()"
-             (blur)="filtrarSegunVista()"
-             placeholder="0" />
+             placeholder="Experiencia mínima en años">
     </div>
 
     <div class="acciones-filtros">
       <div class="botones-filtro">
-        <button class="btn primary" (click)="resetearFiltros()">
-          🔄 Limpiar Filtros
+        <button class="btn-resetear" (click)="resetearFiltros()">
+          Limpiar Filtros
         </button>
       </div>
     </div>
@@ -64,106 +60,120 @@
 
   <!-- LISTA DE DOCENTES -->
   <section class="docentes-section">
-    <div class="docentes-header">
-      <h2>{{ mostrarInactivos ? 'Lista de Docentes Inactivos' : 'Lista de Docentes Activos' }}</h2>
-      <div class="actions">
-        <input type="text" [(ngModel)]="textoBusqueda" (ngModelChange)="filtrarSegunVista()"
-          placeholder="Buscar por nombre..." />
+    <div class="docentes-table-container">
+      <div class="table-header">
+        <h2>{{ mostrarInactivos ? 'Lista de Docentes Inactivos' : 'Lista de Docentes Activos' }}</h2>
+        <div class="actions">
+          <input type="text"
+                 [(ngModel)]="textoBusqueda"
+                 (ngModelChange)="filtrarSegunVista()"
+                 placeholder="Buscar por nombre, teléfono o especialización..." />
+        </div>
       </div>
-    </div>
 
-    <div class="docentes-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Nombres</th>
-            <th>Teléfono</th>
-            <th>Tipo Contrato</th>
-            <th>Ex</th>
-            <th>Nivel de Inglés</th>
-            <th>Horas Disponibles</th>
-            <th>Horas Asignadas</th>
-            <th>Máx. Horas</th>
-            <th>Especialización</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngIf="docentesPaginados.length === 0">
-            <td colspan="10" class="no-data">
-              <div class="no-data-content">
-                <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con los filtros aplicados.</p>
-                <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con los filtros aplicados.</p>
-              </div>
-            </td>
-          </tr>
-          <tr *ngFor="let docente of docentesPaginados; let i = index">
-            <td>
-              {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
-              docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
-            </td>
-            <td>{{ docente.persona?.telefono }}</td>
-            <td>{{ docente.tipo_contrato?.nombre }}</td>
-            <td>{{ docente.experiencia_anios }}</td>
-            <td>{{ docente.nivel_ingles?.nombre }}</td>
-            <td>{{ docente.horas_disponibles }}</td>
-            <td>{{ docente.horas_asignadas }}</td>
-            <td>{{ docente.max_horas_semanales }}</td>
-            <td>
-              <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre
-                }}<br /></span>
-            </td>
-            <td>
-              <button (click)="verDocente(i)">
-                <img src="img/ojo-abierto.png" alt="Ver" width="20" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- PAGINACIÓN -->
-    <div class="pagination" *ngIf="totalPaginas > 1">
-      <div class="pagination-info">
-        <span>Mostrando {{ obtenerRangoPagina().inicio }} - {{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} docentes</span>
+      <div class="table-responsive">
+        <table class="docentes-table">
+          <thead>
+            <tr>
+              <th>Nombres</th>
+              <th>Teléfono</th>
+              <th>Tipo Contrato</th>
+              <th>Ex</th>
+              <th>Nivel de Inglés</th>
+              <th>Horas Disponibles</th>
+              <th>Horas Asignadas</th>
+              <th>Máx. Horas</th>
+              <th>Especialización</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="docentesPaginados.length === 0">
+              <td colspan="10" class="no-data">
+                <div class="no-data-content">
+                  <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con los filtros aplicados.</p>
+                  <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con los filtros aplicados.</p>
+                </div>
+              </td>
+            </tr>
+            <tr *ngFor="let docente of docentesPaginados; let i = index">
+              <td>
+                <strong>{{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
+                docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}</strong>
+              </td>
+              <td>{{ docente.persona?.telefono }}</td>
+              <td>
+                <span class="tipo-badge" [attr.data-tipo]="docente.tipo_contrato?.nombre">
+                  {{ docente.tipo_contrato?.nombre }}
+                </span>
+              </td>
+              <td>{{ docente.experiencia_anios }}</td>
+              <td>
+                <span class="nivel-badge">{{ docente.nivel_ingles?.nombre }}</span>
+              </td>
+              <td>{{ docente.horas_disponibles }}</td>
+              <td>{{ docente.horas_asignadas }}</td>
+              <td>{{ docente.max_horas_semanales }}</td>
+              <td>
+                <div class="especializaciones-list">
+                  <span *ngFor="let e of docente.especializaciones" class="especializacion-tag">
+                    {{ e.especializacion?.nombre }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-view" (click)="verDocente(i)" title="Ver Docente">
+                    <img src="img/ojo-abierto.png" alt="Ver" width="16" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      
-      <div class="pagination-controls">
-        <button class="btn-pagination" 
-                [disabled]="paginaActual === 1" 
-                (click)="cambiarPagina(paginaActual - 1)">
-          ← Anterior
-        </button>
-        
-        <div class="page-numbers">
-          <button *ngFor="let pagina of obtenerPaginasVisibles()" 
-                  class="btn-page" 
-                  [class.active]="pagina === paginaActual"
-                  (click)="cambiarPagina(pagina)">
-            {{ pagina }}
+
+      <!-- PAGINACIÓN -->
+      <div class="pagination" *ngIf="totalPaginas > 1">
+        <div class="pagination-info">
+          <span>Mostrando {{ obtenerRangoPagina().inicio }} - {{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} docentes</span>
+        </div>
+
+        <div class="pagination-controls">
+          <button class="btn-pagination"
+                  [disabled]="paginaActual === 1"
+                  (click)="cambiarPagina(paginaActual - 1)">
+            ← Anterior
+          </button>
+
+          <div class="page-numbers">
+            <button *ngFor="let pagina of obtenerPaginasVisibles()"
+                    class="btn-page"
+                    [class.active]="pagina === paginaActual"
+                    (click)="cambiarPagina(pagina)">
+              {{ pagina }}
+            </button>
+          </div>
+
+          <button class="btn-pagination"
+                  [disabled]="paginaActual === totalPaginas"
+                  (click)="cambiarPagina(paginaActual + 1)">
+            Siguiente →
           </button>
         </div>
-        
-        <button class="btn-pagination" 
-                [disabled]="paginaActual === totalPaginas" 
-                (click)="cambiarPagina(paginaActual + 1)">
-          Siguiente →
-        </button>
       </div>
     </div>
   </section>
 
   <!-- MODAL VER DETALLES -->
-  <div class="modal-backdrop" *ngIf="mostrarModalVista">
-    <div class="modal-vista">
+  <div class="modal-backdrop" *ngIf="mostrarModalVista" (click)="cerrarModalVista()">
+    <div class="modal-vista" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Detalle del Docente</h3>
         <button class="btn-close" (click)="cerrarModalVista()">×</button>
       </div>
-      
+
       <div class="modal-content" *ngIf="docenteSeleccionado">
-        
         <div class="info-section">
           <h4>Información Personal</h4>
           <div class="info-grid">
@@ -191,7 +201,9 @@
           <div class="info-grid">
             <div class="info-item">
               <label>Tipo de Contrato:</label>
-              <span>{{ docenteSeleccionado.tipo_contrato?.nombre }}</span>
+              <span class="tipo-badge" [attr.data-tipo]="docenteSeleccionado.tipo_contrato?.nombre">
+                {{ docenteSeleccionado.tipo_contrato?.nombre }}
+              </span>
             </div>
             <div class="info-item">
               <label>Experiencia:</label>
@@ -199,7 +211,7 @@
             </div>
             <div class="info-item">
               <label>Nivel de Inglés:</label>
-              <span>{{ docenteSeleccionado.nivel_ingles?.nombre }}</span>
+              <span class="nivel-badge">{{ docenteSeleccionado.nivel_ingles?.nombre }}</span>
             </div>
             <div class="info-item">
               <label>Horas Disponibles:</label>
@@ -215,35 +227,41 @@
             </div>
             <div class="info-item">
               <label>Puede dar Sábados:</label>
-              <span class="badge" [ngClass]="docenteSeleccionado.puede_dar_sabados ? 'badge-si' : 'badge-no'">
+              <span class="badge" [class.badge-si]="docenteSeleccionado.puede_dar_sabados" [class.badge-no]="!docenteSeleccionado.puede_dar_sabados">
                 {{ docenteSeleccionado.puede_dar_sabados ? 'Sí' : 'No' }}
               </span>
             </div>
             <div class="info-item">
               <label>Estado:</label>
-              <span class="badge" [ngClass]="docenteSeleccionado.activo ? 'badge-activo' : 'badge-inactivo'">
+              <span class="badge" [class.badge-activo]="docenteSeleccionado.activo" [class.badge-inactivo]="!docenteSeleccionado.activo">
                 {{ docenteSeleccionado.activo ? 'Activo' : 'Inactivo' }}
               </span>
             </div>
           </div>
         </div>
 
-        <div class="info-section" *ngIf="docenteSeleccionado.especializaciones?.length > 0">
+        <div class="info-section" *ngIf="getEspecializaciones().length > 0">
           <h4>Especializaciones</h4>
           <div class="especializaciones-list">
-            <span *ngFor="let e of docenteSeleccionado.especializaciones" class="especializacion-tag">
-              {{ e.especializacion?.nombre }}
-            </span>
+            <ng-container *ngFor="let e of getEspecializaciones()">
+              <ng-container *ngIf="e?.especializacion as esp">
+                <span class="especializacion-tag" *ngIf="esp.nombre">
+                  {{ esp.nombre }}
+                </span>
+              </ng-container>
+            </ng-container>
           </div>
         </div>
 
-        <div class="info-section" *ngIf="docenteSeleccionado.horarios?.length > 0">
+        <div class="info-section" *ngIf="getHorarios().length > 0">
           <h4>Horarios Disponibles</h4>
           <div class="horarios-list">
-            <div *ngFor="let h of docenteSeleccionado.horarios" class="horario-item">
-              <span class="dia">{{ h.horario?.dia }}</span>
-              <span class="horario">{{ formatTime(h.horario?.hora_inicio) }} - {{ formatTime(h.horario?.hora_fin) }}</span>
-            </div>
+            <ng-container *ngFor="let h of getHorarios()">
+              <div class="horario-item">
+                <span class="dia">{{ h.dia }}</span>
+                <span class="horario">{{ formatTime(h.hora_inicio) }} - {{ formatTime(h.hora_fin) }}</span>
+              </div>
+            </ng-container>
           </div>
         </div>
       </div>

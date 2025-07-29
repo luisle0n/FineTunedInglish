@@ -1,10 +1,11 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { DocenteService, Docente } from '../../../services/docente.service';
+import { DashboardService, DashboardStats } from '../../../services/dashboard.service';
 import { FormsModule } from '@angular/forms';
 import { Chart } from 'chart.js/auto';
 
@@ -22,21 +23,45 @@ export class InicioGerenteComponent implements OnInit, AfterViewInit {
   distribucionEdades: { [key: string]: number } = {};
 
   // Variables para estadísticas del dashboard
-  estadisticas: any = {
+  estadisticas: DashboardStats = {
     docentes: {
       docentes_activos: 0,
       docentes_inactivos: 0,
-      total_docentes: 0
+      total_docentes: 0,
+      aulas_asignadas: 0,
+      horas_programadas: 0,
+      horas_disponibles: 0,
+      distribucion_tipo_contrato: [],
+      distribucion_nivel_ingles: []
     }
   };
   cargando = true;
   cargandoEstadisticas = true;
 
+  // Variables para modales
+  mostrarModalAula = false;
+  mostrarModalClase = false;
+  mostrarModalUsuario = false;
+  guardandoAula = false;
+
+  // Datos para formularios
+  nuevaAula: any = {
+    numero: '',
+    ubicacion: '',
+    piso: '',
+    tipo_aula: '',
+    edad_minima: 0,
+    edad_maxima: 0,
+    capacidad: 0,
+    observaciones: ''
+  };
+
   constructor(
     private router: Router, 
     private authService: AuthService, 
     private http: HttpClient,
-    private docenteService: DocenteService
+    private docenteService: DocenteService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit() {
@@ -56,13 +81,14 @@ export class InicioGerenteComponent implements OnInit, AfterViewInit {
     this.cargandoEstadisticas = true;
     console.log('📊 Cargando estadísticas del dashboard...');
     
-    this.http.get<any>('http://localhost:3000/dashboard/estadisticas').subscribe({
+    this.dashboardService.getDashboardStats().subscribe({
       next: (response) => {
         console.log('📊 Respuesta completa de la API:', response);
         if (response.success && response.dashboard) {
           this.estadisticas = response.dashboard;
           console.log('✅ Estadísticas cargadas:', this.estadisticas);
           console.log('📈 Total docentes:', this.estadisticas.docentes.total_docentes);
+          this.procesarDatosParaGraficos();
         } else {
           console.error('❌ Respuesta inválida de la API');
         }
@@ -99,19 +125,19 @@ export class InicioGerenteComponent implements OnInit, AfterViewInit {
   procesarDatosParaGraficos(): void {
     console.log('🔄 Procesando datos para gráficos...');
     
-    // Procesar distribución por tipo de contrato
-    this.distribucionContratos = {};
-    this.docentes.forEach(docente => {
-      const tipoContrato = docente.tipo_contrato?.nombre || 'Sin Contrato';
-      this.distribucionContratos[tipoContrato] = (this.distribucionContratos[tipoContrato] || 0) + 1;
-    });
+    if (this.estadisticas.docentes?.distribucion_tipo_contrato) {
+      this.distribucionContratos = {};
+      this.estadisticas.docentes.distribucion_tipo_contrato.forEach((item: any) => {
+        this.distribucionContratos[item.tipo_contrato] = item.total;
+      });
+    }
     
-    // Procesar distribución por nivel de inglés
-    this.distribucionEdades = {};
-    this.docentes.forEach(docente => {
-      const nivelIngles = docente.nivel_ingles?.nombre || 'Sin Nivel';
-      this.distribucionEdades[nivelIngles] = (this.distribucionEdades[nivelIngles] || 0) + 1;
-    });
+    if (this.estadisticas.docentes?.distribucion_nivel_ingles) {
+      this.distribucionEdades = {};
+      this.estadisticas.docentes.distribucion_nivel_ingles.forEach((item: any) => {
+        this.distribucionEdades[item.nivel_ingles] = item.total;
+      });
+    }
     
     console.log('📊 Distribución por contratos:', this.distribucionContratos);
     console.log('📊 Distribución por niveles de inglés:', this.distribucionEdades);
@@ -237,5 +263,87 @@ export class InicioGerenteComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // === ACCIONES RÁPIDAS ===
+  mostrarModalAgregarAula(): void {
+    this.mostrarModalAula = true;
+  }
 
+  cerrarModalAula(): void {
+    this.mostrarModalAula = false;
+    this.limpiarFormularioAula();
+  }
+
+  mostrarModalAgregarClase(): void {
+    this.mostrarModalClase = true;
+  }
+
+  cerrarModalClase(): void {
+    this.mostrarModalClase = false;
+  }
+
+  mostrarModalAgregarUsuario(): void {
+    this.mostrarModalUsuario = true;
+  }
+
+  cerrarModalUsuario(): void {
+    this.mostrarModalUsuario = false;
+  }
+
+  // === MÉTODOS DE FORMULARIOS ===
+  agregarAula(): void {
+    this.guardandoAula = true;
+    
+    const datosAula = {
+      numero: Number(this.nuevaAula.numero),
+      ubicacion: this.nuevaAula.ubicacion,
+      piso: this.nuevaAula.piso,
+      tipo_aula: this.nuevaAula.tipo_aula,
+      edad_minima: Number(this.nuevaAula.edad_minima),
+      edad_maxima: Number(this.nuevaAula.edad_maxima),
+      capacidad: Number(this.nuevaAula.capacidad),
+      observaciones: this.nuevaAula.observaciones
+    };
+    
+    console.log('📤 JSON a enviar al crear aula:', JSON.stringify(datosAula, null, 2));
+    console.log('📋 Objeto datosAula completo:', datosAula);
+    
+    this.http.post('http://localhost:3000/aulas', datosAula).subscribe({
+      next: (response: any) => {
+        console.log('✅ Aula creada exitosamente:', response);
+        this.cerrarModalAula();
+        this.guardandoAula = false;
+      },
+      error: (error) => {
+        console.error('❌ Error al crear aula:', error);
+        this.guardandoAula = false;
+      }
+    });
+  }
+
+  // === MÉTODOS AUXILIARES ===
+  limpiarFormularioAula(): void {
+    this.nuevaAula = {
+      numero: '',
+      ubicacion: '',
+      piso: '',
+      tipo_aula: '',
+      edad_minima: 0,
+      edad_maxima: 0,
+      capacidad: 0,
+      observaciones: ''
+    };
+  }
+
+  private convertirABoolean(valor: any): boolean {
+    if (typeof valor === 'boolean') {
+      return valor;
+    }
+    if (typeof valor === 'string') {
+      return valor.toLowerCase() === 'true';
+    }
+    if (typeof valor === 'number') {
+      return valor !== 0;
+    }
+    return false;
+  }
 }

@@ -1,5 +1,229 @@
 @use '../../../../styles.scss';
 
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    input {
+        width: 250px;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+
+        &:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+    }
+
+    button {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
+table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0.5rem 0;
+
+    th {
+        background: var(--primary-blue);
+        color: white;
+        font-weight: 500;
+        padding: 12px 20px;
+        text-align: left;
+        font-size: 14px;
+        border: none;
+
+        &:first-child {
+            padding-left: 24px;
+        }
+
+        &:last-child {
+            padding-right: 24px;
+        }
+    }
+
+    td {
+        padding: 16px 20px;
+        font-size: 14px;
+        color: #333;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+
+        &:first-child {
+            padding-left: 24px;
+        }
+
+        &:last-child {
+            padding-right: 24px;
+        }
+
+        strong {
+            color: #333;
+            font-weight: 500;
+        }
+    }
+
+    tr {
+        transition: background-color 0.2s;
+
+        &:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        &:hover {
+            background-color: #f5f5f5;
+        }
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+
+        .btn-icon {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+
+            img {
+                width: 16px;
+                height: 16px;
+            }
+
+            // Ver (ojo)
+            &[title="Ver Docente"] {
+                background-color: #e3f2fd;
+
+                img {
+                    color: #2196f3;
+                }
+
+                &:hover {
+                    background-color: #bbdefb;
+                }
+            }
+
+            // Editar (lápiz)
+            &[title="Editar Docente"] {
+                background-color: #f0faf0;
+
+                img {
+                    color: #4caf50;
+                }
+
+                &:hover {
+                    background-color: #e8f5e9;
+                }
+            }
+
+            // Eliminar (papelera)
+            &[title="Eliminar Docente"] {
+                background-color: #ffebee;
+
+                img {
+                    color: #f44336;
+                }
+
+                &:hover {
+                    background-color: #ffcdd2;
+                }
+            }
+
+            // Reactivar
+            &[title="Reactivar Docente"] {
+                background-color: #fff3e0;
+
+                img {
+                    color: #ff9800;
+                }
+
+                &:hover {
+                    background-color: #ffe0b2;
+                }
+            }
+        }
+    }
+
+    // Estados y badges
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: center;
+
+        &.badge-si {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        &.badge-no {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        &.badge-activo {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+
+        &.badge-inactivo {
+            background: #fafafa;
+            color: #616161;
+            border: 1px solid #e0e0e0;
+        }
+    }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+    .table-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+
+        .actions {
+            flex-direction: column;
+            gap: 10px;
+
+            input {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    }
+}
+
 .dashboard-content {
     flex: 1;
     width: 100%;
@@ -14,9 +238,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 0.5rem;
+        // Corregido: estas líneas estaban fuera de un bloque, se eliminan para evitar errores de sintaxis
 
         .left h1 {
             font-size: 1.8rem;
@@ -345,21 +567,21 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            
+
             // Estilos para el scrollbar
             &::-webkit-scrollbar {
                 width: 8px;
             }
-            
+
             &::-webkit-scrollbar-track {
                 background: #f1f1f1;
                 border-radius: 4px;
             }
-            
+
             &::-webkit-scrollbar-thumb {
                 background: #c1c1c1;
                 border-radius: 4px;
-                
+
                 &:hover {
                     background: #a8a8a8;
                 }
@@ -421,7 +643,7 @@
 // Estilos para la sección de datos del docente
 .datos-docente-section {
     margin-bottom: 1.5rem;
-    
+
     .section-title {
         color: var(--primary-blue);
         font-size: 1.3rem;
@@ -429,37 +651,37 @@
         padding-bottom: 0.5rem;
         border-bottom: 2px solid var(--primary-blue);
     }
-    
+
     .form-section {
         background-color: #f8f9fa;
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1rem;
         border: 1px solid #e9ecef;
-        
+
         .subsection-title {
             color: var(--primary-blue);
             font-size: 1.1rem;
             margin-bottom: 1rem;
             font-weight: 600;
         }
-        
+
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
-            
+
             .form-group {
                 display: flex;
                 flex-direction: column;
-                
+
                 label {
                     font-weight: 600;
                     color: #495057;
                     margin-bottom: 0.5rem;
                     font-size: 0.9rem;
                 }
-                
+
                 input,
                 select {
                     padding: 0.75rem;
@@ -467,23 +689,23 @@
                     border-radius: 6px;
                     font-size: 0.9rem;
                     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-                    
+
                     &:focus {
                         outline: none;
                         border-color: var(--primary-blue);
                         box-shadow: 0 0 0 3px rgba(33, 51, 100, 0.1);
                     }
-                    
+
                     &::placeholder {
                         color: #6c757d;
                         font-style: italic;
                     }
                 }
-                
+
                 select {
                     background-color: white;
                     cursor: pointer;
-                    
+
                     option {
                         padding: 0.5rem;
                     }
@@ -491,7 +713,7 @@
             }
         }
     }
-    
+
     // Estilos para especializaciones
     .especializaciones-container {
         .especializaciones-grid {
@@ -499,7 +721,7 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 1rem;
-            
+
             .especializacion-item {
                 .checkbox-container {
                     display: flex;
@@ -511,29 +733,29 @@
                     cursor: pointer;
                     transition: all 0.2s ease;
                     position: relative;
-                    
+
                     &:hover {
                         border-color: var(--primary-blue);
                         background-color: #f8f9fa;
                     }
-                    
+
                     input[type="checkbox"] {
                         position: absolute;
                         opacity: 0;
                         cursor: pointer;
                         height: 0;
                         width: 0;
-                        
-                        &:checked ~ .checkmark {
+
+                        &:checked~.checkmark {
                             background-color: var(--primary-blue);
                             border-color: var(--primary-blue);
-                            
+
                             &:after {
                                 display: block;
                             }
                         }
                     }
-                    
+
                     .checkmark {
                         height: 20px;
                         width: 20px;
@@ -543,7 +765,7 @@
                         margin-right: 0.75rem;
                         position: relative;
                         transition: all 0.2s ease;
-                        
+
                         &:after {
                             content: "";
                             position: absolute;
@@ -557,7 +779,7 @@
                             transform: rotate(45deg);
                         }
                     }
-                    
+
                     .especializacion-label {
                         font-weight: 500;
                         color: #495057;
@@ -566,13 +788,13 @@
                 }
             }
         }
-        
+
         .especializaciones-summary {
             background-color: white;
             border: 1px solid #e9ecef;
             border-radius: 6px;
             padding: 0.75rem;
-            
+
             .summary-text {
                 margin: 0;
                 color: var(--primary-blue);
@@ -588,7 +810,7 @@
 .confirmacion-modal {
     max-width: 1200px !important;
     max-height: 85vh !important;
-    
+
     .confirmacion-content {
         flex: 1;
         overflow-y: auto;
@@ -596,19 +818,19 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        
+
         .confirmacion-info {
             background-color: #f8f9fa;
             border-radius: 8px;
             padding: 1rem;
             border-left: 4px solid var(--primary-blue);
-            
+
             .info-text {
                 margin: 0 0 0.5rem 0;
                 color: #495057;
                 font-weight: 500;
             }
-            
+
             .warning-text {
                 margin: 0;
                 color: #dc3545;
@@ -616,32 +838,32 @@
                 font-size: 0.9rem;
             }
         }
-        
+
         .docentes-preview {
             h4 {
                 color: var(--primary-blue);
                 margin-bottom: 1rem;
                 font-size: 1.1rem;
             }
-            
+
             .preview-table-container {
                 max-height: 300px;
                 overflow-y: auto;
                 border: 1px solid #e9ecef;
                 border-radius: 6px;
-                
+
                 .preview-table {
                     width: 100%;
                     border-collapse: collapse;
                     background-color: white;
-                    
+
                     thead {
                         background-color: var(--primary-blue);
                         color: white;
                         position: sticky;
                         top: 0;
                         z-index: 10;
-                        
+
                         th {
                             padding: 0.75rem 0.5rem;
                             text-align: left;
@@ -650,23 +872,23 @@
                             border: none;
                         }
                     }
-                    
+
                     tbody {
                         tr {
                             border-bottom: 1px solid #e9ecef;
-                            
+
                             &:hover {
                                 background-color: #f8f9fa;
                             }
-                            
+
                             &.even {
                                 background-color: #fafbfc;
                             }
-                            
+
                             &:last-child {
                                 border-bottom: none;
                             }
-                            
+
                             td {
                                 padding: 0.5rem;
                                 font-size: 0.85rem;
@@ -692,59 +914,59 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    
+
     .paginacion-info {
         text-align: center;
-        
+
         .info-text {
             color: #6c757d;
             font-size: 0.9rem;
             font-weight: 500;
         }
     }
-    
+
     .paginacion-controls {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 1rem;
-        
+
         .items-por-pagina {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             font-size: 0.9rem;
             color: #495057;
-            
+
             label {
                 font-weight: 500;
             }
-            
+
             select {
                 padding: 0.25rem 0.5rem;
                 border: 1px solid #ced4da;
                 border-radius: 4px;
                 background-color: white;
                 font-size: 0.9rem;
-                
+
                 &:focus {
                     outline: none;
                     border-color: var(--primary-blue);
                     box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
                 }
             }
-            
+
             span {
                 color: #6c757d;
             }
         }
-        
+
         .navegacion-paginas {
             display: flex;
             align-items: center;
             gap: 0.25rem;
-            
+
             .btn-pagina {
                 display: flex;
                 align-items: center;
@@ -759,56 +981,56 @@
                 transition: all 0.2s ease;
                 font-size: 0.9rem;
                 font-weight: 500;
-                
+
                 &:hover:not(:disabled) {
                     background-color: #e9ecef;
                     border-color: #adb5bd;
                 }
-                
+
                 &:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
                 }
-                
+
                 &.numero {
                     min-width: 2rem;
-                    
+
                     &.activa {
                         background-color: var(--primary-blue);
                         color: white;
                         border-color: var(--primary-blue);
                     }
                 }
-                
+
                 span {
                     font-size: 0.8rem;
                     font-weight: bold;
                 }
             }
-            
+
             .paginas-numeros {
                 display: flex;
                 gap: 0.25rem;
             }
         }
     }
-    
+
     .no-data {
         text-align: center;
         padding: 3rem 1rem;
-        
+
         .no-data-content {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 1rem;
-            
+
             p {
                 color: #6c757d;
                 font-size: 1rem;
                 margin: 0;
             }
-            
+
             .btn {
                 padding: 0.5rem 1rem;
                 font-size: 0.9rem;
@@ -821,7 +1043,7 @@
 .vista-docente-modal {
     max-width: 800px !important;
     max-height: 85vh !important;
-    
+
     .modal-header {
         display: flex;
         justify-content: space-between;
@@ -831,13 +1053,13 @@
         background-color: var(--primary-blue);
         color: white;
         border-radius: 8px 8px 0 0;
-        
+
         h3 {
             margin: 0;
             font-size: 1.3rem;
             font-weight: 600;
         }
-        
+
         .btn-close {
             background: none;
             border: none;
@@ -852,25 +1074,25 @@
             justify-content: center;
             border-radius: 50%;
             transition: background-color 0.2s ease;
-            
+
             &:hover {
                 background-color: rgba(255, 255, 255, 0.2);
             }
         }
     }
-    
+
     .vista-docente-content {
         padding: 2rem;
         max-height: 60vh;
         overflow-y: auto;
-        
+
         .info-section {
             margin-bottom: 2rem;
-            
+
             &:last-child {
                 margin-bottom: 0;
             }
-            
+
             .section-title {
                 color: var(--primary-blue);
                 font-size: 1.1rem;
@@ -879,17 +1101,17 @@
                 padding-bottom: 0.5rem;
                 border-bottom: 2px solid #e9ecef;
             }
-            
+
             .info-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                 gap: 1rem;
-                
+
                 .info-item {
                     display: flex;
                     flex-direction: column;
                     gap: 0.25rem;
-                    
+
                     label {
                         font-weight: 600;
                         color: #495057;
@@ -897,7 +1119,7 @@
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                     }
-                    
+
                     span {
                         color: #212529;
                         font-size: 1rem;
@@ -906,7 +1128,7 @@
                         border-radius: 4px;
                         border-left: 3px solid var(--primary-blue);
                     }
-                    
+
                     .estado-badge {
                         display: inline-block;
                         padding: 0.25rem 0.75rem;
@@ -915,20 +1137,20 @@
                         font-weight: 600;
                         text-align: center;
                         width: fit-content;
-                        
+
                         &.activo {
                             background-color: #d4edda;
                             color: #155724;
                             border: 1px solid #c3e6cb;
                         }
-                        
+
                         &:not(.activo) {
                             background-color: #f8d7da;
                             color: #721c24;
                             border: 1px solid #f5c6cb;
                         }
                     }
-                    
+
                     .badge {
                         display: inline-block;
                         padding: 0.25rem 0.75rem;
@@ -950,7 +1172,7 @@
                             border: 1px solid #fecaca;
                         }
                     }
-                    
+
                     .id-text {
                         font-family: 'Courier New', monospace;
                         font-size: 0.85rem;
@@ -960,12 +1182,12 @@
                     }
                 }
             }
-            
+
             .especializaciones-list {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 0.5rem;
-                
+
                 .especializacion-tag {
                     background-color: var(--primary-blue);
                     color: white;
@@ -975,12 +1197,12 @@
                     font-weight: 500;
                 }
             }
-            
+
             .horarios-list {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
-                
+
                 .horario-item {
                     display: flex;
                     justify-content: space-between;
@@ -989,12 +1211,12 @@
                     background-color: #f8f9fa;
                     border-radius: 6px;
                     border-left: 3px solid var(--primary-blue);
-                    
+
                     .dia {
                         font-weight: 600;
                         color: var(--primary-blue);
                     }
-                    
+
                     .horario {
                         color: #495057;
                         font-family: 'Courier New', monospace;
@@ -1003,53 +1225,54 @@
             }
         }
     }
-    
+
     // Estilos para el modo de edición en el modal de vista
     .form-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1rem;
-        
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            
+
             label {
                 font-weight: 600;
                 color: #495057;
                 font-size: 0.9rem;
             }
-            
-            input, select {
+
+            input,
+            select {
                 padding: 0.75rem;
                 border: 1px solid #ced4da;
                 border-radius: 4px;
                 font-size: 1rem;
                 transition: border-color 0.2s ease;
-                
+
                 &:focus {
                     outline: none;
                     border-color: var(--primary-blue);
                     box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
                 }
-                
+
                 &.ng-invalid.ng-touched {
                     border-color: #dc3545;
                 }
             }
-            
+
             select {
                 background-color: white;
                 cursor: pointer;
-                
+
                 // Estilos específicos para el campo de estado
                 &#estado_vista {
                     option[value="true"] {
                         color: #28a745;
                         font-weight: 500;
                     }
-                    
+
                     option[value="false"] {
                         color: #dc3545;
                         font-weight: 500;
@@ -1058,14 +1281,14 @@
             }
         }
     }
-    
+
     .especializaciones-container {
         .especializaciones-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 0.75rem;
             margin-bottom: 1rem;
-            
+
             .especializacion-item {
                 .checkbox-container {
                     display: flex;
@@ -1075,15 +1298,15 @@
                     padding: 0.5rem;
                     border-radius: 4px;
                     transition: background-color 0.2s ease;
-                    
+
                     &:hover {
                         background-color: #f8f9fa;
                     }
-                    
+
                     input[type="checkbox"] {
                         display: none;
                     }
-                    
+
                     .checkmark {
                         width: 18px;
                         height: 18px;
@@ -1092,11 +1315,11 @@
                         position: relative;
                         transition: all 0.2s ease;
                     }
-                    
-                    input[type="checkbox"]:checked + .checkmark {
+
+                    input[type="checkbox"]:checked+.checkmark {
                         background-color: var(--primary-blue);
                         border-color: var(--primary-blue);
-                        
+
                         &::after {
                             content: '✓';
                             position: absolute;
@@ -1108,7 +1331,7 @@
                             font-weight: bold;
                         }
                     }
-                    
+
                     .especializacion-label {
                         font-size: 0.9rem;
                         color: #495057;
@@ -1116,13 +1339,13 @@
                 }
             }
         }
-        
+
         .especializaciones-summary {
             background-color: #e3f2fd;
             padding: 0.75rem;
             border-radius: 4px;
             border-left: 4px solid var(--primary-blue);
-            
+
             .summary-text {
                 margin: 0;
                 color: var(--primary-blue);
@@ -1130,7 +1353,7 @@
             }
         }
     }
-    
+
     .horarios-section {
         .horarios-title {
             color: var(--primary-blue);
@@ -1138,7 +1361,7 @@
             font-size: 1.1rem;
             font-weight: 600;
         }
-        
+
         .horarios-container {
             .horarios-tabla {
                 width: 100%;
@@ -1147,66 +1370,66 @@
                 border-radius: 6px;
                 overflow: hidden;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                
+
                 thead {
                     background-color: var(--primary-blue);
                     color: white;
-                    
+
                     th {
                         padding: 0.75rem;
                         text-align: left;
                         font-weight: 600;
                         font-size: 0.9rem;
                         border: none;
-                        
+
                         &.checkbox-header {
                             width: 50px;
                             text-align: center;
                         }
                     }
                 }
-                
+
                 tbody {
                     tr {
                         border-bottom: 1px solid #e9ecef;
                         transition: background-color 0.2s ease;
-                        
+
                         &:hover {
                             background-color: #f8f9fa;
                         }
-                        
+
                         &.selected {
                             background-color: #e3f2fd;
                         }
-                        
+
                         &.even {
                             background-color: #fafbfc;
                         }
-                        
+
                         &:last-child {
                             border-bottom: none;
                         }
-                        
+
                         td {
                             padding: 0.75rem;
                             border: none;
                             vertical-align: middle;
-                            
+
                             &.checkbox-cell {
                                 text-align: center;
                                 width: 50px;
                             }
-                            
+
                             &.dia-cell {
                                 font-weight: 600;
                                 color: var(--primary-blue);
                             }
-                            
+
                             &.hora-cell {
                                 font-family: 'Courier New', monospace;
                                 color: #495057;
                             }
-                            
+
                             &.estado-cell {
                                 text-align: center;
                             }
@@ -1214,14 +1437,14 @@
                     }
                 }
             }
-            
+
             .horarios-summary {
                 margin-top: 1rem;
                 background-color: #e8f5e8;
                 padding: 0.75rem;
                 border-radius: 4px;
                 border-left: 4px solid #28a745;
-                
+
                 .summary-text {
                     margin: 0;
                     color: #155724;
@@ -1256,7 +1479,7 @@
 // Estilos para la tabla de horarios mejorada
 .horarios-section {
     margin-top: 1rem;
-    
+
     .horarios-title {
         color: var(--primary-blue);
         font-size: 1.2rem;
@@ -1264,14 +1487,14 @@
         padding-bottom: 0.5rem;
         border-bottom: 2px solid var(--primary-blue);
     }
-    
+
     .horarios-container {
         background-color: #f8f9fa;
         border-radius: 8px;
         padding: 1rem;
         border: 1px solid #e9ecef;
     }
-    
+
     .horarios-tabla {
         width: 100%;
         border-collapse: collapse;
@@ -1279,21 +1502,21 @@
         border-radius: 6px;
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        
+
         thead {
             background-color: var(--primary-blue);
             color: white;
-            
+
             th {
                 padding: 0.75rem;
                 text-align: left;
                 font-weight: 600;
                 border: none;
-                
+
                 &.checkbox-header {
                     width: 50px;
                     text-align: center;
-                    
+
                     input[type="checkbox"] {
                         width: 16px;
                         height: 16px;
@@ -1302,58 +1525,58 @@
                 }
             }
         }
-        
+
         tbody {
             tr {
                 border-bottom: 1px solid #e9ecef;
                 transition: background-color 0.2s ease;
-                
+
                 &:hover {
                     background-color: #f8f9fa;
                 }
-                
+
                 &.selected {
                     background-color: #e3f2fd;
                 }
-                
+
                 &.even {
                     background-color: #fafbfc;
                 }
-                
+
                 &:last-child {
                     border-bottom: none;
                 }
-                
+
                 td {
                     padding: 0.75rem;
                     border: none;
                     vertical-align: middle;
-                    
+
                     &.checkbox-cell {
                         width: 50px;
                         text-align: center;
-                        
+
                         input[type="checkbox"] {
                             width: 16px;
                             height: 16px;
                             cursor: pointer;
                         }
                     }
-                    
+
                     &.dia-cell {
                         font-weight: 500;
                         color: var(--primary-blue);
                     }
-                    
+
                     &.hora-cell {
                         font-family: 'Courier New', monospace;
                         font-weight: 600;
                         color: #495057;
                     }
-                    
+
                     &.estado-cell {
                         text-align: center;
-                        
+
                         .estado-badge {
                             display: inline-block;
                             padding: 0.25rem 0.75rem;
@@ -1363,7 +1586,7 @@
                             background-color: #e9ecef;
                             color: #6c757d;
                             transition: all 0.2s ease;
-                            
+
                             &.selected {
                                 background-color: #28a745;
                                 color: white;
@@ -1374,14 +1597,14 @@
             }
         }
     }
-    
+
     .horarios-summary {
         margin-top: 1rem;
         padding: 0.75rem;
         background-color: white;
         border-radius: 6px;
         border: 1px solid #e9ecef;
-        
+
         .summary-text {
             margin: 0;
             color: var(--primary-blue);
@@ -1395,24 +1618,1430 @@
 .view-toggle {
     display: flex;
     gap: 0.5rem;
-    
+
     .btn {
         padding: 0.5rem 1rem;
         border-radius: 6px;
         font-weight: 500;
         transition: all 0.2s ease;
         border: 1px solid #dee2e6;
-        
+
         &.active {
             background-color: var(--primary-blue);
             color: white;
             border-color: var(--primary-blue);
         }
-        
+
         &:not(.active) {
             background-color: #f8f9fa;
             color: #495057;
-            
+
+            &:hover {
+                background-color: #e9ecef;
+                border-color: #adb5bd;
+            }
+        }
+    }
+}
+
+.left h1 {
+    font-size: 1.8rem;
+    color: var(--primary-blue);
+}
+
+.right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    span {
+        font-size: 0.9rem;
+        color: var(--primary-blue);
+    }
+
+    .user-section {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: bold;
+
+        .user-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            z-index: 200;
+
+            ul {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+
+                li {
+                    padding: 0.8rem 1rem;
+                    cursor: pointer;
+                    color: var(--primary-blue);
+
+                    &:hover {
+                        background-color: rgba(33, 51, 100, 0.1);
+                    }
+                }
+
+                li:not(:last-child) {
+                    border-bottom: 1px solid #eee;
+                }
+            }
+        }
+    }
+}
+
+// Fin de bloque corregido
+
+.content-divider {
+    margin-bottom: 1.5rem;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+.filters-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-end;
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        select,
+        input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 140px;
+        }
+    }
+
+    .acciones-filtros {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+
+        .botones-filtro {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+
+            .btn.primary {
+                background-color: var(--primary-blue);
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #1e40af;
+                }
+            }
+
+            .cargar-excel-label {
+                background-color: #e5e7eb;
+                color: #111827;
+                border-radius: 4px;
+                padding: 0.5rem 1rem;
+                font-weight: bold;
+                cursor: pointer;
+                border: 1px solid #ccc;
+                display: inline-block;
+                transition: background 0.2s;
+
+                &:hover {
+                    background-color: #d1d5db;
+                }
+            }
+
+            input[type='file'] {
+                display: none;
+            }
+        }
+    }
+}
+
+.docentes-section {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+
+    .docentes-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h2 {
+            color: var(--primary-blue);
+            margin: 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+
+            input {
+                padding: 0.5rem;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+
+            .btn.primary {
+                background-color: var(--primary-blue);
+                color: white;
+                border: none;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #1e40af;
+                }
+            }
+        }
+    }
+
+    .docentes-table {
+        overflow-x: auto;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+
+            th,
+            td {
+                padding: 0.75rem;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f3f4f6;
+                color: var(--primary-blue);
+                font-weight: bold;
+            }
+
+            td {
+                color: #333;
+                vertical-align: middle;
+
+                input,
+                select {
+                    width: 100%;
+                    padding: 0.4rem;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+            }
+
+            tbody tr:hover {
+                background-color: #f9fafb;
+            }
+
+            td:last-child {
+                display: flex;
+                gap: 0.4rem;
+
+                button {
+                    background: none;
+                    border: none;
+                    padding: 0.25rem;
+                    cursor: pointer;
+
+                    img {
+                        width: 20px;
+                        height: 20px;
+                        transition: transform 0.2s ease;
+                    }
+
+                    &:hover img {
+                        transform: scale(1.1);
+                    }
+                }
+            }
+        }
+    }
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    background-color: #fff;
+    border-radius: 8px;
+    max-width: 1000px;
+    width: 95%;
+    max-height: 90vh;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    h3 {
+        margin: 0;
+        padding: 2rem 2rem 1rem 2rem;
+        color: var(--primary-blue);
+        font-size: 1.5rem;
+        background-color: #fff;
+        border-bottom: 1px solid #e9ecef;
+        flex-shrink: 0;
+    }
+
+    .docentes-table {
+        overflow-x: auto;
+        margin-bottom: 1rem;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+
+            th,
+            td {
+                padding: 0.5rem;
+                border: 1px solid #ccc;
+                text-align: left;
+                vertical-align: middle;
+            }
+
+            th {
+                background-color: #f3f4f6;
+                color: var(--primary-blue);
+                text-align: center;
+            }
+
+            td input,
+            td select {
+                width: 100%;
+                padding: 0.4rem 0.5rem;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            td.checkbox-group {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+    }
+
+    form {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        // Estilos para el scrollbar
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+
+            &:hover {
+                background: #a8a8a8;
+            }
+        }
+    }
+
+    .modal-actions {
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        background-color: #fff;
+        border-top: 1px solid #e9ecef;
+        flex-shrink: 0;
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+
+            &.primary {
+                background-color: var(--primary-blue);
+                color: white;
+
+                &:hover {
+                    background-color: #1e40af;
+                }
+            }
+
+            &.secondary {
+                background-color: #e5e7eb;
+                color: #111827;
+
+                &:hover {
+                    background-color: #d1d5db;
+                }
+            }
+        }
+    }
+}
+
+.user-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+// Fin de bloque corregido
+
+// Estilos para la sección de datos del docente
+.datos-docente-section {
+    margin-bottom: 1.5rem;
+
+    .section-title {
+        color: var(--primary-blue);
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-blue);
+    }
+
+    .form-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+
+        .subsection-title {
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+
+                label {
+                    font-weight: 600;
+                    color: #495057;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.9rem;
+                }
+
+                input,
+                select {
+                    padding: 0.75rem;
+                    border: 1px solid #ced4da;
+                    border-radius: 6px;
+                    font-size: 0.9rem;
+                    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+                    &:focus {
+                        outline: none;
+                        border-color: var(--primary-blue);
+                        box-shadow: 0 0 0 3px rgba(33, 51, 100, 0.1);
+                    }
+
+                    &::placeholder {
+                        color: #6c757d;
+                        font-style: italic;
+                    }
+                }
+
+                select {
+                    background-color: white;
+                    cursor: pointer;
+
+                    option {
+                        padding: 0.5rem;
+                    }
+                }
+            }
+        }
+    }
+
+    // Estilos para especializaciones
+    .especializaciones-container {
+        .especializaciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+
+            .especializacion-item {
+                .checkbox-container {
+                    display: flex;
+                    align-items: center;
+                    padding: 0.75rem;
+                    background-color: white;
+                    border: 1px solid #ced4da;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    position: relative;
+
+                    &:hover {
+                        border-color: var(--primary-blue);
+                        background-color: #f8f9fa;
+                    }
+
+                    input[type="checkbox"] {
+                        position: absolute;
+                        opacity: 0;
+                        cursor: pointer;
+                        height: 0;
+                        width: 0;
+
+                        &:checked~.checkmark {
+                            background-color: var(--primary-blue);
+                            border-color: var(--primary-blue);
+
+                            &:after {
+                                display: block;
+                            }
+                        }
+                    }
+
+                    .checkmark {
+                        height: 20px;
+                        width: 20px;
+                        background-color: white;
+                        border: 2px solid #ced4da;
+                        border-radius: 4px;
+                        margin-right: 0.75rem;
+                        position: relative;
+                        transition: all 0.2s ease;
+
+                        &:after {
+                            content: "";
+                            position: absolute;
+                            display: none;
+                            left: 6px;
+                            top: 2px;
+                            width: 5px;
+                            height: 10px;
+                            border: solid white;
+                            border-width: 0 2px 2px 0;
+                            transform: rotate(45deg);
+                        }
+                    }
+
+                    .especializacion-label {
+                        font-weight: 500;
+                        color: #495057;
+                        font-size: 0.9rem;
+                    }
+                }
+            }
+        }
+
+        .especializaciones-summary {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 0.75rem;
+
+            .summary-text {
+                margin: 0;
+                color: var(--primary-blue);
+                font-weight: 500;
+                text-align: center;
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
+
+// Estilos para el modal de confirmación
+.confirmacion-modal {
+    max-width: 1200px !important;
+    max-height: 85vh !important;
+
+    .confirmacion-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .confirmacion-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-blue);
+
+            .info-text {
+                margin: 0 0 0.5rem 0;
+                color: #495057;
+                font-weight: 500;
+            }
+
+            .warning-text {
+                margin: 0;
+                color: #dc3545;
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+        }
+
+        .docentes-preview {
+            h4 {
+                color: var(--primary-blue);
+                margin-bottom: 1rem;
+                font-size: 1.1rem;
+            }
+
+            .preview-table-container {
+                max-height: 300px;
+                overflow-y: auto;
+                border: 1px solid #e9ecef;
+                border-radius: 6px;
+
+                .preview-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    background-color: white;
+
+                    thead {
+                        background-color: var(--primary-blue);
+                        color: white;
+                        position: sticky;
+                        top: 0;
+                        z-index: 10;
+
+                        th {
+                            padding: 0.75rem 0.5rem;
+                            text-align: left;
+                            font-weight: 600;
+                            font-size: 0.85rem;
+                            border: none;
+                        }
+                    }
+
+                    tbody {
+                        tr {
+                            border-bottom: 1px solid #e9ecef;
+
+                            &:hover {
+                                background-color: #f8f9fa;
+                            }
+
+                            &.even {
+                                background-color: #fafbfc;
+                            }
+
+                            &:last-child {
+                                border-bottom: none;
+                            }
+
+                            td {
+                                padding: 0.5rem;
+                                font-size: 0.85rem;
+                                color: #495057;
+                                border: none;
+                                vertical-align: middle;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Estilos para la paginación
+.paginacion-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .paginacion-info {
+        text-align: center;
+
+        .info-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    }
+
+    .paginacion-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        .items-por-pagina {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #495057;
+
+            label {
+                font-weight: 500;
+            }
+
+            select {
+                padding: 0.25rem 0.5rem;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                background-color: white;
+                font-size: 0.9rem;
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--primary-blue);
+                    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+                }
+            }
+
+            span {
+                color: #6c757d;
+            }
+        }
+
+        .navegacion-paginas {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+
+            .btn-pagina {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 2rem;
+                height: 2rem;
+                border: 1px solid #dee2e6;
+                background-color: white;
+                color: #495057;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                font-size: 0.9rem;
+                font-weight: 500;
+
+                &:hover:not(:disabled) {
+                    background-color: #e9ecef;
+                    border-color: #adb5bd;
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                &.numero {
+                    min-width: 2rem;
+
+                    &.activa {
+                        background-color: var(--primary-blue);
+                        color: white;
+                        border-color: var(--primary-blue);
+                    }
+                }
+
+                span {
+                    font-size: 0.8rem;
+                    font-weight: bold;
+                }
+            }
+
+            .paginas-numeros {
+                display: flex;
+                gap: 0.25rem;
+            }
+        }
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 3rem 1rem;
+
+        .no-data-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+
+            p {
+                color: #6c757d;
+                font-size: 1rem;
+                margin: 0;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
+
+// Estilos para el modal de vista del docente
+.vista-docente-modal {
+    max-width: 800px !important;
+    max-height: 85vh !important;
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e9ecef;
+        background-color: var(--primary-blue);
+        color: white;
+        border-radius: 8px 8px 0 0;
+
+        h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    .vista-docente-content {
+        padding: 2rem;
+        max-height: 60vh;
+        overflow-y: auto;
+
+        .info-section {
+            margin-bottom: 2rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .section-title {
+                color: var(--primary-blue);
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+
+                .info-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+
+                    label {
+                        font-weight: 600;
+                        color: #495057;
+                        font-size: 0.9rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                    span {
+                        color: #212529;
+                        font-size: 1rem;
+                        padding: 0.5rem;
+                        background-color: #f8f9fa;
+                        border-radius: 4px;
+                        border-left: 3px solid var(--primary-blue);
+                    }
+
+                    .estado-badge {
+                        display: inline-block;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 20px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        text-align: center;
+                        width: fit-content;
+
+                        &.activo {
+                            background-color: #d4edda;
+                            color: #155724;
+                            border: 1px solid #c3e6cb;
+                        }
+
+                        &:not(.activo) {
+                            background-color: #f8d7da;
+                            color: #721c24;
+                            border: 1px solid #f5c6cb;
+                        }
+                    }
+
+                    .badge {
+                        display: inline-block;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 12px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+
+                        &.badge-si {
+                            background-color: #d1fae5;
+                            color: #065f46;
+                            border: 1px solid #a7f3d0;
+                        }
+
+                        &.badge-no {
+                            background-color: #fee2e2;
+                            color: #991b1b;
+                            border: 1px solid #fecaca;
+                        }
+                    }
+
+                    .id-text {
+                        font-family: 'Courier New', monospace;
+                        font-size: 0.85rem;
+                        color: #6c757d;
+                        background-color: #e9ecef;
+                        border-left-color: #6c757d;
+                    }
+                }
+            }
+
+            .especializaciones-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+
+                .especializacion-tag {
+                    background-color: var(--primary-blue);
+                    color: white;
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                }
+            }
+
+            .horarios-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+
+                .horario-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.75rem;
+                    background-color: #f8f9fa;
+                    border-radius: 6px;
+                    border-left: 3px solid var(--primary-blue);
+
+                    .dia {
+                        font-weight: 600;
+                        color: var(--primary-blue);
+                    }
+
+                    .horario {
+                        color: #495057;
+                        font-family: 'Courier New', monospace;
+                    }
+                }
+            }
+        }
+    }
+
+    // Estilos para el modo de edición en el modal de vista
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            label {
+                font-weight: 600;
+                color: #495057;
+                font-size: 0.9rem;
+            }
+
+            input,
+            select {
+                padding: 0.75rem;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 1rem;
+                transition: border-color 0.2s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--primary-blue);
+                    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+                }
+
+                &.ng-invalid.ng-touched {
+                    border-color: #dc3545;
+                }
+            }
+
+            select {
+                background-color: white;
+                cursor: pointer;
+
+                // Estilos específicos para el campo de estado
+                &#estado_vista {
+                    option[value="true"] {
+                        color: #28a745;
+                        font-weight: 500;
+                    }
+
+                    option[value="false"] {
+                        color: #dc3545;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+    }
+
+    .especializaciones-container {
+        .especializaciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+
+            .especializacion-item {
+                .checkbox-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    cursor: pointer;
+                    padding: 0.5rem;
+                    border-radius: 4px;
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    input[type="checkbox"] {
+                        display: none;
+                    }
+
+                    .checkmark {
+                        width: 18px;
+                        height: 18px;
+                        border: 2px solid #ced4da;
+                        border-radius: 3px;
+                        position: relative;
+                        transition: all 0.2s ease;
+                    }
+
+                    input[type="checkbox"]:checked+.checkmark {
+                        background-color: var(--primary-blue);
+                        border-color: var(--primary-blue);
+
+                        &::after {
+                            content: '✓';
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            color: white;
+                            font-size: 12px;
+                            font-weight: bold;
+                        }
+                    }
+
+                    .especializacion-label {
+                        font-size: 0.9rem;
+                        color: #495057;
+                    }
+                }
+            }
+        }
+
+        .especializaciones-summary {
+            background-color: #e3f2fd;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary-blue);
+
+            .summary-text {
+                margin: 0;
+                color: var(--primary-blue);
+                font-weight: 500;
+            }
+        }
+    }
+
+    .horarios-section {
+        .horarios-title {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .horarios-container {
+            .horarios-tabla {
+                width: 100%;
+                border-collapse: collapse;
+                background-color: white;
+                border-radius: 6px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                thead {
+                    background-color: var(--primary-blue);
+                    color: white;
+
+                    th {
+                        padding: 0.75rem;
+                        text-align: left;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        border: none;
+
+                        &.checkbox-header {
+                            width: 50px;
+                            text-align: center;
+                        }
+                    }
+                }
+
+                tbody {
+                    tr {
+                        border-bottom: 1px solid #e9ecef;
+                        transition: background-color 0.2s ease;
+
+                        &:hover {
+                            background-color: #f8f9fa;
+                        }
+
+                        &.selected {
+                            background-color: #e3f2fd;
+                        }
+
+                        &.even {
+                            background-color: #fafbfc;
+                        }
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        td {
+                            padding: 0.75rem;
+                            border: none;
+                            vertical-align: middle;
+
+                            &.checkbox-cell {
+                                text-align: center;
+                                width: 50px;
+                            }
+
+                            &.dia-cell {
+                                font-weight: 600;
+                                color: var(--primary-blue);
+                            }
+
+                            &.hora-cell {
+                                font-family: 'Courier New', monospace;
+                                color: #495057;
+                            }
+
+                            &.estado-cell {
+                                text-align: center;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .horarios-summary {
+                margin-top: 1rem;
+                background-color: #e8f5e8;
+                padding: 0.75rem;
+                border-radius: 4px;
+                border-left: 4px solid #28a745;
+
+                .summary-text {
+                    margin: 0;
+                    color: #155724;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
+
+.formulario-tabla {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+        text-align: left;
+        padding: 0.5rem;
+        background-color: #f8f8f8;
+    }
+
+    td {
+        padding: 0.5rem;
+    }
+
+    input,
+    select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+// Estilos para la tabla de horarios mejorada
+.horarios-section {
+    margin-top: 1rem;
+
+    .horarios-title {
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-blue);
+    }
+
+    .horarios-container {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+    }
+
+    .horarios-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        thead {
+            background-color: var(--primary-blue);
+            color: white;
+
+            th {
+                padding: 0.75rem;
+                text-align: left;
+                font-weight: 600;
+                border: none;
+
+                &.checkbox-header {
+                    width: 50px;
+                    text-align: center;
+
+                    input[type="checkbox"] {
+                        width: 16px;
+                        height: 16px;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                border-bottom: 1px solid #e9ecef;
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background-color: #f8f9fa;
+                }
+
+                &.selected {
+                    background-color: #e3f2fd;
+                }
+
+                &.even {
+                    background-color: #fafbfc;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                td {
+                    padding: 0.75rem;
+                    border: none;
+                    vertical-align: middle;
+
+                    &.checkbox-cell {
+                        width: 50px;
+                        text-align: center;
+
+                        input[type="checkbox"] {
+                            width: 16px;
+                            height: 16px;
+                            cursor: pointer;
+                        }
+                    }
+
+                    &.dia-cell {
+                        font-weight: 500;
+                        color: var(--primary-blue);
+                    }
+
+                    &.hora-cell {
+                        font-family: 'Courier New', monospace;
+                        font-weight: 600;
+                        color: #495057;
+                    }
+
+                    &.estado-cell {
+                        text-align: center;
+
+                        .estado-badge {
+                            display: inline-block;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 20px;
+                            font-size: 0.8rem;
+                            font-weight: 500;
+                            background-color: #e9ecef;
+                            color: #6c757d;
+                            transition: all 0.2s ease;
+
+                            &.selected {
+                                background-color: #28a745;
+                                color: white;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .horarios-summary {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background-color: white;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+
+        .summary-text {
+            margin: 0;
+            color: var(--primary-blue);
+            font-weight: 500;
+            text-align: center;
+        }
+    }
+}
+
+// Estilos para los botones de cambio de vista
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+
+        &.active {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        &:not(.active) {
+            background-color: #f8f9fa;
+            color: #495057;
+
             &:hover {
                 background-color: #e9ecef;
                 border-color: #adb5bd;

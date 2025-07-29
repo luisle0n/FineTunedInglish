@@ -1,11 +1,202 @@
 
 <app-header #headerComponent></app-header>
 
-<div style="margin-bottom: 16px;">
-  <button (click)="mostrarFormulario()" *ngIf="!showForm" class="btn-principal">
-    <img src="/img/mas.png" width="20" alt="icono" />
-    Crear usuario
-  </button>
+<div class="usuarios-container">
+  <!-- HEADER CON FILTROS Y ACCIONES -->
+  <div class="header-section">
+    <div class="filtros-section">
+      <div class="filtro-grupo">
+        <label for="filtroRol">Filtrar por Rol:</label>
+        <select id="filtroRol" [(ngModel)]="filtroRol" (change)="onFiltroRolChange()">
+          <option *ngFor="let rol of roles" [value]="rol.value">{{ rol.label }}</option>
+        </select>
+      </div>
+      
+      <div class="filtro-grupo">
+        <label for="filtroEstado">Filtrar por Estado:</label>
+        <select id="filtroEstado" [(ngModel)]="filtroEstado" (change)="onFiltroEstadoChange()">
+          <option value="todos">Todos</option>
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+        </select>
+      </div>
+      
+      <div class="filtro-grupo">
+        <label for="filtroBusqueda">Buscar:</label>
+        <input 
+          type="text" 
+          id="filtroBusqueda" 
+          [(ngModel)]="filtroBusqueda" 
+          (input)="onFiltroBusquedaChange()"
+          placeholder="Nombre, apellido, cédula o correo..."
+        />
+      </div>
+      
+      <button class="btn-resetear" (click)="resetearFiltros()">
+        🔄 Resetear Filtros
+      </button>
+    </div>
+    
+    <div class="acciones-section">
+      <button (click)="mostrarFormulario()" *ngIf="!showForm" class="btn-principal">
+        <img src="/img/mas.png" width="20" alt="icono" />
+        Crear Usuario
+      </button>
+      
+      <button (click)="cambiarVistaUsuarios()" class="btn-secundario">
+       
+        {{ showModalEliminados ? 'Ver Usuarios Activos' : 'Ver Usuarios Eliminados' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ESTADÍSTICAS -->
+  <div class="stats-section">
+    <div class="stat-card">
+      <h3>Total Usuarios</h3>
+      <p>{{ usuarios.length }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Usuarios Activos</h3>
+      <p>{{ getUsuariosActivosCount() }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Usuarios Eliminados</h3>
+      <p>{{ usuariosEliminados.length }}</p>
+    </div>
+  </div>
+
+  <!-- TABLA DE USUARIOS ACTIVOS -->
+  <div class="table-container" *ngIf="!showModalEliminados">
+    <h2>Usuarios Activos</h2>
+    
+    <div *ngIf="cargando" class="loading">
+      <p>Cargando usuarios...</p>
+    </div>
+    
+    <div *ngIf="error" class="error">
+      <p>Error al cargar usuarios. Intenta de nuevo.</p>
+    </div>
+    
+    <table *ngIf="!cargando && !error" class="usuarios-table">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Nombre Completo</th>
+          <th>Rol</th>
+          <th>Cédula</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="usuariosFiltrados.length === 0">
+          <td colspan="8" class="no-data">
+            <div class="no-data-content">
+              <p>No se encontraron usuarios.</p>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let usuario of usuariosFiltrados">
+          <td>
+            <strong>{{ usuario.username || 'N/A' }}</strong>
+          </td>
+          <td>{{ getNombreCompleto(usuario) }}</td>
+          <td>
+            <span class="rol-badge" [ngClass]="getRolUsuario(usuario).toLowerCase().replace(' ', '-')">
+              {{ getRolUsuario(usuario) }}
+            </span>
+          </td>
+          <td>{{ usuario.persona?.cedula || usuario.cedula || 'N/A' }}</td>
+          <td>{{ usuario.correo || 'N/A' }}</td>
+          <td>{{ usuario.persona?.telefono || usuario.telefono || 'N/A' }}</td>
+          <td>
+            <span class="estado-badge" [ngClass]="getEstadoClass(usuario)">
+              {{ getEstadoUsuario(usuario) }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-view" (click)="verUsuario(usuario)" title="Ver Usuario">
+                <img src="/img/ojo-abierto.png" alt="Ver" width="20" />
+              </button>
+              <button class="btn-edit" (click)="editarUsuario(usuario)" title="Editar Usuario">
+                <img src="/img/edicion.png" alt="Editar" class="btn-icon" />
+              </button>
+              <button class="btn-delete" (click)="eliminarUsuario(usuario)" title="Eliminar Usuario">
+                <img src="/img/eliminar.png" alt="Eliminar" class="btn-icon" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TABLA DE USUARIOS ELIMINADOS -->
+  <div class="table-container" *ngIf="showModalEliminados">
+    <h2>Usuarios Eliminados</h2>
+    
+    <div *ngIf="cargandoEliminados" class="loading">
+      <p>Cargando usuarios eliminados...</p>
+    </div>
+    
+    <div *ngIf="errorEliminados" class="error">
+      <p>Error al cargar usuarios eliminados. Intenta de nuevo.</p>
+    </div>
+    
+    <table *ngIf="!cargandoEliminados && !errorEliminados" class="usuarios-table">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Nombre Completo</th>
+          <th>Rol</th>
+          <th>Cédula</th>
+          <th>Correo</th>
+          <th>Fecha Eliminación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="usuariosEliminados.length === 0">
+          <td colspan="7" class="no-data">
+            <div class="no-data-content">
+              <p>No hay usuarios eliminados.</p>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let usuario of usuariosEliminados">
+          <td>
+            <strong>{{ usuario.username || 'N/A' }}</strong>
+          </td>
+          <td>{{ getNombreCompleto(usuario) }}</td>
+          <td>
+            <span class="rol-badge" [ngClass]="getRolUsuario(usuario).toLowerCase().replace(' ', '-')">
+              {{ getRolUsuario(usuario) }}
+            </span>
+          </td>
+          <td>{{ usuario.persona?.cedula || usuario.cedula || 'N/A' }}</td>
+          <td>{{ usuario.correo || 'N/A' }}</td>
+                     <td>{{ usuario.deleted_at || usuario.updated_at | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-view" (click)="verUsuario(usuario)" title="Ver Usuario">
+                <img src="/img/ojo-abierto.png" alt="Ver" width="20" />
+              </button>
+              <button class="btn-edit" (click)="editarUsuario(usuario)" title="Editar Usuario">
+                <img src="/img/edicion.png" alt="Editar" class="btn-icon" />
+              </button>
+              <button class="btn-restore" (click)="restaurarUsuario(usuario)" title="Restaurar Usuario">
+                <img src="/img/actualizar.png" alt="Restaurar" class="btn-icon" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- MODAL CREAR USUARIO -->
@@ -54,7 +245,7 @@
               <input formControlName="correo" placeholder="Correo" type="email" />
             </div>
             <div class="form-group">
-              <label>Teléfono *</label>
+              <label>Teléfono</label>
               <input formControlName="telefono" placeholder="Teléfono" />
             </div>
             <div class="form-group">
@@ -64,8 +255,83 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button type="submit" [disabled]="creando || usuarioForm.invalid" class="btn-generar-horario">Crear Usuario</button>
+          <button type="submit" [disabled]="creando || usuarioForm.invalid" class="btn-generar-horario">
+            {{ creando ? 'Creando...' : 'Crear Usuario' }}
+          </button>
           <button type="button" (click)="cancelarFormulario()" class="btn-resetear-horario">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR USUARIO -->
+<div class="modal-backdrop" *ngIf="showModalEditar">
+  <div class="modal-vista">
+    <div class="modal-header">
+      <h2 class="modal-title">Editar Usuario</h2>
+      <button class="btn-close" (click)="cerrarModalEditar()">×</button>
+    </div>
+    <div class="modal-content">
+      <form [formGroup]="editarForm" (ngSubmit)="guardarEdicion()">
+        <div class="modal-section">
+          <h3 class="section-title">Información del Usuario</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Rol</label>
+              <select formControlName="rolNombre">
+                <option value="">Mantener rol actual</option>
+                <option value="coordinador academico">Coordinador Académico</option>
+                <option value="talento humano">Talento Humano</option>
+                <option value="gerente">Gerente</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Primer Nombre</label>
+              <input formControlName="primer_nombre" placeholder="Primer Nombre" />
+            </div>
+            <div class="form-group">
+              <label>Segundo Nombre</label>
+              <input formControlName="segundo_nombre" placeholder="Segundo Nombre" />
+            </div>
+            <div class="form-group">
+              <label>Primer Apellido</label>
+              <input formControlName="primer_apellido" placeholder="Primer Apellido" />
+            </div>
+            <div class="form-group">
+              <label>Segundo Apellido</label>
+              <input formControlName="segundo_apellido" placeholder="Segundo Apellido" />
+            </div>
+            <div class="form-group">
+              <label>Cédula</label>
+              <input formControlName="cedula" placeholder="Cédula" />
+            </div>
+            <div class="form-group">
+              <label>Correo</label>
+              <input formControlName="correo" placeholder="Correo" type="email" />
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input formControlName="telefono" placeholder="Teléfono" />
+            </div>
+            <div class="form-group">
+              <label>Nueva Contraseña (opcional)</label>
+              <input formControlName="password" placeholder="Nueva contraseña" type="password" />
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <select formControlName="activo">
+                <option [value]="true">Activo</option>
+                <option [value]="false">Inactivo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" [disabled]="editando" class="btn-generar-horario">
+            {{ editando ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+          <button type="button" (click)="cerrarModalEditar()" class="btn-resetear-horario">Cancelar</button>
         </div>
       </form>
     </div>
@@ -86,31 +352,43 @@
           <table class="tabla-detalle-usuario">
             <tr>
               <th>Usuario</th>
-              <td>{{ usuarioSeleccionado.username }}</td>
+              <td>{{ usuarioSeleccionado.username || 'N/A' }}</td>
             </tr>
             <tr>
               <th>Rol</th>
-              <td>{{ usuarioSeleccionado.rol?.nombre }}</td>
+              <td>{{ getRolUsuario(usuarioSeleccionado) }}</td>
             </tr>
             <tr>
               <th>Nombre Completo</th>
-              <td>{{ usuarioSeleccionado.persona?.primer_nombre }} {{ usuarioSeleccionado.persona?.segundo_nombre }} {{ usuarioSeleccionado.persona?.primer_apellido }} {{ usuarioSeleccionado.persona?.segundo_apellido }}</td>
+              <td>{{ getNombreCompleto(usuarioSeleccionado) }}</td>
             </tr>
             <tr>
               <th>Cédula</th>
-              <td>{{ usuarioSeleccionado.persona?.cedula }}</td>
+              <td>{{ usuarioSeleccionado.persona?.cedula || usuarioSeleccionado.cedula || 'N/A' }}</td>
             </tr>
             <tr>
               <th>Correo</th>
-              <td>{{ usuarioSeleccionado.persona?.correo }}</td>
+              <td>{{ usuarioSeleccionado.correo || 'N/A' }}</td>
             </tr>
             <tr>
               <th>Teléfono</th>
-              <td>{{ usuarioSeleccionado.persona?.telefono }}</td>
+              <td>{{ usuarioSeleccionado.persona?.telefono || usuarioSeleccionado.telefono || 'N/A' }}</td>
             </tr>
             <tr>
-              <th>Activo</th>
-              <td><span [class.activo]="usuarioSeleccionado.activo">●</span> {{ usuarioSeleccionado.activo ? 'Sí' : 'No' }}</td>
+              <th>Estado</th>
+              <td>
+                <span class="estado-badge" [ngClass]="getEstadoClass(usuarioSeleccionado)">
+                  {{ getEstadoUsuario(usuarioSeleccionado) }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="usuarioSeleccionado.created_at">
+              <th>Fecha de Creación</th>
+              <td>{{ usuarioSeleccionado.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+            <tr *ngIf="usuarioSeleccionado.updated_at">
+              <th>Última Actualización</th>
+              <td>{{ usuarioSeleccionado.updated_at | date:'dd/MM/yyyy HH:mm' }}</td>
             </tr>
           </table>
         </div>
@@ -118,44 +396,3 @@
     </div>
   </div>
 </div>
-
-<div class="usuario-filtros">
-  <label>Filtrar por rol:</label>
-  <select [(ngModel)]="filtroRol" (change)="onFiltroRolChange()">
-    <option *ngFor="let rol of roles" [value]="rol.value">{{ rol.label }}</option>
-  </select>
-</div>
-
-<table class="tabla-estandar">
-  <thead>
-    <tr>
-      <th>Usuario</th>
-      <th>Rol</th>
-      <th>Nombre</th>
-      <th>Correo</th>
-      <th>Teléfono</th>
-      <th>Activo</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let usuario of usuariosFiltrados">
-      <td>{{ usuario.username }}</td>
-      <td>{{ usuario.rol?.nombre }}</td>
-      <td>
-        {{ usuario.persona?.primer_nombre }} {{ usuario.persona?.segundo_nombre }}
-        {{ usuario.persona?.primer_apellido }} {{ usuario.persona?.segundo_apellido }}
-      </td>
-      <td>{{ usuario.persona?.correo }}</td>
-      <td>{{ usuario.persona?.telefono }}</td>
-      <td>
-        <span [class.activo]="usuario.activo">●</span>
-      </td>
-      <td>
-        <button class="btn-ver" (click)="verUsuario(usuario)">
-          <img src="/img/ojo-abierto.png" alt="Ver" width="22" />
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>

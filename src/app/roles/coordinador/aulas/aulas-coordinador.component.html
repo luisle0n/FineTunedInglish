@@ -120,11 +120,11 @@
           
           <!-- Botón para cambiar vista -->
           <button class="btn-toggle-view" (click)="cambiarVistaAulas()">
-            {{ mostrarAulasEliminadas ? '🔄 Ver Aulas Activas' : '🗑️ Ver Aulas Eliminadas' }}
+            {{ mostrarAulasEliminadas ? 'Ver Aulas Activas' : 'Ver Aulas Eliminadas' }}
           </button>
           
           <!-- Botón agregar solo para aulas activas -->
-          <button *ngIf="!mostrarAulasEliminadas" class="btn-primary">
+          <button *ngIf="!mostrarAulasEliminadas" class="btn-primary" (click)="mostrarModalAgregarAula()" type="button">
             <img src="img/mas.png" alt="Agregar" class="btn-icon" />
             Agregar Aula
           </button>
@@ -143,7 +143,7 @@
           <div class="error-icon">⚠️</div>
           <h3>Error al cargar aulas eliminadas</h3>
           <p>No se pudieron cargar las aulas eliminadas. Por favor intente nuevamente.</p>
-          <button class="btn primary" (click)="cargarAulasEliminadas()">🔄 Reintentar</button>
+          <button class="btn primary" (click)="cargarAulasEliminadas()">Reintentar</button>
         </div>
 
         <!-- Tabla de aulas activas -->
@@ -550,6 +550,153 @@
                     class="btn-primary" 
                     [disabled]="!editForm.valid || guardando">
               {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR AULA -->
+  <div class="modal-backdrop" *ngIf="mostrarModalCrearAula" (click)="cerrarModalCrearAula()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Crear Nueva Aula</h3>
+        <button class="btn-close" (click)="cerrarModalCrearAula()">×</button>
+      </div>
+      
+      <div class="modal-content">
+        <form (ngSubmit)="crearAula()" #crearForm="ngForm">
+          
+          <!-- Información Básica -->
+          <div class="form-section">
+            <h4>Información Básica</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="numeroNuevo">Número de Aula *</label>
+                <input type="text" 
+                       id="numeroNuevo" 
+                       name="numeroNuevo"
+                       [(ngModel)]="nuevaAula.numero" 
+                       required
+                       class="form-control" />
+              </div>
+              
+              <div class="form-group">
+                <label for="ubicacionNuevo">Ubicación *</label>
+                <input type="text" 
+                       id="ubicacionNuevo" 
+                       name="ubicacionNuevo"
+                       [(ngModel)]="nuevaAula.ubicacion" 
+                       required
+                       class="form-control" />
+              </div>
+              
+              <div class="form-group">
+                <label for="pisoNuevo">Piso *</label>
+                <select id="pisoNuevo" 
+                        name="pisoNuevo"
+                        [(ngModel)]="nuevaAula.piso" 
+                        required
+                        class="form-control">
+                  <option value="">Selecciona un piso</option>
+                  <option value="Primer Piso">Primer Piso</option>
+                  <option value="Segundo Piso">Segundo Piso</option>
+                  <option value="Tercer Piso">Tercer Piso</option>
+                  <option value="Cuarto Piso">Cuarto Piso</option>
+                  <option value="Quinto Piso">Quinto Piso</option>
+                  <option value="Sexto Piso">Sexto Piso</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="capacidadNuevo">Capacidad *</label>
+                <input type="number" 
+                       id="capacidadNuevo" 
+                       name="capacidadNuevo"
+                       [(ngModel)]="nuevaAula.capacidad" 
+                       min="1"
+                       required
+                       class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tipo y Rango de Edad -->
+          <div class="form-section">
+            <h4>Tipo y Rango de Edad</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="tipo_aulaNuevo">Tipo de Aula *</label>
+                <select id="tipo_aulaNuevo" 
+                        name="tipo_aulaNuevo"
+                        [(ngModel)]="nuevaAula.tipo_aula" 
+                        required
+                        class="form-control">
+                  <option value="tiny_kids">Tiny Kids</option>
+                  <option value="children">Children</option>
+                  <option value="teens">Teens</option>
+                  <option value="adults">Adults</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="edad_minimaNuevo">Edad Mínima *</label>
+                <input type="number" 
+                       id="edad_minimaNuevo" 
+                       name="edad_minimaNuevo"
+                       [(ngModel)]="nuevaAula.edad_minima" 
+                       min="0"
+                       required
+                       class="form-control" />
+              </div>
+              
+              <div class="form-group">
+                <label for="edad_maximaNuevo">Edad Máxima *</label>
+                <input type="number" 
+                       id="edad_maximaNuevo" 
+                       name="edad_maximaNuevo"
+                       [(ngModel)]="nuevaAula.edad_maxima" 
+                       min="0"
+                       required
+                       class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Opciones Adicionales -->
+          <div class="form-section">
+            <h4>Opciones Adicionales</h4>
+            <div class="form-grid">
+                    <!-- Campo para_ninos removido ya que no existe en la base de datos -->
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="form-section">
+            <h4>Observaciones</h4>
+            <div class="form-group">
+              <label for="observacionesNuevo">Notas Adicionales</label>
+              <textarea id="observacionesNuevo" 
+                        name="observacionesNuevo"
+                        [(ngModel)]="nuevaAula.observaciones" 
+                        rows="3"
+                        class="form-control"
+                        placeholder="Descripción adicional del aula..."></textarea>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="form-actions">
+            <button type="button" 
+                    class="btn-secondary" 
+                    (click)="cerrarModalCrearAula()">
+              Cancelar
+            </button>
+            <button type="submit" 
+                    class="btn-primary" 
+                    [disabled]="!crearForm.valid || guardandoNuevaAula">
+              {{ guardandoNuevaAula ? 'Creando...' : 'Crear Aula' }}
             </button>
           </div>
         </form>

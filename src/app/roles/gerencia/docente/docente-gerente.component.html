@@ -15,8 +15,12 @@
     <div class="filter-group">
       <label for="filtroContrato">Tipo de Contrato</label>
       <select id="filtroContrato" [(ngModel)]="filtroContrato" (ngModelChange)="filtrarSegunVista()">
-        <option value="Todos">Todos</option>
-        <option *ngFor="let contrato of contratos" [value]="contrato.nombre">{{ contrato.nombre }}</option>
+        <option value="Todos">
+          <span class="tipo-badge" data-tipo="Todos">Todos</span>
+        </option>
+        <option *ngFor="let contrato of contratos" [value]="contrato.nombre">
+          <span class="tipo-badge" [attr.data-tipo]="contrato.nombre">{{ contrato.nombre }}</span>
+        </option>
       </select>
     </div>
     <div class="filter-group">
@@ -75,7 +79,11 @@
               {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{ docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
             </td>
             <td>{{ docente.persona?.telefono }}</td>
-            <td>{{ docente.tipo_contrato?.nombre }}</td>
+            <td>
+              <span class="tipo-badge" [attr.data-tipo]="docente.tipo_contrato?.nombre">
+                {{ docente.tipo_contrato?.nombre }}
+              </span>
+            </td>
             <td>{{ docente.experiencia_anios }}</td>
             <td>{{ docente.nivel_ingles?.nombre }}</td>
             <td>{{ docente.horas_disponibles }}</td>

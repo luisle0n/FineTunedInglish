@@ -1,14 +1,26 @@
 <main class="dashboard-content">
-    <!-- Header General -->
     <app-header></app-header>
 
+    <!-- BOTONES DE VISTA -->
+    <div class="view-toggle">
+        <button class="btn-view-toggle active-btn" [class.selected]="!mostrarInactivos" (click)="cambiarAVistaActivos()"
+            style="background-color: var(--primary-blue); color: var(--white); border: none; padding: 8px 16px; border-radius: 4px; margin-right: 8px;">
+            Docentes Activos
+        </button>
+        <button class="btn-view-toggle inactive-btn" [class.selected]="mostrarInactivos"
+            (click)="cambiarAVistaInactivos()"
+            style="background-color: var(--accent-red); color: var(--white); border: none; padding: 8px 16px; border-radius: 4px;">
+            Docentes Inactivos
+        </button>
+    </div>
+
     <!-- FILTROS -->
-    <!-- FILTROS -->
-    <section class="filters-card">
+    <div class="filters-card">
         <div class="filter-group">
             <label for="tipoContrato">Tipo de Contrato</label>
-            <select id="tipoContrato" [(ngModel)]="filtroContrato" (change)="filtrarDocentes()">
-                <option value="Todos">Todos</option>
+            <select id="tipoContrato" class="form-select" [(ngModel)]="filtroContrato"
+                (ngModelChange)="filtrarSegunVista()">
+                <option value="Todos">Todos los tipos de contrato</option>
                 <option *ngFor="let contrato of contratos" [value]="contrato.nombre">
                     {{ contrato.nombre }}
                 </option>
@@ -17,8 +29,9 @@
 
         <div class="filter-group">
             <label for="nivelIngles">Nivel de Inglés</label>
-            <select id="nivelIngles" [(ngModel)]="filtroNivelIngles" (change)="filtrarDocentes()">
-                <option value="Todos">Todos</option>
+            <select id="nivelIngles" class="form-select" [(ngModel)]="filtroNivelIngles"
+                (ngModelChange)="filtrarSegunVista()">
+                <option value="Todos">Todos los niveles</option>
                 <option *ngFor="let nivel of nivelesIngles" [value]="nivel.nombre">
                     {{ nivel.nombre }}
                 </option>
@@ -27,231 +40,142 @@
 
         <div class="filter-group">
             <label for="experiencia">Experiencia Mínima</label>
-            <input id="experiencia" 
-                   type="number" 
-                   [(ngModel)]="filtroExperiencia" 
-                   (input)="validarExperiencia($event)"
-                   (blur)="validarExperiencia($event)"
-                   min="0"
-                   placeholder="0" />
+            <input type="number" id="experiencia" class="form-control" [(ngModel)]="filtroExperiencia"
+                (input)="validarExperiencia($event)" (blur)="validarExperiencia($event)" min="0" placeholder="0" />
         </div>
 
-        <div class="filter-group acciones-filtros">
-            <label style="visibility: hidden;">Acciones</label>
+        <div class="acciones-filtros">
             <div class="botones-filtro">
-                <button class="btn primary" (click)="resetearFiltros()">Limpiar</button>
-                <label class="btn secondary cargar-excel-label">
-                    Cargar Excel
-                    <input type="file" hidden (change)="cargarDesdeExcel($event)" accept=".csv" />
+                <button class="btn-action" (click)="resetearFiltros()"
+                    style="background-color: var(--primary-blue); color: var(--white); border: none; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>Limpiar Filtros</span>
+                </button>
+                <label class="btn-action"
+                    style="background-color: var(--primary-blue); color: var(--white); border: none; padding: 8px 16px; border-radius: 4px; margin-left: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span>Cargar Excel</span>
+                    <input type="file" hidden (change)="cargarDesdeExcel($event)" accept=".csv,.xlsx,.xls" />
                 </label>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- LISTA DE DOCENTES -->
     <section class="docentes-section">
-        <div class="docentes-header">
-            <h2>{{ mostrarInactivos ? 'Lista de Docentes Inactivos' : 'Lista de Docentes Activos' }}</h2>
-            <div class="actions">
-                <input type="text" [(ngModel)]="textoBusqueda" (ngModelChange)="filtrarSegunVista()"
-                    placeholder="Buscar por nombre..." />
-                <button class="btn primary" (click)="abrirModal()">+ Agregar</button>
-                <div class="view-toggle">
-                    <button class="btn secondary" 
-                            [class.active]="!mostrarInactivos"
-                            (click)="cambiarAVistaActivos()">
-                         Docentes Activos
-                    </button>
-                    <button class="btn secondary" 
-                            [class.active]="mostrarInactivos"
-                            (click)="cambiarAVistaInactivos()">
-                         Docentes Inactivos
+        <div class="docentes-table-container">
+            <div class="table-header">
+                <h2>{{ mostrarInactivos ? 'Lista de Docentes Inactivos' : 'Lista de Docentes Activos' }}</h2>
+                <div class="actions">
+                    <input type="text" [(ngModel)]="textoBusqueda" (ngModelChange)="filtrarSegunVista()"
+                        placeholder="Buscar por nombre, teléfono o especialización..." />
+                    <button class="btn-action" (click)="abrirModal()"
+                        style="background-color: var(--primary-blue); color: var(--white); border: none; padding: 8px 16px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <span>+ Agregar</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <div class="docentes-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombres</th>
-                        <th>Teléfono</th>
-                        <th>Tipo Contrato</th>
-                        <th>Ex</th>
-                        <th>Nivel de Inglés</th>
-                        <th>Horas Disponibles</th>
-                        <th>Horas Asignadas</th>
-                        <th>Máx. Horas</th>
-                        <th>Especialización</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngIf="docentesPaginados.length === 0">
-                        <td colspan="10" class="no-data">
-                            <div class="no-data-content">
-                                <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con los filtros aplicados.</p>
-                                <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con los filtros aplicados.</p>
-                                <button class="btn secondary" (click)="resetearFiltros()">
-                                    Limpiar Filtros
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr *ngFor="let docente of docentesPaginados; let i = index">
-                        <td>
-                            {{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
-                            docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}
-                        </td>
-                        <td *ngIf="editIndex !== i">{{ docente.persona?.telefono }}</td>
-                        <td *ngIf="editIndex === i">
-                            <input [(ngModel)]="docente.editValues.telefono" />
-                        </td>
-                        <td *ngIf="editIndex !== i">{{ docente.tipo_contrato?.nombre }}</td>
-                        <td *ngIf="editIndex === i">
-                            <select [(ngModel)]="docente.editValues.tipo_contrato_id">
-                                <option *ngFor="let contrato of contratos" [value]="contrato.id">{{ contrato.nombre }}
-                                </option>
-                            </select>
-                        </td>
-                        <td *ngIf="editIndex !== i">{{ docente.experiencia_anios }}</td>
-                        <td *ngIf="editIndex === i">
-                            <input type="number" 
-                                   [(ngModel)]="docente.editValues.experiencia_anios" 
-                                   min="0"
-                                   (input)="validarExperienciaEdicion($event)"
-                                   (blur)="validarExperienciaEdicion($event)" />
-                        </td>
-                        <td *ngIf="editIndex !== i">{{ docente.nivel_ingles?.nombre }}</td>
-                        <td *ngIf="editIndex === i">
-                            <select [(ngModel)]="docente.editValues.nivel_ingles_id">
-                                <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">{{ nivel.nombre }}
-                                </option>
-                            </select>
-                        </td>
-                        <td *ngIf="editIndex !== i">{{ docente.horas_disponibles }}</td>
-                        <td *ngIf="editIndex === i">
-                            <input type="number" 
-                                   [(ngModel)]="docente.editValues.horas_disponibles" 
-                                   min="0"
-                                   (input)="validarHorasEdicion($event)"
-                                   (blur)="validarHorasEdicion($event)" />
-                        </td>
-                        <td *ngIf="editIndex !== i">{{ docente.horas_asignadas }}</td>
-                        <td *ngIf="editIndex === i">{{ docente.horas_asignadas }}</td>
-                        <td *ngIf="editIndex !== i">{{ docente.max_horas_semanales }}</td>
-                        <td *ngIf="editIndex === i">
-                            <input type="number" 
-                                   [(ngModel)]="docente.editValues.max_horas_semanales" 
-                                   min="0" />
-                        </td>
+            <div class="table-responsive">
+                <table class="docentes-table">
+                    <thead>
+                        <tr>
+                            <th>Nombres</th>
+                            <th>Teléfono</th>
+                            <th>Tipo Contrato</th>
+                            <th>Ex</th>
+                            <th>Nivel de Inglés</th>
+                            <th>Horas Disponibles</th>
+                            <th>Horas Asignadas</th>
+                            <th>Máx. Horas</th>
+                            <th>Especialización</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngIf="docentesPaginados.length === 0">
+                            <td colspan="10" class="no-data">
+                                <div class="no-data-content">
+                                    <p *ngIf="!mostrarInactivos">No se encontraron docentes activos que coincidan con
+                                        los filtros aplicados.</p>
+                                    <p *ngIf="mostrarInactivos">No se encontraron docentes inactivos que coincidan con
+                                        los filtros aplicados.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr *ngFor="let docente of docentesPaginados; let i = index">
+                            <td>
+                                <strong>{{ docente.persona?.primer_nombre }} {{ docente.persona?.segundo_nombre }} {{
+                                    docente.persona?.primer_apellido }} {{ docente.persona?.segundo_apellido }}</strong>
+                            </td>
+                            <td>{{ docente.persona?.telefono }}</td>
+                            <td>
+                                <span class="tipo-badge" [attr.data-tipo]="docente.tipo_contrato?.nombre">
+                                    {{ docente.tipo_contrato?.nombre }}
+                                </span>
+                            </td>
+                            <td>{{ docente.experiencia_anios }}</td>
+                            <td>
+                                <span class="nivel-badge">{{ docente.nivel_ingles?.nombre }}</span>
+                            </td>
+                            <td>{{ docente.horas_disponibles }}</td>
+                            <td>{{ docente.horas_asignadas }}</td>
+                            <td>{{ docente.max_horas_semanales }}</td>
+                            <td>
+                                <div class="especializaciones-list">
+                                    <span *ngFor="let e of docente.especializaciones" class="especializacion-tag">
+                                        {{ e.especializacion?.nombre }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" (click)="verDocente(i)" title="Ver Docente">
+                                        <img src="img/ojo-abierto.png" alt="Ver" width="16"
+                                            style="color: var(--primary-blue);" />
+                                    </button>
+                                    <button class="btn-icon" (click)="editarFila(i)" title="Editar Docente">
+                                        <img src="img/edicion.png" alt="Editar" width="16" style="color: #4CAF50;" />
+                                    </button>
+                                    <button *ngIf="!mostrarInactivos" class="btn-icon" (click)="eliminarFila(i)"
+                                        title="Eliminar Docente">
+                                        <img src="img/eliminar.png" alt="Eliminar" width="16"
+                                            style="color: var(--accent-red);" />
+                                    </button>
+                                    <button *ngIf="mostrarInactivos" class="btn-icon" (click)="reactivarDocente(i)"
+                                        title="Reactivar Docente">
+                                        <img src="img/reactivado.png" alt="Reactivar" width="16"
+                                            style="color: #FFC107;" />
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-                        <td *ngIf="editIndex !== i">
-                            <span *ngFor="let e of docente.especializaciones">{{ e.especializacion?.nombre
-                                }}<br /></span>
-                        </td>
-                        <td *ngIf="editIndex === i">
-                            <div style="display: flex; flex-direction: column;">
-                                <label *ngFor="let espec of especializaciones"
-                                    style="display: flex; align-items: center;">
-                                    <input type="checkbox" [value]="espec.id"
-                                        [checked]="docente.editValues.especializaciones?.includes(espec.id)"
-                                        (change)="toggleEspecializacionEditar(docente, espec.id, $event)" />
-                                    {{ espec.nombre }}
-                                </label>
-                            </div>
-                        </td>
-                        <td>
-                            <ng-container *ngIf="editIndex !== i">
-                                <button (click)="editarFila(i)">
-                                    <img src="img/edicion.png" alt="Editar" width="20" />
-                                </button>
-                                <!-- Botón de eliminar solo para docentes activos -->
-                                <button *ngIf="!mostrarInactivos" (click)="eliminarFila(i)">
-                                    <img src="img/eliminar.png" alt="Eliminar" width="20" />
-                                </button>
-                                <!-- Botón de reactivar solo para docentes inactivos -->
-                                <button *ngIf="mostrarInactivos" (click)="reactivarDocente(i)">
-                                    <img src="img/reactivado.png" alt="Reactivar" width="20" />
-                                </button>
-                                <button (click)="verDocente(i)">
-                                    <img src="img/ojo-abierto.png" alt="Ver" width="20" />
-                                </button>    
-                            </ng-container>
-                            <ng-container *ngIf="editIndex === i">
-                                <button (click)="guardarFila(i)">
-                                    <img src="img/salvar.png" alt="Guardar" width="20" />
-                                </button>
-                                <button (click)="cancelarEdicion()">
-                                    <img src="img/error.png" alt="Cancelar" width="20" />
-                                </button>
-                            </ng-container>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <!-- CONTROLES DE PAGINACIÓN -->
-            <div class="paginacion-container" *ngIf="(mostrarInactivos ? docentesInactivosFiltrados.length : docentesFiltrados.length) > 0">
-                <div class="paginacion-info">
-                    <span class="info-text">
-                        Mostrando {{ obtenerRangoPagina().inicio }}-{{ obtenerRangoPagina().fin }} de {{ obtenerRangoPagina().total }} docentes
-                    </span>
+            <!-- PAGINACIÓN -->
+            <div class="pagination" *ngIf="totalPaginas > 1">
+                <div class="pagination-info">
+                    <span>Mostrando {{ obtenerRangoPagina().inicio }} - {{ obtenerRangoPagina().fin }} de {{
+                        obtenerRangoPagina().total }} docentes</span>
                 </div>
-                
-                <div class="paginacion-controls">
-                    <div class="items-por-pagina">
-                        <label for="itemsPorPagina">Mostrar:</label>
-                        <select id="itemsPorPagina" 
-                                [value]="docentesPorPagina" 
-                                (change)="onItemsPorPaginaChange($event)">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                        <span>por página</span>
-                    </div>
-                    
-                    <div class="navegacion-paginas">
-                        <button class="btn-pagina" 
-                                [disabled]="paginaActual === 1"
-                                (click)="cambiarPagina(1)"
-                                title="Primera página">
-                            <span>«</span>
-                        </button>
-                        
-                        <button class="btn-pagina" 
-                                [disabled]="paginaActual === 1"
-                                (click)="cambiarPagina(paginaActual - 1)"
-                                title="Página anterior">
-                            <span>‹</span>
-                        </button>
-                        
-                        <div class="paginas-numeros">
-                            <button *ngFor="let pagina of obtenerPaginasVisibles()" 
-                                    class="btn-pagina numero"
-                                    [class.activa]="pagina === paginaActual"
-                                    (click)="cambiarPagina(pagina)">
-                                {{ pagina }}
-                            </button>
-                        </div>
-                        
-                        <button class="btn-pagina" 
-                                [disabled]="paginaActual === totalPaginas"
-                                (click)="cambiarPagina(paginaActual + 1)"
-                                title="Página siguiente">
-                            <span>›</span>
-                        </button>
-                        
-                        <button class="btn-pagina" 
-                                [disabled]="paginaActual === totalPaginas"
-                                (click)="cambiarPagina(totalPaginas)"
-                                title="Última página">
-                            <span>»</span>
+
+                <div class="pagination-controls">
+                    <button class="btn-pagination" [disabled]="paginaActual === 1"
+                        (click)="cambiarPagina(paginaActual - 1)">
+                        ← Anterior
+                    </button>
+
+                    <div class="page-numbers">
+                        <button *ngFor="let pagina of obtenerPaginasVisibles()" class="btn-page"
+                            [class.active]="pagina === paginaActual" (click)="cambiarPagina(pagina)">
+                            {{ pagina }}
                         </button>
                     </div>
+
+                    <button class="btn-pagination" [disabled]="paginaActual === totalPaginas"
+                        (click)="cambiarPagina(paginaActual + 1)">
+                        Siguiente →
+                    </button>
                 </div>
             </div>
         </div>
@@ -265,166 +189,107 @@
                 <!-- DATOS DEL DOCENTE -->
                 <div class="datos-docente-section">
                     <h4 class="section-title">Datos del Docente</h4>
-                    
+
                     <!-- Información Personal -->
                     <div class="form-section">
                         <h5 class="subsection-title">Información Personal</h5>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="primer_nombre">Primer Nombre *</label>
-                                <input 
-                                    id="primer_nombre"
-                                    type="text" 
-                                    [(ngModel)]="nuevoDocente.primer_nombre" 
-                                    name="primer_nombre" 
-                                    required 
-                                    placeholder="Ingrese el primer nombre" />
+                                <input id="primer_nombre" type="text" [(ngModel)]="nuevoDocente.primer_nombre"
+                                    name="primer_nombre" required placeholder="Ingrese el primer nombre" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="segundo_nombre">Segundo Nombre</label>
-                                <input 
-                                    id="segundo_nombre"
-                                    type="text" 
-                                    [(ngModel)]="nuevoDocente.segundo_nombre" 
-                                    name="segundo_nombre" 
-                                    placeholder="Ingrese el segundo nombre" />
+                                <input id="segundo_nombre" type="text" [(ngModel)]="nuevoDocente.segundo_nombre"
+                                    name="segundo_nombre" placeholder="Ingrese el segundo nombre" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="primer_apellido">Primer Apellido *</label>
-                                <input 
-                                    id="primer_apellido"
-                                    type="text" 
-                                    [(ngModel)]="nuevoDocente.primer_apellido" 
-                                    name="primer_apellido" 
-                                    required 
-                                    placeholder="Ingrese el primer apellido" />
+                                <input id="primer_apellido" type="text" [(ngModel)]="nuevoDocente.primer_apellido"
+                                    name="primer_apellido" required placeholder="Ingrese el primer apellido" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="segundo_apellido">Segundo Apellido</label>
-                                <input 
-                                    id="segundo_apellido"
-                                    type="text" 
-                                    [(ngModel)]="nuevoDocente.segundo_apellido" 
-                                    name="segundo_apellido" 
-                                    placeholder="Ingrese el segundo apellido" />
+                                <input id="segundo_apellido" type="text" [(ngModel)]="nuevoDocente.segundo_apellido"
+                                    name="segundo_apellido" placeholder="Ingrese el segundo apellido" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="cedula">Cédula *</label>
-                                <input 
-                                    id="cedula"
-                                    type="text" 
-                                    [(ngModel)]="nuevoDocente.cedula" 
-                                    name="cedula" 
-                                    required 
+                                <input id="cedula" type="text" [(ngModel)]="nuevoDocente.cedula" name="cedula" required
                                     placeholder="Ingrese la cédula" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="correo">Correo Electrónico *</label>
-                                <input 
-                                    id="correo"
-                                    type="email" 
-                                    [(ngModel)]="nuevoDocente.correo" 
-                                    name="correo" 
-                                    required 
+                                <input id="correo" type="email" [(ngModel)]="nuevoDocente.correo" name="correo" required
                                     placeholder="ejemplo@email.com" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="telefono">Teléfono *</label>
-                                <input 
-                                    id="telefono"
-                                    type="tel" 
-                                    [(ngModel)]="nuevoDocente.telefono" 
-                                    name="telefono" 
-                                    required 
-                                    placeholder="0991234567" />
+                                <input id="telefono" type="tel" [(ngModel)]="nuevoDocente.telefono" name="telefono"
+                                    required placeholder="0991234567" />
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Información Profesional -->
                     <div class="form-section">
                         <h5 class="subsection-title">Información Profesional</h5>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="tipo_contrato">Tipo de Contrato *</label>
-                                <select 
-                                    id="tipo_contrato"
-                                    [(ngModel)]="nuevoDocente.tipo_contrato_id" 
-                                    name="tipo_contrato_id" 
-                                    required>
+                                <select id="tipo_contrato" [(ngModel)]="nuevoDocente.tipo_contrato_id"
+                                    name="tipo_contrato_id" required>
                                     <option value="" disabled selected>Seleccione un tipo de contrato</option>
                                     <option *ngFor="let contrato of contratos" [value]="contrato.id">
                                         {{ contrato.nombre }}
                                     </option>
                                 </select>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="experiencia_anios">Experiencia (años) *</label>
-                                <input 
-                                    id="experiencia_anios"
-                                    type="number" 
-                                    [(ngModel)]="nuevoDocente.experiencia_anios" 
-                                    name="experiencia_anios" 
-                                    required 
-                                    min="0"
-                                    (input)="validarExperienciaModal($event)"
-                                    (blur)="validarExperienciaModal($event)"
-                                    placeholder="0" />
+                                <input id="experiencia_anios" type="number" [(ngModel)]="nuevoDocente.experiencia_anios"
+                                    name="experiencia_anios" required min="0" (input)="validarExperienciaModal($event)"
+                                    (blur)="validarExperienciaModal($event)" placeholder="0" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="nivel_ingles">Nivel de Inglés *</label>
-                                <select 
-                                    id="nivel_ingles"
-                                    [(ngModel)]="nuevoDocente.nivel_ingles_id" 
-                                    name="nivel_ingles_id" 
-                                    required>
+                                <select id="nivel_ingles" [(ngModel)]="nuevoDocente.nivel_ingles_id"
+                                    name="nivel_ingles_id" required>
                                     <option value="" disabled selected>Seleccione el nivel de inglés</option>
                                     <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">
                                         {{ nivel.nombre }}
                                     </option>
                                 </select>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="horas_disponibles">Horas Disponibles *</label>
-                                <input 
-                                    id="horas_disponibles"
-                                    type="number" 
-                                    [(ngModel)]="nuevoDocente.horas_disponibles" 
-                                    name="horas_disponibles" 
-                                    required 
-                                    min="0"
-                                    (input)="validarHorasModal($event)"
-                                    (blur)="validarHorasModal($event)"
-                                    placeholder="0" />
+                                <input id="horas_disponibles" type="number" [(ngModel)]="nuevoDocente.horas_disponibles"
+                                    name="horas_disponibles" required min="0" (input)="validarHorasModal($event)"
+                                    (blur)="validarHorasModal($event)" placeholder="0" />
                             </div>
-                            
 
-                            
+
+
                             <div class="form-group">
                                 <label for="max_horas_semanales">Máximo Horas Semanales</label>
-                                <input 
-                                    id="max_horas_semanales"
-                                    type="number" 
-                                    [(ngModel)]="nuevoDocente.max_horas_semanales" 
-                                    name="max_horas_semanales" 
-                                    min="0"
+                                <input id="max_horas_semanales" type="number"
+                                    [(ngModel)]="nuevoDocente.max_horas_semanales" name="max_horas_semanales" min="0"
                                     placeholder="30" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="puede_dar_sabados">Puede dar Sábados</label>
-                                <select 
-                                    id="puede_dar_sabados"
-                                    [(ngModel)]="nuevoDocente.puede_dar_sabados" 
+                                <select id="puede_dar_sabados" [(ngModel)]="nuevoDocente.puede_dar_sabados"
                                     name="puede_dar_sabados">
                                     <option [value]="true">Sí</option>
                                     <option [value]="false">No</option>
@@ -432,7 +297,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Especializaciones -->
                     <div class="form-section">
                         <h5 class="subsection-title">Especializaciones</h5>
@@ -440,9 +305,7 @@
                             <div class="especializaciones-grid">
                                 <div class="especializacion-item" *ngFor="let espec of especializaciones">
                                     <label class="checkbox-container">
-                                        <input 
-                                            type="checkbox" 
-                                            [value]="espec.id"
+                                        <input type="checkbox" [value]="espec.id"
                                             (change)="toggleEspecializacion(espec.id, $event)" />
                                         <span class="checkmark"></span>
                                         <span class="especializacion-label">{{ espec.nombre }}</span>
@@ -451,7 +314,8 @@
                             </div>
                             <div class="especializaciones-summary" *ngIf="nuevoDocente.especializaciones.length > 0">
                                 <p class="summary-text">
-                                    <strong>{{ nuevoDocente.especializaciones.length }}</strong> especialización(es) seleccionada(s)
+                                    <strong>{{ nuevoDocente.especializaciones.length }}</strong> especialización(es)
+                                    seleccionada(s)
                                 </p>
                             </div>
                         </div>
@@ -466,10 +330,9 @@
                             <thead>
                                 <tr>
                                     <th class="checkbox-header">
-                                        <input type="checkbox" 
-                                               (change)="toggleAllHorarios($event)"
-                                               [checked]="areAllHorariosSelected()"
-                                               [indeterminate]="areSomeHorariosSelected()" />
+                                        <input type="checkbox" (change)="toggleAllHorarios($event)"
+                                            [checked]="areAllHorariosSelected()"
+                                            [indeterminate]="areSomeHorariosSelected()" />
                                     </th>
                                     <th>Día</th>
                                     <th>Hora Inicio</th>
@@ -478,28 +341,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let horario of horariosDisponibles; let i = index" 
-                                    [class.selected]="isHorarioSelected(horario.id)"
-                                    [class.even]="i % 2 === 0">
+                                <tr *ngFor="let horario of horariosDisponibles; let i = index"
+                                    [class.selected]="isHorarioSelected(horario.id)" [class.even]="i % 2 === 0">
                                     <td class="checkbox-cell">
-                                        <input type="checkbox" 
-                                               [value]="horario.id"
-                                               [checked]="isHorarioSelected(horario.id)"
-                                               (change)="toggleHorario(horario.id, $event)" />
+                                        <input type="checkbox" [value]="horario.id"
+                                            [checked]="isHorarioSelected(horario.id)"
+                                            (change)="toggleHorario(horario.id, $event)" />
                                     </td>
                                     <td class="dia-cell">{{ horario.dia }}</td>
                                     <td class="hora-cell">{{ formatTime(horario.hora_inicio) }}</td>
                                     <td class="hora-cell">{{ formatTime(horario.hora_fin) }}</td>
                                     <td class="estado-cell">
-                                        <span class="estado-badge" 
-                                              [class.selected]="isHorarioSelected(horario.id)">
+                                        <span class="estado-badge" [class.selected]="isHorarioSelected(horario.id)">
                                             {{ isHorarioSelected(horario.id) ? 'Seleccionado' : 'Disponible' }}
                                         </span>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        
+
                         <div class="horarios-summary" *ngIf="getSelectedHorariosCount() > 0">
                             <p class="summary-text">
                                 <strong>{{ getSelectedHorariosCount() }}</strong> horario(s) seleccionado(s)
@@ -521,11 +381,12 @@
     <div class="modal-backdrop" *ngIf="mostrarModalConfirmacion">
         <div class="modal confirmacion-modal">
             <h3>Confirmar Carga de Docentes</h3>
-            
+
             <div class="confirmacion-content">
                 <div class="confirmacion-info">
                     <p class="info-text">
-                        Se van a cargar <strong>{{ docentesPendientes.length }}</strong> docente(s) desde el archivo Excel.
+                        Se van a cargar <strong>{{ docentesPendientes.length }}</strong> docente(s) desde el archivo
+                        Excel.
                     </p>
                     <p class="warning-text">
                         ⚠️ Esta acción no se puede deshacer. Verifica que los datos sean correctos antes de continuar.
@@ -549,9 +410,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let docente of docentesPendientes; let i = index" [class.even]="i % 2 === 0">
+                                <tr *ngFor="let docente of docentesPendientes; let i = index"
+                                    [class.even]="i % 2 === 0">
                                     <td>
-                                        {{ docente.primer_nombre }} {{ docente.segundo_nombre }} 
+                                        {{ docente.primer_nombre }} {{ docente.segundo_nombre }}
                                         {{ docente.primer_apellido }} {{ docente.segundo_apellido }}
                                     </td>
                                     <td>{{ docente.cedula }}</td>
@@ -586,7 +448,7 @@
                 <h3>{{ modoEdicionVista ? 'Editar Docente' : 'Información Detallada del Docente' }}</h3>
                 <button class="btn-close" (click)="cerrarModalVista()">×</button>
             </div>
-            
+
             <!-- MODO VISTA -->
             <div class="vista-docente-content" *ngIf="docenteSeleccionado && !modoEdicionVista">
                 <!-- Información Personal -->
@@ -595,7 +457,10 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <label>Nombre Completo:</label>
-                            <span>{{ docenteSeleccionado.persona?.primer_nombre }} {{ docenteSeleccionado.persona?.segundo_nombre }} {{ docenteSeleccionado.persona?.primer_apellido }} {{ docenteSeleccionado.persona?.segundo_apellido }}</span>
+                            <span>{{ docenteSeleccionado.persona?.primer_nombre }} {{
+                                docenteSeleccionado.persona?.segundo_nombre }} {{
+                                docenteSeleccionado.persona?.primer_apellido }} {{
+                                docenteSeleccionado.persona?.segundo_apellido }}</span>
                         </div>
                         <div class="info-item">
                             <label>Cédula:</label>
@@ -628,7 +493,7 @@
                             <label>Nivel de Inglés:</label>
                             <span>{{ docenteSeleccionado.nivel_ingles?.nombre }}</span>
                         </div>
-                                                <div class="info-item">
+                        <div class="info-item">
                             <label>Horas Disponibles:</label>
                             <span>{{ docenteSeleccionado.horas_disponibles }} horas</span>
                         </div>
@@ -642,7 +507,8 @@
                         </div>
                         <div class="info-item">
                             <label>Puede dar Sábados:</label>
-                            <span class="badge" [ngClass]="docenteSeleccionado.puede_dar_sabados ? 'badge-si' : 'badge-no'">
+                            <span class="badge"
+                                [ngClass]="docenteSeleccionado.puede_dar_sabados ? 'badge-si' : 'badge-no'">
                                 {{ docenteSeleccionado.puede_dar_sabados ? 'Sí' : 'No' }}
                             </span>
                         </div>
@@ -671,7 +537,8 @@
                     <div class="horarios-list">
                         <div class="horario-item" *ngFor="let horario of docenteSeleccionado.horarios">
                             <span class="dia">{{ horario.horario?.dia }}</span>
-                            <span class="horario">{{ formatTime(horario.horario?.hora_inicio) }} - {{ formatTime(horario.horario?.hora_fin) }}</span>
+                            <span class="horario">{{ formatTime(horario.horario?.hora_inicio) }} - {{
+                                formatTime(horario.horario?.hora_fin) }}</span>
                         </div>
                     </div>
                 </div>
@@ -686,180 +553,120 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="primer_nombre_vista">Primer Nombre *</label>
-                                <input 
-                                    id="primer_nombre_vista"
-                                    type="text" 
-                                    [(ngModel)]="docenteEdicionVista.primer_nombre" 
-                                    name="primer_nombre_vista" 
-                                    required 
+                                <input id="primer_nombre_vista" type="text"
+                                    [(ngModel)]="docenteEdicionVista.primer_nombre" name="primer_nombre_vista" required
                                     placeholder="Ingrese el primer nombre" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="segundo_nombre_vista">Segundo Nombre</label>
-                                <input 
-                                    id="segundo_nombre_vista"
-                                    type="text" 
-                                    [(ngModel)]="docenteEdicionVista.segundo_nombre" 
-                                    name="segundo_nombre_vista" 
+                                <input id="segundo_nombre_vista" type="text"
+                                    [(ngModel)]="docenteEdicionVista.segundo_nombre" name="segundo_nombre_vista"
                                     placeholder="Ingrese el segundo nombre" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="primer_apellido_vista">Primer Apellido *</label>
-                                <input 
-                                    id="primer_apellido_vista"
-                                    type="text" 
-                                    [(ngModel)]="docenteEdicionVista.primer_apellido" 
-                                    name="primer_apellido_vista" 
-                                    required 
-                                    placeholder="Ingrese el primer apellido" />
+                                <input id="primer_apellido_vista" type="text"
+                                    [(ngModel)]="docenteEdicionVista.primer_apellido" name="primer_apellido_vista"
+                                    required placeholder="Ingrese el primer apellido" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="segundo_apellido_vista">Segundo Apellido</label>
-                                <input 
-                                    id="segundo_apellido_vista"
-                                    type="text" 
-                                    [(ngModel)]="docenteEdicionVista.segundo_apellido" 
-                                    name="segundo_apellido_vista" 
+                                <input id="segundo_apellido_vista" type="text"
+                                    [(ngModel)]="docenteEdicionVista.segundo_apellido" name="segundo_apellido_vista"
                                     placeholder="Ingrese el segundo apellido" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="cedula_vista">Cédula *</label>
-                                <input 
-                                    id="cedula_vista"
-                                    type="text" 
-                                    [(ngModel)]="docenteEdicionVista.cedula" 
-                                    name="cedula_vista" 
-                                    required 
-                                    placeholder="Ingrese la cédula" />
+                                <input id="cedula_vista" type="text" [(ngModel)]="docenteEdicionVista.cedula"
+                                    name="cedula_vista" required placeholder="Ingrese la cédula" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="correo_vista">Correo Electrónico *</label>
-                                <input 
-                                    id="correo_vista"
-                                    type="email" 
-                                    [(ngModel)]="docenteEdicionVista.correo" 
-                                    name="correo_vista" 
-                                    required 
-                                    placeholder="ejemplo@email.com" />
+                                <input id="correo_vista" type="email" [(ngModel)]="docenteEdicionVista.correo"
+                                    name="correo_vista" required placeholder="ejemplo@email.com" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="telefono_vista">Teléfono *</label>
-                                <input 
-                                    id="telefono_vista"
-                                    type="tel" 
-                                    [(ngModel)]="docenteEdicionVista.telefono" 
-                                    name="telefono_vista" 
-                                    required 
-                                    placeholder="0991234567" />
+                                <input id="telefono_vista" type="tel" [(ngModel)]="docenteEdicionVista.telefono"
+                                    name="telefono_vista" required placeholder="0991234567" />
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Información Profesional -->
                     <div class="info-section">
                         <h4 class="section-title">Información Profesional</h4>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="tipo_contrato_vista">Tipo de Contrato *</label>
-                                <select 
-                                    id="tipo_contrato_vista"
-                                    [(ngModel)]="docenteEdicionVista.tipo_contrato_id" 
-                                    name="tipo_contrato_vista" 
-                                    required>
+                                <select id="tipo_contrato_vista" [(ngModel)]="docenteEdicionVista.tipo_contrato_id"
+                                    name="tipo_contrato_vista" required>
                                     <option value="" disabled selected>Seleccione un tipo de contrato</option>
                                     <option *ngFor="let contrato of contratos" [value]="contrato.id">
                                         {{ contrato.nombre }}
                                     </option>
                                 </select>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="experiencia_anios_vista">Experiencia (años) *</label>
-                                <input 
-                                    id="experiencia_anios_vista"
-                                    type="number" 
-                                    [(ngModel)]="docenteEdicionVista.experiencia_anios" 
-                                    name="experiencia_anios_vista" 
-                                    required 
-                                    min="0"
-                                    (input)="validarExperienciaVista($event)"
-                                    (blur)="validarExperienciaVista($event)"
-                                    placeholder="0" />
+                                <input id="experiencia_anios_vista" type="number"
+                                    [(ngModel)]="docenteEdicionVista.experiencia_anios" name="experiencia_anios_vista"
+                                    required min="0" (input)="validarExperienciaVista($event)"
+                                    (blur)="validarExperienciaVista($event)" placeholder="0" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="nivel_ingles_vista">Nivel de Inglés *</label>
-                                <select 
-                                    id="nivel_ingles_vista"
-                                    [(ngModel)]="docenteEdicionVista.nivel_ingles_id" 
-                                    name="nivel_ingles_vista" 
-                                    required>
+                                <select id="nivel_ingles_vista" [(ngModel)]="docenteEdicionVista.nivel_ingles_id"
+                                    name="nivel_ingles_vista" required>
                                     <option value="" disabled selected>Seleccione el nivel de inglés</option>
                                     <option *ngFor="let nivel of nivelesIngles" [value]="nivel.id">
                                         {{ nivel.nombre }}
                                     </option>
                                 </select>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="horas_disponibles_vista">Horas Disponibles *</label>
-                                <input 
-                                    id="horas_disponibles_vista"
-                                    type="number" 
-                                    [(ngModel)]="docenteEdicionVista.horas_disponibles" 
-                                    name="horas_disponibles_vista" 
-                                    required 
-                                    min="0"
-                                    (input)="validarHorasVista($event)"
-                                    (blur)="validarHorasVista($event)"
-                                    placeholder="0" />
+                                <input id="horas_disponibles_vista" type="number"
+                                    [(ngModel)]="docenteEdicionVista.horas_disponibles" name="horas_disponibles_vista"
+                                    required min="0" (input)="validarHorasVista($event)"
+                                    (blur)="validarHorasVista($event)" placeholder="0" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="horas_asignadas_vista">Horas Asignadas</label>
-                                <input 
-                                    id="horas_asignadas_vista"
-                                    type="number" 
-                                    [value]="docenteSeleccionado.horas_asignadas" 
-                                    name="horas_asignadas_vista" 
-                                    readonly
+                                <input id="horas_asignadas_vista" type="number"
+                                    [value]="docenteSeleccionado.horas_asignadas" name="horas_asignadas_vista" readonly
                                     placeholder="0" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="max_horas_semanales_vista">Máximo Horas Semanales</label>
-                                <input 
-                                    id="max_horas_semanales_vista"
-                                    type="number" 
-                                    [(ngModel)]="docenteEdicionVista.max_horas_semanales" 
-                                    name="max_horas_semanales_vista" 
-                                    min="0"
-                                    placeholder="30" />
+                                <input id="max_horas_semanales_vista" type="number"
+                                    [(ngModel)]="docenteEdicionVista.max_horas_semanales"
+                                    name="max_horas_semanales_vista" min="0" placeholder="30" />
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="puede_dar_sabados_vista">Puede dar Sábados</label>
-                                <select 
-                                    id="puede_dar_sabados_vista"
-                                    [(ngModel)]="docenteEdicionVista.puede_dar_sabados" 
+                                <select id="puede_dar_sabados_vista" [(ngModel)]="docenteEdicionVista.puede_dar_sabados"
                                     name="puede_dar_sabados_vista">
                                     <option [value]="true">Sí</option>
                                     <option [value]="false">No</option>
                                 </select>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="estado_vista">Estado *</label>
-                                <select 
-                                    id="estado_vista"
-                                    [(ngModel)]="docenteEdicionVista.activo" 
-                                    name="estado_vista" 
+                                <select id="estado_vista" [(ngModel)]="docenteEdicionVista.activo" name="estado_vista"
                                     required>
                                     <option [value]="true">Activo</option>
                                     <option [value]="false">Inactivo</option>
@@ -867,7 +674,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Especializaciones -->
                     <div class="info-section">
                         <h4 class="section-title">Especializaciones</h4>
@@ -875,9 +682,7 @@
                             <div class="especializaciones-grid">
                                 <div class="especializacion-item" *ngFor="let espec of especializaciones">
                                     <label class="checkbox-container">
-                                        <input 
-                                            type="checkbox" 
-                                            [value]="espec.id"
+                                        <input type="checkbox" [value]="espec.id"
                                             [checked]="docenteEdicionVista.especializaciones.includes(espec.id)"
                                             (change)="toggleEspecializacionVista(espec.id, $event)" />
                                         <span class="checkmark"></span>
@@ -885,9 +690,11 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="especializaciones-summary" *ngIf="docenteEdicionVista.especializaciones.length > 0">
+                            <div class="especializaciones-summary"
+                                *ngIf="docenteEdicionVista.especializaciones.length > 0">
                                 <p class="summary-text">
-                                    <strong>{{ docenteEdicionVista.especializaciones.length }}</strong> especialización(es) seleccionada(s)
+                                    <strong>{{ docenteEdicionVista.especializaciones.length }}</strong>
+                                    especialización(es) seleccionada(s)
                                 </p>
                             </div>
                         </div>
@@ -901,10 +708,9 @@
                                 <thead>
                                     <tr>
                                         <th class="checkbox-header">
-                                            <input type="checkbox" 
-                                                   (change)="toggleAllHorariosVista($event)"
-                                                   [checked]="areAllHorariosSelectedVista()"
-                                                   [indeterminate]="areSomeHorariosSelectedVista()" />
+                                            <input type="checkbox" (change)="toggleAllHorariosVista($event)"
+                                                [checked]="areAllHorariosSelectedVista()"
+                                                [indeterminate]="areSomeHorariosSelectedVista()" />
                                         </th>
                                         <th>Día</th>
                                         <th>Hora Inicio</th>
@@ -913,28 +719,27 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let horario of horariosDisponibles; let i = index" 
+                                    <tr *ngFor="let horario of horariosDisponibles; let i = index"
                                         [class.selected]="isHorarioSelectedVista(horario.id)"
                                         [class.even]="i % 2 === 0">
                                         <td class="checkbox-cell">
-                                            <input type="checkbox" 
-                                                   [value]="horario.id"
-                                                   [checked]="isHorarioSelectedVista(horario.id)"
-                                                   (change)="toggleHorarioVista(horario.id, $event)" />
+                                            <input type="checkbox" [value]="horario.id"
+                                                [checked]="isHorarioSelectedVista(horario.id)"
+                                                (change)="toggleHorarioVista(horario.id, $event)" />
                                         </td>
                                         <td class="dia-cell">{{ horario.dia }}</td>
                                         <td class="hora-cell">{{ formatTime(horario.hora_inicio) }}</td>
                                         <td class="hora-cell">{{ formatTime(horario.hora_fin) }}</td>
                                         <td class="estado-cell">
-                                            <span class="estado-badge" 
-                                                  [class.selected]="isHorarioSelectedVista(horario.id)">
+                                            <span class="estado-badge"
+                                                [class.selected]="isHorarioSelectedVista(horario.id)">
                                                 {{ isHorarioSelectedVista(horario.id) ? 'Seleccionado' : 'Disponible' }}
                                             </span>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            
+
                             <div class="horarios-summary" *ngIf="getSelectedHorariosCountVista() > 0">
                                 <p class="summary-text">
                                     <strong>{{ getSelectedHorariosCountVista() }}</strong> horario(s) seleccionado(s)
@@ -954,7 +759,7 @@
                         Editar Docente
                     </button>
                 </ng-container>
-                
+
                 <ng-container *ngIf="modoEdicionVista">
                     <button type="button" class="btn secondary" (click)="cancelarEdicionVista()">
                         Cancelar
@@ -967,9 +772,6 @@
         </div>
     </div>
 
-<app-toast-notification 
-    [visible]="showToast" 
-    [message]="toastMessage" 
-    [type]="toastType">
-</app-toast-notification>
+    <app-toast-notification [visible]="showToast" [message]="toastMessage" [type]="toastType">
+    </app-toast-notification>
 </main>

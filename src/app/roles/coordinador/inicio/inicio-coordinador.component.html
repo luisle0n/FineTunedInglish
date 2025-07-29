@@ -19,21 +19,24 @@
         <div class="metric-card">
             <div class="metric-text">
                 <h3>Aulas Asignadas</h3>
-                <p class="metric-value">18</p>
+                <p class="metric-value" *ngIf="!cargandoEstadisticas">{{ estadisticas.docentes.aulas_asignadas }}</p>
+                <div class="loading-skeleton" *ngIf="cargandoEstadisticas"></div>
             </div>
             <img src="img/entrada.png" alt="Aulas Asignadas" class="metric-icon" />
         </div>
         <div class="metric-card">
             <div class="metric-text">
                 <h3>Horas Programadas</h3>
-                <p class="metric-value">320</p>
+                <p class="metric-value" *ngIf="!cargandoEstadisticas">{{ estadisticas.docentes.horas_programadas }}</p>
+                <div class="loading-skeleton" *ngIf="cargandoEstadisticas"></div>
             </div>
             <img src="img/reloj-circular.png" alt="Horas Programadas" class="metric-icon" />
         </div>
         <div class="metric-card">
             <div class="metric-text">
                 <h3>Horas Disponibles</h3>
-                <p class="metric-value">80</p>
+                <p class="metric-value" *ngIf="!cargandoEstadisticas">{{ estadisticas.docentes.horas_disponibles }}</p>
+                <div class="loading-skeleton" *ngIf="cargandoEstadisticas"></div>
             </div>
             <img src="img/calendario.png" alt="Horas Disponibles" class="metric-icon" />
         </div>
@@ -77,7 +80,7 @@
 
         <div class="quick-actions">
             <h3>Acciones Rápidas</h3>
-            <button class="btn outline" (click)="mostrarModalAgregarAula()">
+            <button class="btn outline" (click)="mostrarModalAgregarAula()" type="button">
                 <img src="img/entrada.png" alt="Agregar Aula" class="icon" />
                 Agregar Aula
             </button>
@@ -93,28 +96,87 @@
     </section>
 
     <!-- Modal Agregar Aula -->
-    <div class="modal-backdrop" *ngIf="mostrarModalAula" (click)="cerrarModalAula()">
+    <!-- Debug: mostrarModalAula = {{ mostrarModalAula }} -->
+    <div class="modal-backdrop" *ngIf="mostrarModalAula" (click)="cerrarModalAula()" style="z-index: 9999 !important;">
         <div class="modal" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Agregar Aula</h3>
+                <h3>Crear Nueva Aula</h3>
                 <button class="btn-close" (click)="cerrarModalAula()">×</button>
             </div>
             <div class="modal-content">
                 <form (ngSubmit)="agregarAula()" #formAula="ngForm">
-                    <div class="form-group">
-                        <label for="nombre_aula">Nombre del Aula *</label>
-                        <input type="text" id="nombre_aula" name="nombre_aula" [(ngModel)]="nuevaAula.nombre" required>
+                    <!-- Información Básica -->
+                    <div class="form-section">
+                        <h4>Información Básica</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="numero">Número de Aula *</label>
+                                <input type="text" id="numero" name="numero" [(ngModel)]="nuevaAula.numero" required class="form-control" placeholder="Ej: A101">
+                            </div>
+                            <div class="form-group">
+                                <label for="ubicacion">Ubicación *</label>
+                                <input type="text" id="ubicacion" name="ubicacion" [(ngModel)]="nuevaAula.ubicacion" required class="form-control" placeholder="Ej: Edificio Principal">
+                            </div>
+                            <div class="form-group">
+                                <label for="piso">Piso *</label>
+                                <select id="piso" name="piso" [(ngModel)]="nuevaAula.piso" required class="form-control">
+                                    <option value="">Selecciona un piso</option>
+                                    <option value="Primer Piso">Primer Piso</option>
+                                    <option value="Segundo Piso">Segundo Piso</option>
+                                    <option value="Tercer Piso">Tercer Piso</option>
+                                    <option value="Cuarto Piso">Cuarto Piso</option>
+                                    <option value="Quinto Piso">Quinto Piso</option>
+                                    <option value="Sexto Piso">Sexto Piso</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="capacidad">Capacidad *</label>
+                                <input type="number" id="capacidad" name="capacidad" [(ngModel)]="nuevaAula.capacidad" required min="1" class="form-control" placeholder="Ej: 20">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="capacidad_aula">Capacidad *</label>
-                        <input type="number" id="capacidad_aula" name="capacidad_aula" [(ngModel)]="nuevaAula.capacidad" required min="1">
+
+                    <!-- Tipo y Rango de Edad -->
+                    <div class="form-section">
+                        <h4>Tipo y Rango de Edad</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="tipo_aula">Tipo de Aula *</label>
+                                <select id="tipo_aula" name="tipo_aula" [(ngModel)]="nuevaAula.tipo_aula" required class="form-control">
+                                    <option value="">Selecciona un tipo</option>
+                                    <option value="tiny_kids">Tiny Kids</option>
+                                    <option value="children">Children</option>
+                                    <option value="teens">Teens</option>
+                                    <option value="adults">Adults</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edad_minima">Edad Mínima *</label>
+                                <input type="number" id="edad_minima" name="edad_minima" [(ngModel)]="nuevaAula.edad_minima" required min="0" class="form-control" placeholder="Ej: 3">
+                            </div>
+                            <div class="form-group">
+                                <label for="edad_maxima">Edad Máxima *</label>
+                                <input type="number" id="edad_maxima" name="edad_maxima" [(ngModel)]="nuevaAula.edad_maxima" required min="0" class="form-control" placeholder="Ej: 6">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="piso_aula">Piso</label>
-                        <input type="text" id="piso_aula" name="piso_aula" [(ngModel)]="nuevaAula.piso">
+
+                    <!-- Configuración Adicional -->
+                    <div class="form-section">
+                        <h4>Configuración Adicional</h4>
+                        <div class="form-grid">
+                                  <!-- Campo para_ninos removido ya que no existe en la base de datos -->
+                        </div>
+                        <div class="form-group">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea id="observaciones" name="observaciones" [(ngModel)]="nuevaAula.observaciones" rows="3" class="form-control" placeholder="Descripción adicional del aula..."></textarea>
+                        </div>
                     </div>
+
                     <div class="modal-actions">
-                        <button type="submit" class="btn primary">Agregar Aula</button>
+                        <button type="submit" class="btn primary" [disabled]="!formAula.valid || guardandoAula">
+                            {{ guardandoAula ? 'Creando...' : 'Crear Aula' }}
+                        </button>
                         <button type="button" class="btn outline" (click)="cerrarModalAula()">Cancelar</button>
                     </div>
                 </form>

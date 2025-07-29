@@ -2,71 +2,42 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface Persona {
+  cedula: string;
+  primer_nombre: string;
+  segundo_nombre?: string;
+  primer_apellido: string;
+  segundo_apellido?: string;
+  correo: string;
+  telefono?: string;
+}
+
 export interface Docente {
   id: string;
-  experiencia_anios: number;
-  horas_disponibles: number;
-  activo: boolean;
-  persona: {
-    id: string;
-    cedula: string;
-    correo: string;
-    telefono: string;
-    primer_nombre: string;
-    segundo_nombre: string;
-    primer_apellido: string;
-    segundo_apellido: string;
-  };
-  tipo_contrato: {
+  persona?: Persona;
+  tipo_contrato?: {
     nombre: string;
   };
-  nivel_ingles: {
+  experiencia_anios: number;
+  nivel_ingles?: {
     nombre: string;
   };
-  especializaciones: Array<{
-    especializacion: {
-      nombre: string;
+  horas_disponibles?: number;
+  horas_asignadas?: number;
+  max_horas_semanales?: number;
+  puede_dar_sabados?: boolean;
+  especializaciones?: Array<{
+    especializacion?: {
+      id?: number;
+      nombre?: string;
     };
   }>;
-  horarios: Array<{
-    horario: {
-      dia: string;
-      hora_fin: string;
-      hora_inicio: string;
-    };
-  }>;
-  editValues?: {
-    correo: string;
-    telefono: string;
-    tipo_contrato_id: string;
-    experiencia_anios: number;
-    nivel_ingles_id: string;
-    horas_disponibles: number;
-    especializaciones: string[];
-  };
-}
-
-export interface DocentePayload {
-  docente_id: string;
-  persona_id: string;
-  primer_nombre: string;
-  segundo_nombre: string;
-  primer_apellido: string;
-  segundo_apellido: string;
-  cedula: string;
-  correo: string;
-  telefono: string;
-  tipo_contrato_id: string;
-  experiencia_anios: number;
-  nivel_ingles_id: string;
-  horas_disponibles: number;
-  especializaciones: string[];
-  horarios: string[];
-}
-
-export interface EstadoPayload {
-  docente_id: string;
   activo: boolean;
+  horarios?: Array<{
+    dia: string;
+    hora_inicio: string;
+    hora_fin: string;
+  }>;
 }
 
 @Injectable({
@@ -75,45 +46,62 @@ export interface EstadoPayload {
 export class DocenteService {
   private baseUrl = 'http://localhost:3000';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
+
+  // Obtener todos los docentes
+  getDocentes(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/docentes`);
+  }
 
   // Obtener docentes activos
-  getDocentesActivos(): Observable<Docente[]> {
-    return this.http.get<Docente[]>(`${this.baseUrl}/docentes`);
+  getDocentesActivos(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/docentes`);
   }
 
   // Obtener docentes inactivos
-  getDocentesInactivos(): Observable<Docente[]> {
-    return this.http.get<Docente[]>(`${this.baseUrl}/docentes/inactivos`);
+  getDocentesInactivos(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/docentes/inactivos`);
   }
 
-  // Crear nuevo docente
-  crearDocente(payload: Omit<DocentePayload, 'docente_id' | 'persona_id'>): Observable<any> {
-    return this.http.post(`${this.baseUrl}/docentes`, payload);
+  // Obtener catálogos
+  getTiposContrato(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/catalogos/tipos-contrato`);
   }
 
-  // Actualizar datos del docente
-  actualizarDocente(payload: DocentePayload): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/docentes`, payload);
+  getNivelesIngles(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/catalogos/niveles-ingles`);
   }
 
-  // Cambiar estado del docente
-  cambiarEstado(payload: EstadoPayload): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/docentes/estado`, payload);
+  getEspecializaciones(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/catalogos/especializaciones`);
   }
 
-  // Eliminar docente (cambiar a inactivo)
-  eliminarDocente(docenteId: string): Observable<any> {
-    return this.cambiarEstado({ docente_id: docenteId, activo: false });
+  getHorarios(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/catalogos/horarios`);
+  }
+
+  // Crear docente
+  crearDocente(docente: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/docentes`, docente);
+  }
+
+  // Actualizar docente
+  actualizarDocente(id: string, docente: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/docentes/${id}`, docente);
+  }
+
+  // Eliminar docente
+  eliminarDocente(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/docentes/${id}`);
   }
 
   // Reactivar docente
-  reactivarDocente(docenteId: string): Observable<any> {
-    return this.cambiarEstado({ docente_id: docenteId, activo: true });
+  reactivarDocente(id: string): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/docentes/${id}/restaurar`, {});
   }
 
-  // Cargar múltiples docentes desde Excel
-  cargarDocentesMasivo(docentes: any[]): Observable<any>[] {
-    return docentes.map(docente => this.crearDocente(docente));
+  // Cargar docentes masivamente
+  cargarDocentesMasivo(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/docentes/masivo`, data);
   }
 } 

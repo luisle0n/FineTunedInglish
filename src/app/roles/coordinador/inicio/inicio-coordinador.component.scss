@@ -508,4 +508,156 @@
             margin: 1rem;
         }
     }
+
+    // === ESTILOS ESPECÍFICOS PARA EL MODAL DE CREAR AULA ===
+    .modal-content {
+        padding: 1.5rem;
+
+        h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        // Estilos específicos para el formulario de crear aula
+        form {
+            .form-section {
+                margin-bottom: 2rem;
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid #e0e0e0;
+
+                &:last-of-type {
+                    border-bottom: none;
+                    margin-bottom: 1rem;
+                }
+
+                h4 {
+                    color: var(--primary-blue);
+                    margin-bottom: 1rem;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                }
+
+                .form-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 1rem;
+                    margin-bottom: 1rem;
+                }
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+
+                label {
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    color: #333;
+                    font-weight: 500;
+                    font-size: 0.9rem;
+                }
+
+                .form-control {
+                    width: 100%;
+                    padding: 0.75rem;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    font-size: 0.9rem;
+                    box-sizing: border-box;
+                    transition: border-color 0.3s ease;
+
+                    &:focus {
+                        outline: none;
+                        border-color: var(--primary-blue);
+                        box-shadow: 0 0 0 2px rgba(33, 51, 100, 0.1);
+                    }
+
+                    &::placeholder {
+                        color: #adb5bd;
+                    }
+                }
+
+                textarea.form-control {
+                    resize: vertical;
+                    min-height: 80px;
+                    font-family: inherit;
+                }
+
+                select.form-control {
+                    background-color: white;
+                    cursor: pointer;
+                }
+            }
+
+            .form-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 1rem;
+                margin-top: 1.5rem;
+                padding-top: 1rem;
+                border-top: 1px solid #e0e0e0;
+
+                .btn-secondary {
+                    background-color: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background 0.3s ease;
+
+                    &:hover {
+                        background-color: #5a6268;
+                    }
+                }
+
+                .btn-primary {
+                    background-color: var(--primary-blue);
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background 0.3s ease;
+
+                    &:hover:not(:disabled) {
+                        background-color: #1e40af;
+                    }
+
+                    &:disabled {
+                        background-color: #adb5bd;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+    }
+
+    // Responsive para el modal de crear aula
+    @media (max-width: 768px) {
+        .modal-content {
+            form {
+                .form-section {
+                    .form-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .form-actions {
+                    flex-direction: column;
+                    
+                    .btn {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
 }

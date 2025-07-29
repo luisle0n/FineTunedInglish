@@ -1,10 +1,11 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { DocenteService, Docente } from '../../../services/docente.service';
+import { DashboardService, DashboardStats } from '../../../services/dashboard.service';
 import { FormsModule } from '@angular/forms';
 import { Chart } from 'chart.js/auto';
 import { ToastNotificationComponent } from '../../../shared/components/toast-notification/toast-notification.component';
@@ -19,11 +20,16 @@ import { ToastNotificationComponent } from '../../../shared/components/toast-not
 
 export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   // Variables para estadísticas del dashboard
-  estadisticas: any = {
+  estadisticas: DashboardStats = {
     docentes: {
       docentes_activos: 0,
       docentes_inactivos: 0,
-      total_docentes: 0
+      total_docentes: 0,
+      aulas_asignadas: 0,
+      horas_programadas: 0,
+      horas_disponibles: 0,
+      distribucion_tipo_contrato: [],
+      distribucion_nivel_ingles: []
     }
   };
   cargandoEstadisticas = true;
@@ -37,12 +43,18 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   mostrarModalAula = false;
   mostrarModalClase = false;
   mostrarModalUsuario = false;
+  guardandoAula = false;
 
   // Datos para formularios
   nuevaAula: any = {
-    nombre: '',
+    numero: '',
+    ubicacion: '',
+    piso: '',
+    tipo_aula: '',
+    edad_minima: 0,
+    edad_maxima: 0,
     capacidad: 0,
-    piso: ''
+    observaciones: ''
   };
 
   nuevaClase: any = {
@@ -78,7 +90,9 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
     private router: Router, 
     private http: HttpClient, 
     private authService: AuthService,
-    private docenteService: DocenteService
+    private docenteService: DocenteService,
+    private dashboardService: DashboardService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -107,10 +121,11 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   cargarEstadisticas(): void {
     this.cargandoEstadisticas = true;
     
-    this.http.get<any>('http://localhost:3000/dashboard/estadisticas').subscribe({
+    this.dashboardService.getDashboardStats().subscribe({
       next: (response) => {
         if (response.success && response.dashboard) {
           this.estadisticas = response.dashboard;
+          this.procesarDatosParaGraficos();
         } else {
           console.error('❌ Respuesta inválida de la API');
         }
@@ -140,19 +155,19 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   // === PROCESAMIENTO DE DATOS PARA GRÁFICOS ===
   procesarDatosParaGraficos(): void {
     
-    // Procesar distribución por tipo de contrato
-    this.distribucionContratos = {};
-    this.docentes.forEach(docente => {
-      const tipoContrato = docente.tipo_contrato?.nombre || 'Sin Contrato';
-      this.distribucionContratos[tipoContrato] = (this.distribucionContratos[tipoContrato] || 0) + 1;
-    });
+    if (this.estadisticas.docentes?.distribucion_tipo_contrato) {
+      this.distribucionContratos = {};
+      this.estadisticas.docentes.distribucion_tipo_contrato.forEach((item: any) => {
+        this.distribucionContratos[item.tipo_contrato] = item.total;
+      });
+    }
     
-    // Procesar distribución por nivel de inglés
-    this.distribucionEdades = {};
-    this.docentes.forEach(docente => {
-      const nivelIngles = docente.nivel_ingles?.nombre || 'Sin Nivel';
-      this.distribucionEdades[nivelIngles] = (this.distribucionEdades[nivelIngles] || 0) + 1;
-    });
+    if (this.estadisticas.docentes?.distribucion_nivel_ingles) {
+      this.distribucionEdades = {};
+      this.estadisticas.docentes.distribucion_nivel_ingles.forEach((item: any) => {
+        this.distribucionEdades[item.nivel_ingles] = item.total;
+      });
+    }
     
   }
 
@@ -265,40 +280,65 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   // === ACCIONES RÁPIDAS ===
   mostrarModalAgregarAula(): void {
     this.mostrarModalAula = true;
+    this.cdr.detectChanges();
   }
 
   cerrarModalAula(): void {
     this.mostrarModalAula = false;
     this.limpiarFormularioAula();
+    this.cdr.detectChanges();
   }
 
   mostrarModalAgregarClase(): void {
     this.mostrarModalClase = true;
+    this.cdr.detectChanges();
   }
 
   cerrarModalClase(): void {
     this.mostrarModalClase = false;
     this.limpiarFormularioClase();
+    this.cdr.detectChanges();
   }
 
   mostrarModalAgregarUsuario(): void {
     this.mostrarModalUsuario = true;
+    this.cdr.detectChanges();
   }
 
   cerrarModalUsuario(): void {
     this.mostrarModalUsuario = false;
     this.limpiarFormularioUsuario();
+    this.cdr.detectChanges();
   }
 
   // === MÉTODOS DE FORMULARIOS ===
   agregarAula(): void {
-    this.http.post('http://localhost:3000/aulas', this.nuevaAula).subscribe({
-      next: (response) => {
-        this.showToastMessage('Aula agregada exitosamente. Puedes ir a la vista de Aulas para verla.', 'success');
+    this.guardandoAula = true;
+    
+    const datosAula = {
+      numero: Number(this.nuevaAula.numero),
+      ubicacion: this.nuevaAula.ubicacion,
+      piso: this.nuevaAula.piso,
+      tipo_aula: this.nuevaAula.tipo_aula,
+      edad_minima: Number(this.nuevaAula.edad_minima),
+      edad_maxima: Number(this.nuevaAula.edad_maxima),
+      capacidad: Number(this.nuevaAula.capacidad),
+      observaciones: this.nuevaAula.observaciones
+    };
+    
+    console.log('📤 JSON a enviar al crear aula:', JSON.stringify(datosAula, null, 2));
+    console.log('📋 Objeto datosAula completo:', datosAula);
+    
+    this.http.post('http://localhost:3000/aulas', datosAula).subscribe({
+      next: (response: any) => {
+        this.showToastMessage('Aula creada exitosamente. Puedes ir a la vista de Aulas para verla.', 'success');
         this.cerrarModalAula();
+        this.guardandoAula = false;
       },
       error: (error) => {
-        this.showToastMessage('Error al agregar el aula', 'error');
+        console.error('Error al crear aula:', error);
+        this.showToastMessage('Error al crear el aula. Verifica que todos los campos requeridos estén completos.', 'error');
+        this.guardandoAula = false;
       }
     });
   }
@@ -338,7 +378,16 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
   }
 
   limpiarFormularioAula(): void {
-    this.nuevaAula = { nombre: '', capacidad: 0, piso: '' };
+    this.nuevaAula = {
+      numero: '',
+      ubicacion: '',
+      piso: '',
+      tipo_aula: '',
+      edad_minima: 0,
+      edad_maxima: 0,
+      capacidad: 0,
+      observaciones: ''
+    };
   }
 
   limpiarFormularioClase(): void {
@@ -365,5 +414,18 @@ export class InicioCoordinadorComponent implements OnInit, AfterViewInit {
       telefono: '',
       password: ''
     };
+  }
+
+  private convertirABoolean(valor: any): boolean {
+    if (typeof valor === 'boolean') {
+      return valor;
+    }
+    if (typeof valor === 'string') {
+      return valor.toLowerCase() === 'true';
+    }
+    if (typeof valor === 'number') {
+      return valor !== 0;
+    }
+    return false;
   }
 }
